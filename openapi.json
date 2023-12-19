@@ -1,0 +1,2141 @@
+{
+  "components": {
+    "parameters": {
+      "OGC_sortby": {
+        "description": "\nDefine the sort order based on given property. Sort order is defined based on preceding '+' (asc) or '-' (desc).\n\nAvailable properties are: \"created\", \"updated\", \"datetime\".\n\nDefault sort is \"-created\".\n",
+        "in": "query",
+        "name": "sortby",
+        "required": false,
+        "schema": {
+          "items": {
+            "pattern": "[+|-]?[A-Za-z_].*",
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "STAC_bbox": {
+        "$ref": "https://api.stacspec.org/v1.0.0/item-search/openapi.yaml#/components/parameters/bbox"
+      },
+      "STAC_collectionsArray": {
+        "$ref": "https://api.stacspec.org/v1.0.0/item-search/openapi.yaml#/components/parameters/collectionsArray"
+      },
+      "STAC_collections_filter": {
+        "description": "\nA CQL2 filter expression for filtering sequences.\n\nAllowed properties are: \n * \"created\": upload date\n * \"updated\": last edit date\n * \"status\": status of the sequence. Can either be \"ready\" (for collections ready to be served) or \"deleted\"  for deleted collection. By default, only the \"ready\" collections will be shown.\n\nUsage doc can be found here: https://docs.geoserver.org/2.23.x/en/user/tutorials/cql/cql_tutorial.html\n\nExamples:\n\n* updated >= '2023-12-31'\n\n* updated BETWEEN '2018-01-01' AND '2023-12-31'\n\n* created <= '2023-01-01' AND updated >= '2018-01-01'\n",
+        "in": "query",
+        "name": "filter",
+        "required": false,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "STAC_collections_limit": {
+        "description": "Estimated number of collections that should be present in response. Defaults to 100. Note that response can contain a bit more or a bit less entries due to internal mechanisms.",
+        "in": "query",
+        "name": "limit",
+        "required": false,
+        "schema": {
+          "maximum": 1000,
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "STAC_datetime": {
+        "$ref": "https://api.stacspec.org/v1.0.0/item-search/openapi.yaml#/components/parameters/datetime"
+      },
+      "STAC_ids": {
+        "$ref": "https://api.stacspec.org/v1.0.0/item-search/openapi.yaml#/components/parameters/ids"
+      },
+      "STAC_intersects": {
+        "$ref": "https://api.stacspec.org/v1.0.0/item-search/openapi.yaml#/components/parameters/intersects"
+      },
+      "STAC_limit": {
+        "$ref": "https://api.stacspec.org/v1.0.0/item-search/openapi.yaml#/components/parameters/limit"
+      }
+    },
+    "responses": {
+      "STAC_search": {
+        "content": {
+          "application/geo+json": {
+            "schema": {
+              "$ref": "https://api.stacspec.org/v1.0.0/item-search/openapi.yaml#/components/schemas/itemCollection"
+            }
+          }
+        },
+        "description": "the items list"
+      }
+    },
+    "schemas": {
+      "GeoVisioCatalog": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/STACCatalog"
+          },
+          {
+            "properties": {
+              "links": {
+                "items": {
+                  "properties": {
+                    "extent": {
+                      "$ref": "#/components/schemas/STACExtentTemporal"
+                    },
+                    "geovisio:status": {
+                      "$ref": "#/components/schemas/GeoVisioCollectionStatus"
+                    },
+                    "stats:items": {
+                      "$ref": "#/components/schemas/STACStatsForItems"
+                    }
+                  },
+                  "required": [
+                    "href",
+                    "rel"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              }
+            },
+            "type": "object"
+          }
+        ]
+      },
+      "GeoVisioCollection": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/STACCollection"
+          },
+          {
+            "properties": {
+              "stats:items": {
+                "$ref": "#/components/schemas/STACStatsForItems"
+              }
+            },
+            "type": "object"
+          }
+        ]
+      },
+      "GeoVisioCollectionImportStatus": {
+        "properties": {
+          "items": {
+            "items": {
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "nb_errors": {
+                  "type": "integer"
+                },
+                "process_error": {
+                  "type": "string"
+                },
+                "processed_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "processing_in_progress": {
+                  "type": "bool"
+                },
+                "rank": {
+                  "type": "integer"
+                },
+                "status": {
+                  "$ref": "#/components/schemas/GeoVisioItemStatus"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "status": {
+            "$ref": "#/components/schemas/GeoVisioCollectionStatus"
+          }
+        },
+        "type": "object"
+      },
+      "GeoVisioCollectionItems": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/STACCollectionItems"
+          },
+          {
+            "$ref": "#/components/schemas/STACLinks"
+          },
+          {
+            "properties": {
+              "features": {
+                "items": {
+                  "$ref": "#/components/schemas/GeoVisioItem"
+                },
+                "type": "array"
+              }
+            },
+            "type": "object"
+          }
+        ]
+      },
+      "GeoVisioCollectionOfCollection": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/STACCollection"
+          },
+          {
+            "properties": {
+              "links": {
+                "items": {
+                  "properties": {
+                    "created": {
+                      "description": "Upload date of the collection",
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "extent": {
+                      "$ref": "#/components/schemas/STACExtentTemporal"
+                    },
+                    "geovisio:status": {
+                      "$ref": "#/components/schemas/GeoVisioCollectionStatus"
+                    },
+                    "stats:items": {
+                      "$ref": "#/components/schemas/STACStatsForItems"
+                    },
+                    "updated": {
+                      "description": "Update date of the collection",
+                      "format": "date-time",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "href",
+                    "rel"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              }
+            },
+            "type": "object"
+          }
+        ]
+      },
+      "GeoVisioCollectionStatus": {
+        "enum": [
+          "ready",
+          "broken",
+          "preparing",
+          "waiting-for-process"
+        ],
+        "type": "string"
+      },
+      "GeoVisioCollections": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/STACCollections"
+          },
+          {
+            "$ref": "#/components/schemas/STACLinks"
+          },
+          {
+            "properties": {
+              "collections": {
+                "items": {
+                  "$ref": "#/components/schemas/GeoVisioCollection"
+                },
+                "type": "array"
+              }
+            },
+            "type": "object"
+          }
+        ]
+      },
+      "GeoVisioCollectionsRSS": {
+        "properties": {
+          "channel": {
+            "properties": {
+              "description": {
+                "type": "string"
+              },
+              "docs": {
+                "format": "uri",
+                "type": "string"
+              },
+              "generator": {
+                "type": "string"
+              },
+              "image": {
+                "properties": {
+                  "link": {
+                    "format": "uri",
+                    "type": "string"
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "url": {
+                    "format": "uri",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "item": {
+                "items": {
+                  "$ref": "#/components/schemas/GeoVisioItemRSS"
+                },
+                "type": "array"
+              },
+              "language": {
+                "type": "string"
+              },
+              "lastBuildDate": {
+                "type": "string"
+              },
+              "link": {
+                "format": "uri",
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "title",
+              "link",
+              "description",
+              "generator",
+              "docs"
+            ],
+            "type": "object"
+          },
+          "version": {
+            "example": "2.0",
+            "type": "string",
+            "xml": {
+              "attribute": true
+            }
+          }
+        },
+        "required": [
+          "version",
+          "channel"
+        ],
+        "type": "object",
+        "xml": {
+          "name": "rss"
+        }
+      },
+      "GeoVisioConfiguration": {
+        "properties": {
+          "auth": {
+            "properties": {
+              "enabled": {
+                "type": "boolean"
+              },
+              "user_profile": {
+                "properties": {
+                  "url": {
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "required": [
+              "enabled"
+            ],
+            "type": "object"
+          },
+          "license": {
+            "properties": {
+              "id": {
+                "description": "SPDX id of the license",
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "auth"
+        ],
+        "type": "object"
+      },
+      "GeoVisioItem": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/STACItem"
+          },
+          {
+            "properties": {
+              "properties": {
+                "properties": {
+                  "geovisio:image": {
+                    "format": "uri",
+                    "type": "string"
+                  },
+                  "geovisio:producer": {
+                    "type": "string"
+                  },
+                  "geovisio:status": {
+                    "$ref": "#/components/schemas/GeoVisioItemStatus"
+                  },
+                  "geovisio:thumbnail": {
+                    "format": "uri",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          }
+        ]
+      },
+      "GeoVisioItemRSS": {
+        "properties": {
+          "author": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "enclosure": {
+            "properties": {
+              "length": {
+                "type": "integer",
+                "xml": {
+                  "attribute": true
+                }
+              },
+              "type": {
+                "type": "string",
+                "xml": {
+                  "attribute": true
+                }
+              },
+              "url": {
+                "format": "uri",
+                "type": "string",
+                "xml": {
+                  "attribute": true
+                }
+              }
+            },
+            "type": "object"
+          },
+          "encoded": {
+            "type": "string",
+            "xml": {
+              "namespace": "http://purl.org/rss/1.0/modules/content/",
+              "prefix": "content"
+            }
+          },
+          "guid": {
+            "format": "uri",
+            "type": "string"
+          },
+          "link": {
+            "format": "uri",
+            "type": "string"
+          },
+          "point": {
+            "type": "string",
+            "xml": {
+              "namespace": "http://www.georss.org/georss",
+              "prefix": "georss"
+            }
+          },
+          "pubDate": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "link",
+          "description",
+          "author",
+          "pubDate",
+          "point"
+        ],
+        "type": "object"
+      },
+      "GeoVisioItemStatus": {
+        "enum": [
+          "ready",
+          "broken",
+          "waiting-for-process"
+        ],
+        "type": "string"
+      },
+      "GeoVisioLanding": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/STACLanding"
+          },
+          {
+            "properties": {
+              "extent": {
+                "$ref": "#/components/schemas/STACExtent"
+              }
+            },
+            "type": "object"
+          }
+        ]
+      },
+      "GeoVisioPatchCollection": {
+        "properties": {
+          "title": {
+            "description": "The sequence title (publicly displayed)",
+            "type": "string"
+          },
+          "visible": {
+            "default": "null",
+            "description": "Should the sequence be publicly visible ?",
+            "enum": [
+              "true",
+              "false",
+              "null"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "GeoVisioPatchItem": {
+        "properties": {
+          "visible": {
+            "default": "null",
+            "description": "Should the picture be publicly visible ?",
+            "enum": [
+              "true",
+              "false",
+              "null"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "GeoVisioPostCollection": {
+        "properties": {
+          "title": {
+            "description": "The sequence title",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "GeoVisioPostItem": {
+        "patternProperties": {
+          "override_(Exif|Xmp)\\..+": {
+            "description": "An EXIF or XMP tag to use instead of existing one in picture file metadata. The query name can be any valid Exiv2 property name.",
+            "type": "string"
+          }
+        },
+        "properties": {
+          "isBlurred": {
+            "default": "false",
+            "description": "Is picture blurred",
+            "enum": [
+              "true",
+              "false",
+              "null"
+            ],
+            "type": "string"
+          },
+          "override_capture_time": {
+            "description": "datetime when the picture was taken. It will change the picture's metadata with this datetime. It should be an iso 3339 formated datetime (like '2017-07-21T17:32:28Z')",
+            "format": "date-time",
+            "type": "string"
+          },
+          "override_latitude": {
+            "description": "latitude of the picture in decimal degrees (WGS84 / EPSG:4326). It will change the picture's metadata with this latitude.",
+            "format": "double",
+            "type": "number"
+          },
+          "override_longitude": {
+            "description": "longitude of the picture in decimal degrees (WGS84 / EPSG:4326). It will change the picture's metadata with this longitude.",
+            "format": "double",
+            "type": "number"
+          },
+          "picture": {
+            "description": "Picture to upload",
+            "format": "binary",
+            "type": "string"
+          },
+          "position": {
+            "description": "Position of picture in sequence (starting from 1)",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "GeoVisioTokens": {
+        "items": {
+          "properties": {
+            "description": {
+              "type": "string"
+            },
+            "generated_at": {
+              "type": "string"
+            },
+            "id": {
+              "type": "string"
+            },
+            "links": {
+              "items": {
+                "properties": {
+                  "href": {
+                    "type": "string"
+                  },
+                  "ref": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "type": "object"
+        },
+        "type": "array"
+      },
+      "GeoVisioUser": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "links": {
+            "items": {
+              "properties": {
+                "href": {
+                  "type": "string"
+                },
+                "ref": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "GeoVisioUserAuth": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "oauth_id": {
+            "type": "string"
+          },
+          "oauth_provider": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "JWToken": {
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "generated_at": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "jwt_token": {
+            "description": "this jwt_token will be needed to authenticate future queries as Bearer token",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "JWTokenClaimable": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/JWToken"
+          },
+          {
+            "properties": {
+              "links": {
+                "items": {
+                  "properties": {
+                    "href": {
+                      "type": "string"
+                    },
+                    "ref": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              }
+            },
+            "type": "object"
+          }
+        ]
+      },
+      "STACCatalog": {
+        "$ref": "https://api.stacspec.org/v1.0.0/core/openapi.yaml#/components/schemas/catalog"
+      },
+      "STACCollection": {
+        "$ref": "https://api.stacspec.org/v1.0.0/collections/openapi.yaml#/components/schemas/collection"
+      },
+      "STACCollectionItems": {
+        "properties": {
+          "features": {
+            "items": {
+              "$ref": "#/components/schemas/STACItem"
+            },
+            "type": "array"
+          },
+          "links": {
+            "$ref": "https://api.stacspec.org/v1.0.0/ogcapi-features/openapi.yaml#/components/schemas/links"
+          },
+          "numberMatched": {
+            "$ref": "https://api.stacspec.org/v1.0.0/ogcapi-features/openapi.yaml#/components/schemas/numberMatched"
+          },
+          "numberReturned": {
+            "$ref": "https://api.stacspec.org/v1.0.0/ogcapi-features/openapi.yaml#/components/schemas/numberReturned"
+          },
+          "timeStamp": {
+            "$ref": "https://api.stacspec.org/v1.0.0/ogcapi-features/openapi.yaml#/components/schemas/timeStamp"
+          },
+          "type": {
+            "enum": [
+              "FeatureCollection"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "features"
+        ],
+        "type": "object"
+      },
+      "STACCollections": {
+        "$ref": "https://api.stacspec.org/v1.0.0/collections/openapi.yaml#/components/schemas/collections"
+      },
+      "STACConformance": {
+        "$ref": "http://schemas.opengis.net/ogcapi/features/part1/1.0/openapi/schemas/confClasses.yaml"
+      },
+      "STACExtent": {
+        "$ref": "https://api.stacspec.org/v1.0.0/collections/openapi.yaml#/components/schemas/extent"
+      },
+      "STACExtentTemporal": {
+        "properties": {
+          "temporal": {
+            "$ref": "https://api.stacspec.org/v1.0.0/collections/openapi.yaml#/components/schemas/extent/properties/temporal"
+          }
+        },
+        "type": "object"
+      },
+      "STACItem": {
+        "description": "A GeoJSON Feature augmented with foreign members that contain values relevant to a STAC entity",
+        "properties": {
+          "assets": {
+            "$ref": "https://api.stacspec.org/v1.0.0/ogcapi-features/openapi.yaml#/components/schemas/assets"
+          },
+          "geometry": {
+            "$ref": "https://api.stacspec.org/v1.0.0/ogcapi-features/openapi.yaml#/components/schemas/pointGeoJSON"
+          },
+          "id": {
+            "$ref": "https://api.stacspec.org/v1.0.0/ogcapi-features/openapi.yaml#/components/schemas/itemId"
+          },
+          "links": {
+            "$ref": "https://api.stacspec.org/v1.0.0/ogcapi-features/openapi.yaml#/components/schemas/links"
+          },
+          "properties": {
+            "$ref": "https://api.stacspec.org/v1.0.0/ogcapi-features/openapi.yaml#/components/schemas/properties"
+          },
+          "stac_extensions": {
+            "$ref": "https://api.stacspec.org/v1.0.0/ogcapi-features/openapi.yaml#/components/schemas/stac_extensions"
+          },
+          "stac_version": {
+            "$ref": "https://api.stacspec.org/v1.0.0/ogcapi-features/openapi.yaml#/components/schemas/stac_version"
+          },
+          "type": {
+            "$ref": "https://api.stacspec.org/v1.0.0/ogcapi-features/openapi.yaml#/components/schemas/itemType"
+          }
+        },
+        "required": [
+          "stac_version",
+          "id",
+          "type",
+          "geometry",
+          "bbox",
+          "links",
+          "properties",
+          "assets"
+        ],
+        "type": "object"
+      },
+      "STACItemSearchBody": {
+        "$ref": "https://api.stacspec.org/v1.0.0/item-search/openapi.yaml#/components/schemas/searchBody"
+      },
+      "STACLanding": {
+        "$ref": "https://api.stacspec.org/v1.0.0/core/openapi.yaml#/components/schemas/landingPage"
+      },
+      "STACLinks": {
+        "properties": {
+          "links": {
+            "$ref": "https://api.stacspec.org/v1.0.0/collections/openapi.yaml#/components/schemas/links"
+          }
+        },
+        "type": "object"
+      },
+      "STACStatsForItems": {
+        "$ref": "https://stac-extensions.github.io/stats/v0.2.0/schema.json#/definitions/stats_for_items"
+      }
+    },
+    "securitySchemes": {
+      "bearerToken": {
+        "bearerFormat": "JWT",
+        "scheme": "bearer",
+        "type": "http"
+      },
+      "cookieAuth": {
+        "in": "cookie",
+        "name": "session",
+        "type": "apiKey"
+      }
+    }
+  },
+  "info": {
+    "contact": {
+      "email": "panieravide@riseup.net",
+      "name": "GeoVisio team",
+      "url": "https://gitlab.com/geovisio/api"
+    },
+    "description": "Hosting and display of geolocated pictures",
+    "title": "geovisio",
+    "version": "2.3.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeoVisioLanding"
+                }
+              }
+            },
+            "description": "the Catalog listing resources available in this API. A non-standard \"extent\" property is also available (note that this may evolve in the future)"
+          }
+        },
+        "summary": "Retrieves API resources list",
+        "tags": [
+          "Metadata"
+        ]
+      }
+    },
+    "/api/auth/tokens/generate": {
+      "post": {
+        "description": "<br/>The response contains the JWT token, and this token can be saved, but won't be usable until someone claims it with /auth/tokens/claims/:id<br/><br/>The response contains the claim route as a link with `rel`=`claim`.<br/>",
+        "parameters": [
+          {
+            "description": "optional description of the token",
+            "in": "query",
+            "name": "description",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JWTokenClaimable"
+                }
+              }
+            },
+            "description": "The newly generated token"
+          }
+        },
+        "summary": "Generate a new token, not associated to any user",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/auth/tokens/{token_id}/claim": {
+      "get": {
+        "description": "<br/>The token will now be associated to the logged user.<br/><br/>Only one user can claim a token<br/>",
+        "parameters": [
+          {
+            "description": "Token ID",
+            "in": "path",
+            "name": "token_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The token has been correctly associated to the account"
+          }
+        },
+        "summary": "Claim a non associated token",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/collections": {
+      "get": {
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/STAC_collections_limit"
+          },
+          {
+            "deprecated": true,
+            "description": "Deprecated, use \"filter\" parameter instead (`filter=created > some_date`). Filter for collection uploaded after this date. To filter by capture date, use datetime instead.",
+            "in": "query",
+            "name": "created_after",
+            "required": false,
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            }
+          },
+          {
+            "deprecated": true,
+            "description": "Deprecated, use \"filter\" parameter instead (`filter=created < some_date`). Filter for collection uploaded before this date. To filter by capture date, use datetime instead.",
+            "in": "query",
+            "name": "created_before",
+            "required": false,
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Expected output format (STAC JSON or RSS XML)",
+            "in": "query",
+            "name": "format",
+            "required": false,
+            "schema": {
+              "default": "json",
+              "enum": [
+                "rss",
+                "json"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/STAC_bbox"
+          },
+          {
+            "$ref": "#/components/parameters/STAC_collections_filter"
+          },
+          {
+            "description": "Filter sequence by capture date. To filter by upload date, use \"filter\" parameter instead.\nYou can filter by a single date or a date interval, open or closed.\nAdhere to RFC 3339. Open intervals are expressed using double-dots.\nThis endpoint will only answer based on date (not time) value, even if time can be set in query (for STAC compatibility purposes).\nExamples:\n* A date-time: \"2018-02-12\"\n* A closed interval: \"2018-02-12/2018-03-18\"\n* Open intervals: \"2018-02-12/..\" or \"../2018-03-18\"",
+            "explode": false,
+            "in": "query",
+            "name": "datetime",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeoVisioCollections"
+                }
+              },
+              "application/rss+xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeoVisioCollectionsRSS"
+                }
+              }
+            },
+            "description": "the list of available collections"
+          }
+        },
+        "summary": "List available collections",
+        "tags": [
+          "Sequences"
+        ]
+      },
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GeoVisioPostCollection"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/GeoVisioPostCollection"
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/GeoVisioPostCollection"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeoVisioCollection"
+                }
+              }
+            },
+            "description": "the collection metadata"
+          }
+        },
+        "security": [
+          {
+            "bearerToken": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "summary": "Create a new sequence",
+        "tags": [
+          "Upload"
+        ]
+      }
+    },
+    "/api/collections/{collectionId}": {
+      "delete": {
+        "description": "The associated images will be hidden right away and deleted asynchronously<br/>",
+        "parameters": [
+          {
+            "description": "ID of the collection",
+            "in": "path",
+            "name": "collectionId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The collection has been correctly deleted"
+          }
+        },
+        "security": [
+          {
+            "bearerToken": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "summary": "Delete a collection and all the associated pictures",
+        "tags": [
+          "Editing"
+        ]
+      },
+      "get": {
+        "parameters": [
+          {
+            "description": "ID of collection to retrieve",
+            "in": "path",
+            "name": "collectionId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeoVisioCollection"
+                }
+              }
+            },
+            "description": "the collection metadata"
+          }
+        },
+        "summary": "Retrieve metadata of a single collection",
+        "tags": [
+          "Sequences"
+        ]
+      },
+      "patch": {
+        "parameters": [
+          {
+            "description": "The sequence ID",
+            "in": "path",
+            "name": "collectionId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GeoVisioPatchCollection"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/GeoVisioPatchCollection"
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/GeoVisioPatchCollection"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeoVisioCollection"
+                }
+              }
+            },
+            "description": "the wanted collection"
+          }
+        },
+        "security": [
+          {
+            "bearerToken": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "summary": "Edits properties of an existing collection",
+        "tags": [
+          "Editing"
+        ]
+      }
+    },
+    "/api/collections/{collectionId}/geovisio_status": {
+      "get": {
+        "parameters": [
+          {
+            "description": "ID of collection to retrieve",
+            "in": "path",
+            "name": "collectionId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeoVisioCollectionImportStatus"
+                }
+              }
+            },
+            "description": "the pictures statuses"
+          }
+        },
+        "summary": "Retrieve import status of all pictures in sequence",
+        "tags": [
+          "Upload"
+        ]
+      }
+    },
+    "/api/collections/{collectionId}/items": {
+      "get": {
+        "parameters": [
+          {
+            "description": "ID of collection to retrieve",
+            "in": "path",
+            "name": "collectionId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Number of items that should be present in response. Unlimited by default.",
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "maximum": 10000,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Position of last received picture in sequence. Response will start with the following picture.",
+            "in": "query",
+            "name": "startAfterRank",
+            "required": false,
+            "schema": {
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Used in the pagination context, if present, the api will return the given picture in the results. Can be used in the same time as the `limit` parameter, but not with the `startAfterRank` parameter.",
+            "in": "query",
+            "name": "withPicture",
+            "required": false,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/geo+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeoVisioCollectionItems"
+                }
+              }
+            },
+            "description": "the items list"
+          }
+        },
+        "summary": "List items of a single collection",
+        "tags": [
+          "Sequences"
+        ]
+      },
+      "post": {
+        "parameters": [
+          {
+            "description": "ID of sequence to add this picture into",
+            "in": "path",
+            "name": "collectionId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/GeoVisioPostItem"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/geo+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeoVisioItem"
+                }
+              }
+            },
+            "description": "the added picture metadata"
+          }
+        },
+        "security": [
+          {
+            "bearerToken": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "summary": "Add a new picture in a given sequence",
+        "tags": [
+          "Upload"
+        ]
+      }
+    },
+    "/api/collections/{collectionId}/items/{itemId}": {
+      "delete": {
+        "parameters": [
+          {
+            "description": "ID of sequence the picture belongs to",
+            "in": "path",
+            "name": "collectionId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "ID of picture to edit",
+            "in": "path",
+            "name": "itemId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The object has been correctly deleted"
+          }
+        },
+        "security": [
+          {
+            "bearerToken": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "summary": "Delete an existing picture",
+        "tags": [
+          "Editing"
+        ]
+      },
+      "get": {
+        "parameters": [
+          {
+            "description": "ID of collection to retrieve",
+            "in": "path",
+            "name": "collectionId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "ID of item to retrieve",
+            "in": "path",
+            "name": "itemId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "102": {
+            "content": {
+              "application/geo+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeoVisioItem"
+                }
+              }
+            },
+            "description": "the item (which is still under process)"
+          },
+          "200": {
+            "content": {
+              "application/geo+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeoVisioItem"
+                }
+              }
+            },
+            "description": "the wanted item"
+          }
+        },
+        "summary": "Get a single item from a collection",
+        "tags": [
+          "Pictures"
+        ]
+      },
+      "patch": {
+        "parameters": [
+          {
+            "description": "ID of sequence the picture belongs to",
+            "in": "path",
+            "name": "collectionId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "ID of picture to edit",
+            "in": "path",
+            "name": "itemId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GeoVisioPatchItem"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/GeoVisioPatchItem"
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/GeoVisioPatchItem"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/geo+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeoVisioItem"
+                }
+              }
+            },
+            "description": "the wanted item"
+          }
+        },
+        "security": [
+          {
+            "bearerToken": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "summary": "Edits properties of an existing picture",
+        "tags": [
+          "Editing"
+        ]
+      }
+    },
+    "/api/collections/{collectionId}/thumb.jpg": {
+      "get": {
+        "parameters": [
+          {
+            "description": "ID of collection to retrieve",
+            "in": "path",
+            "name": "collectionId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "image/jpeg": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "500px wide ready-for-display image"
+          }
+        },
+        "summary": "Get the thumbnail representing a single collection",
+        "tags": [
+          "Sequences"
+        ]
+      }
+    },
+    "/api/configuration": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeoVisioConfiguration"
+                }
+              }
+            },
+            "description": "Information about the instance configuration"
+          }
+        },
+        "summary": "Return instance configuration informations",
+        "tags": [
+          "Metadata"
+        ]
+      }
+    },
+    "/api/conformance": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/STACConformance"
+                }
+              }
+            },
+            "description": "the list of definitions this API conforms to"
+          }
+        },
+        "summary": "List definitions this API conforms to",
+        "tags": [
+          "Metadata"
+        ]
+      }
+    },
+    "/api/docs/specs.json": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "https://spec.openapis.org/oas/3.0/schema/2021-09-28"
+                }
+              }
+            },
+            "description": "JSON file documenting API routes"
+          }
+        },
+        "summary": "The OpenAPI 3 specification for this API",
+        "tags": [
+          "Metadata"
+        ]
+      }
+    },
+    "/api/docs/swagger": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "text/html": {}
+            },
+            "description": "API Swagger"
+          }
+        },
+        "summary": "The human-readable API documentation",
+        "tags": [
+          "Metadata"
+        ]
+      }
+    },
+    "/api/map/{z}/{x}/{y}.{format}": {
+      "get": {
+        "description": "<br/>Vector tiles contains possibly two layers : sequences and pictures.<br/><br/>Layer \"sequences\":<br/>  - Available on all zoom levels<br/>  - Available properties (all levels)<br/>    - id (sequence ID)<br/>  - Other properties (available on zoom levels >= 13)<br/>    - account_id<br/>    - model (camera make and model)<br/>    - type (flat or equirectangular)<br/>    - date (capture date, as YYYY-MM-DD)<br/><br/>Layer \"pictures\":<br/>  - Available on zoom levels >= 13<br/>  - Available properties:<br/>    - id (picture ID)<br/>    - account_id<br/>    - ts (picture date/time)<br/>    - heading (picture heading in degrees)<br/>        - sequences (list of sequences ID this pictures belongs to)<br/>    - type (flat or equirectangular)<br/>    - model (camera make and model)<br/>",
+        "parameters": [
+          {
+            "description": "Zoom level (6 to 14)",
+            "in": "path",
+            "name": "z",
+            "required": true,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "description": "X coordinate",
+            "in": "path",
+            "name": "x",
+            "required": true,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "description": "Y coordinate",
+            "in": "path",
+            "name": "y",
+            "required": true,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "description": "Tile format (mvt, pbf)",
+            "in": "path",
+            "name": "format",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/vnd.mapbox-vector-tile": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Sequences vector tile"
+          }
+        },
+        "summary": "Get pictures and sequences as vector tiles",
+        "tags": [
+          "Map",
+          "Pictures",
+          "Sequences"
+        ]
+      }
+    },
+    "/api/pictures/{pictureId}/hd.{format}": {
+      "get": {
+        "parameters": [
+          {
+            "description": "ID of picture to retrieve",
+            "in": "path",
+            "name": "pictureId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Wanted format for output image (either jpg or webp)",
+            "in": "path",
+            "name": "format",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "image/jpeg": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              },
+              "image/webp": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "High-definition"
+          }
+        },
+        "summary": "Get picture image (high-definition)",
+        "tags": [
+          "Pictures"
+        ]
+      }
+    },
+    "/api/pictures/{pictureId}/sd.{format}": {
+      "get": {
+        "parameters": [
+          {
+            "description": "ID of picture to retrieve",
+            "in": "path",
+            "name": "pictureId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Wanted format for output image (either jpg or webp)",
+            "in": "path",
+            "name": "format",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "image/jpeg": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              },
+              "image/webp": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Standard definition (width of 2048px)"
+          }
+        },
+        "summary": "Get picture image (standard definition)",
+        "tags": [
+          "Pictures"
+        ]
+      }
+    },
+    "/api/pictures/{pictureId}/thumb.{format}": {
+      "get": {
+        "parameters": [
+          {
+            "description": "ID of picture to retrieve",
+            "in": "path",
+            "name": "pictureId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Wanted format for output image (either jpg or webp)",
+            "in": "path",
+            "name": "format",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "image/jpeg": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              },
+              "image/webp": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "500px wide ready-for-display image"
+          }
+        },
+        "summary": "Get picture thumbnail",
+        "tags": [
+          "Pictures"
+        ]
+      }
+    },
+    "/api/pictures/{pictureId}/tiled/{col}_{row}.{format}": {
+      "get": {
+        "parameters": [
+          {
+            "description": "ID of picture to retrieve",
+            "in": "path",
+            "name": "pictureId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Tile column ID",
+            "in": "path",
+            "name": "col",
+            "required": true,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "description": "Tile row ID",
+            "in": "path",
+            "name": "row",
+            "required": true,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "description": "Wanted format for output image (either jpg or webp)",
+            "in": "path",
+            "name": "format",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "image/jpeg": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              },
+              "image/webp": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Tile image (size depends of original image resolution, square with side size around 512px)"
+          }
+        },
+        "summary": "Get picture tile",
+        "tags": [
+          "Pictures"
+        ]
+      }
+    },
+    "/api/search": {
+      "get": {
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/STAC_bbox"
+          },
+          {
+            "$ref": "#/components/parameters/STAC_intersects"
+          },
+          {
+            "$ref": "#/components/parameters/STAC_datetime"
+          },
+          {
+            "$ref": "#/components/parameters/STAC_limit"
+          },
+          {
+            "$ref": "#/components/parameters/STAC_ids"
+          },
+          {
+            "$ref": "#/components/parameters/STAC_collectionsArray"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/STAC_search"
+          }
+        },
+        "summary": "Search through all available items",
+        "tags": [
+          "Pictures"
+        ]
+      },
+      "post": {
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/STAC_search"
+          }
+        },
+        "summary": "Search through all available items",
+        "tags": [
+          "Pictures"
+        ]
+      }
+    },
+    "/api/users/me": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeoVisioUser"
+                }
+              }
+            },
+            "description": "Information about the logged account"
+          }
+        },
+        "summary": "Get current logged user informations",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/api/users/me/catalog": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeoVisioCatalog"
+                }
+              }
+            },
+            "description": "the Catalog listing all sequences associated to given user. Note that it's similar to the user's colletion, but with less metadata since a STAC collection is an enhanced STAC catalog."
+          }
+        },
+        "summary": "Get current logged user catalog",
+        "tags": [
+          "Users",
+          "Sequences"
+        ]
+      }
+    },
+    "/api/users/me/collection": {
+      "get": {
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/STAC_collections_limit"
+          },
+          {
+            "$ref": "#/components/parameters/STAC_collections_filter"
+          },
+          {
+            "$ref": "#/components/parameters/OGC_sortby"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeoVisioCollection"
+                }
+              }
+            },
+            "description": "the Collection listing all sequences associated to given user. Note that it's similar to the user's catalog, but with more metadata since a STAC collection is an enhanced STAC catalog."
+          }
+        },
+        "summary": "Get current logged user collection",
+        "tags": [
+          "Users",
+          "Sequences"
+        ]
+      }
+    },
+    "/api/users/me/tokens": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeoVisioTokens"
+                }
+              }
+            },
+            "description": "the token list"
+          }
+        },
+        "summary": "List the tokens of a authenticated user",
+        "tags": [
+          "Auth",
+          "Users"
+        ]
+      }
+    },
+    "/api/users/me/tokens/{token_id}": {
+      "delete": {
+        "description": "<br/>This token will not be usable anymore<br/>",
+        "parameters": [
+          {
+            "description": "ID of the token",
+            "in": "path",
+            "name": "token_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The token has been correctly deleted"
+          }
+        },
+        "summary": "Delete a token corresponding to a token id.",
+        "tags": [
+          "Auth"
+        ]
+      },
+      "get": {
+        "description": "<br/>This token will be needed to authenticate others api calls<br/>",
+        "parameters": [
+          {
+            "description": "ID of the token",
+            "in": "path",
+            "name": "token_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JWToken"
+                }
+              }
+            },
+            "description": "The token, with it's JWT counterpart."
+          }
+        },
+        "summary": "Get the JWT token corresponding to a token id.",
+        "tags": [
+          "Auth",
+          "Users"
+        ]
+      }
+    },
+    "/api/users/{userId}/catalog/": {
+      "get": {
+        "parameters": [
+          {
+            "description": "User ID",
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeoVisioCatalog"
+                }
+              }
+            },
+            "description": "the Catalog listing all sequences associated to given user"
+          }
+        },
+        "summary": "Retrieves an user list of sequences (catalog)",
+        "tags": [
+          "Sequences",
+          "Users"
+        ]
+      }
+    },
+    "/api/users/{userId}/collection": {
+      "get": {
+        "description": "<br/>It's quite the same as \"/users/<uuid:userId>/catalog/\" but with additional information, as a STAC collection have more metadatas than STAC catalogs.<br/><br/>Links contain information of user sequences (child), as well as pagination links (next/prev).<br/><br/>Also, links are filtered to match passed conditions, so you can have pagination and filters on client-side.<br/><br/>Note that on paginated results, filter can only be used with column used in sortby parameter.<br/><br/>",
+        "parameters": [
+          {
+            "description": "User ID",
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/STAC_collections_limit"
+          },
+          {
+            "$ref": "#/components/parameters/STAC_collections_filter"
+          },
+          {
+            "$ref": "#/components/parameters/OGC_sortby"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeoVisioCollectionOfCollection"
+                }
+              }
+            },
+            "description": "the Collection listing all sequences associated to given user"
+          }
+        },
+        "summary": "Retrieves an collection of the user list collections",
+        "tags": [
+          "Sequences",
+          "Users"
+        ]
+      }
+    }
+  },
+  "tags": [
+    {
+      "description": "API metadata",
+      "name": "Metadata"
+    },
+    {
+      "description": "Collections of pictures",
+      "name": "Sequences"
+    },
+    {
+      "description": "Geolocated images",
+      "name": "Pictures"
+    },
+    {
+      "description": "Tiles for web map display",
+      "name": "Map"
+    },
+    {
+      "description": "Sending pictures & sequences",
+      "name": "Upload"
+    },
+    {
+      "description": "Modifying pictures & sequences",
+      "name": "Editing"
+    },
+    {
+      "description": "Account management",
+      "name": "Users"
+    },
+    {
+      "description": "User authentication",
+      "name": "Auth"
+    }
+  ]
+}

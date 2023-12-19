@@ -1,0 +1,106 @@
+{
+	"info": {
+		"_postman_id": "5b7fb4f6-2969-4c31-9ff0-f8d31c9dae97",
+		"name": "Panoramax",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get Collections",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/api/collections?",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"collections"
+					],
+					"query": [
+						{
+							"key": "",
+							"value": null
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Collection",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"title\": \"FirstCollection\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5000/api/collections",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"collections"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Post picture to Collection",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "isBlurred",
+							"value": "false",
+							"type": "default"
+						},
+						{
+							"key": "position",
+							"value": "1",
+							"type": "default"
+						},
+						{
+							"key": "picture",
+							"type": "file",
+							"src": "/C:/Workspace/Nobelisation/panoramax_mobile/test/pictures/background-beautiful-blossom-calm-waters-268533.jpg"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:5000/api/collections/77d0424b-d87b-47a9-a935-03253cb1c111/items",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"collections",
+						"77d0424b-d87b-47a9-a935-03253cb1c111",
+						"items"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
