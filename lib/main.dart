@@ -1,5 +1,18 @@
+library panoramax;
+
 import 'package:flutter/material.dart';
-import 'package:panoramax_mobile/page/homepage.dart';
+import '../service/api/api.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:panoramax_mobile/service/api/model/geo_visio.dart';
+import 'package:intl/intl.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
+part 'component/collection_preview.dart';
+part 'page/homepage.dart';
+
+
+final DateFormat DATE_FORMATTER = DateFormat.yMd();
 
 void main() {
   runApp(const MyApp());
@@ -32,7 +45,17 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const HomePage(title: 'Flutter Demo Home Page'),
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('en'),
+        Locale('fr'),
+      ],
+      home: const HomePage(title: 'Panoramax'),
     );
   }
 }
