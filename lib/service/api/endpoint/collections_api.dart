@@ -29,13 +29,10 @@ class CollectionsApi {
               Uri.http(API_HOSTNAME, '/api/collections', queryParams);
 
     var response = await http.get(url);
-    if(response.statusCode >= 400) {
-      throw new Exception(response.statusCode/* + response.body*/);
-    } else if(response.body != null) {
-      return
-          GeoVisioCollections.fromJson(json.decode(response.body));
+    if(response.statusCode >= 200) {
+      return GeoVisioCollections.fromJson(json.decode(response.body));
     } else {
-      return null;
+      throw new Exception('${response.statusCode} - ${response.body}');
     }
   }
 }

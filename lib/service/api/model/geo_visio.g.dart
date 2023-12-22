@@ -44,6 +44,14 @@ Map<String, dynamic> _$GeoVisioProviderToJson(GeoVisioProvider instance) =>
       'url': instance.url,
     };
 
+StatsItems _$StatsItemsFromJson(Map<String, dynamic> json) =>
+    StatsItems()..count = json['count'] as int;
+
+Map<String, dynamic> _$StatsItemsToJson(StatsItems instance) =>
+    <String, dynamic>{
+      'count': instance.count,
+    };
+
 GeoVisioCollection _$GeoVisioCollectionFromJson(Map<String, dynamic> json) =>
     GeoVisioCollection()
       ..stac_version = json['stac_version'] as String
@@ -51,7 +59,7 @@ GeoVisioCollection _$GeoVisioCollectionFromJson(Map<String, dynamic> json) =>
           ?.map((e) => e as String)
           .toList()
       ..id = json['id'] as String
-      ..title = json['title'] as String?
+      ..title = json['title'] as String
       ..description = json['description'] as String
       ..keywords =
           (json['keywords'] as List<dynamic>?)?.map((e) => e as String).toList()
@@ -63,9 +71,13 @@ GeoVisioCollection _$GeoVisioCollectionFromJson(Map<String, dynamic> json) =>
       ..links = (json['links'] as List<dynamic>)
           .map((e) => GeoVisioLink.fromJson(e as Map<String, dynamic>))
           .toList()
-      ..summaries = (json['summaries'] as List<dynamic>)
-          .map((e) => GeoVisioLink.fromJson(e as Map<String, dynamic>))
-          .toList();
+      ..summaries = (json['summaries'] as List<dynamic>?)
+          ?.map((e) => e as Object)
+          .toList()
+      ..created = json['created'] as String
+      ..updated = json['updated'] as String
+      ..stats_items =
+          StatsItems.fromJson(json['stats:items'] as Map<String, dynamic>);
 
 Map<String, dynamic> _$GeoVisioCollectionToJson(GeoVisioCollection instance) =>
     <String, dynamic>{
@@ -80,6 +92,9 @@ Map<String, dynamic> _$GeoVisioCollectionToJson(GeoVisioCollection instance) =>
       'providers': instance.providers,
       'links': instance.links,
       'summaries': instance.summaries,
+      'created': instance.created,
+      'updated': instance.updated,
+      'stats:items': instance.stats_items,
     };
 
 GeoVisioCollections _$GeoVisioCollectionsFromJson(Map<String, dynamic> json) =>
