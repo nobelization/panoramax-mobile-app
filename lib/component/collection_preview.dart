@@ -93,7 +93,11 @@ class CollectionPreview extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Text(
-                    DATE_FORMATTER.format(DateTime.parse(collection.updated)),
+                    DATE_FORMATTER.format(DateTime.parse(
+                        collection.updated != null ?
+                        collection.updated! :
+                        collection.created
+                    )),
                     style: GoogleFonts.nunito(
                       fontSize: 14,
                       color: Colors.grey[500],

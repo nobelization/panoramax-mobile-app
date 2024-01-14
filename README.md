@@ -21,3 +21,8 @@ samples, guidance on mobile development, and a full API reference.
 ```shell
 docker-compose up -d
 ```
+
+### Generating translation
+```shell
+dart run build_runner build
+```

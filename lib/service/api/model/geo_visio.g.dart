@@ -75,7 +75,7 @@ GeoVisioCollection _$GeoVisioCollectionFromJson(Map<String, dynamic> json) =>
           ?.map((e) => e as Object)
           .toList()
       ..created = json['created'] as String
-      ..updated = json['updated'] as String
+      ..updated = json['updated'] as String?
       ..stats_items =
           StatsItems.fromJson(json['stats:items'] as Map<String, dynamic>);
 
