@@ -1,5 +1,8 @@
 {
-  "yourCollection": "Your collections",
+  "newSequenceNameField": "Name",
+  "newSequenceNameField_placeholder": "Enter the new sequence name",
+  "newSequenceSendButton": "Send",
+  "yourSequence": "Your sequences",
   "element": "element(s)",
-  "createCollection_tooltip": "Create a new collection"
+  "createSequence_tooltip": "Create a new sequence"
 }

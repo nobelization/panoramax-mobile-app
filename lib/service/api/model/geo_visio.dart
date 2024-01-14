@@ -60,7 +60,7 @@ class GeoVisioCollection {
   late List<GeoVisioLink> links;
   late List<Object>? summaries;
   late String created;
-  late String updated;
+  String? updated;
   @JsonKey(name: "stats:items")
   late StatsItems stats_items;
 

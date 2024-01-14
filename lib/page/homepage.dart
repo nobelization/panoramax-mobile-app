@@ -1,44 +1,31 @@
 part of panoramax;
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
+  const HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  CollectionsApi collectionsApi = CollectionsApi();
   late Future<GeoVisioCollections?> futureCollections;
 
   @override
   void initState() {
     super.initState();
-    futureCollections = collectionsApi.apiCollectionsGet();
+    futureCollections = CollectionsApi.INSTANCE.apiCollectionsGet();
   }
 
   Future<void> _createCollection() async {
-
+    await availableCameras().then((value) => Navigator.push(context,
+        MaterialPageRoute(builder: (_) => CapturePage(cameras: value)))
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-      ),
+      appBar: PanoramaxAppBar(context: context),
       body: RefreshIndicator (
         child: SingleChildScrollView(
           physics: AlwaysScrollableScrollPhysics(),
@@ -48,7 +35,7 @@ class _HomePageState extends State<HomePage> {
               Container(
                 margin: const EdgeInsets.fromLTRB(10, 10, 10, 10),
                 child: Text(
-                  AppLocalizations.of(context)!.yourCollection,
+                  AppLocalizations.of(context)!.yourSequence,
                   style: GoogleFonts.nunito(
                     fontSize: 25,
                     fontWeight: FontWeight.w400
@@ -63,21 +50,23 @@ class _HomePageState extends State<HomePage> {
                       children: snapshot.data!.collections.map((collection) => CollectionPreview(collection)).toList(),
                     );
                   } else if (snapshot.hasError) {
-                    return Text('An error occured');
+                    return const Center(child: Text('An error occured'));
                   }
-                  return const CircularProgressIndicator();
+                  return const Center(child: CircularProgressIndicator());
                 }
               )
             ]
           ),
         ),
         onRefresh: () async {
-          setState(() {});
+          setState(() {
+            futureCollections = CollectionsApi.INSTANCE.apiCollectionsGet();
+          });
         },
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _createCollection,
-        tooltip: AppLocalizations.of(context)!.createCollection_tooltip,
+        tooltip: AppLocalizations.of(context)!.createSequence_tooltip,
         child: const Icon(Icons.add),
       )
     );
