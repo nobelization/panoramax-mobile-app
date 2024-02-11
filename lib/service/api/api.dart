@@ -8,5 +8,5 @@ import 'dart:io';
 
 part 'endpoint/collections_api.dart';
 
-const String API_HOSTNAME = '192.168.1.12:5000';
+const String API_HOSTNAME = '10.0.2.2:5000';
 const bool API_IS_HTTPS = false;

@@ -1,8 +1,16 @@
 {
-  "newSequenceNameField": "Name",
-  "newSequenceNameField_placeholder": "Enter the new sequence name",
-  "newSequenceSendButton": "Send",
   "yourSequence": "Your sequences",
   "element": "element(s)",
-  "createSequence_tooltip": "Create a new sequence"
+  "createSequence_tooltip": "Create a new sequence",
+  "unknownError": "Oops ! An error occured...",
+  "emptyError": "No element found",
+  "loading": "Loading...",
+
+  "capture": "Take a picture",
+  "switchCamera": "Switch camera",
+  "createSequenceWithPicture_tooltip": "Create a new sequence with captured pictures",
+
+  "newSequenceNameField": "Name",
+  "newSequenceNameField_placeholder": "Enter the new sequence name",
+  "newSequenceSendButton": "Send"
 }

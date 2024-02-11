@@ -3,6 +3,7 @@ part of panoramax.api;
 class CollectionsApi {
 
   static final CollectionsApi INSTANCE = new CollectionsApi();
+  static final HTTP_CONNECTION_TIMEOUT = const Duration(seconds: 15);
 
   ///
   /// List available collections
@@ -45,11 +46,15 @@ class CollectionsApi {
       Uri.https(API_HOSTNAME, '/api/collections') :
       Uri.http(API_HOSTNAME, '/api/collections');
 
-    var request = http.MultipartRequest('POST', url)
-      ..fields['title'] = '${newCollectionName}';
-    var streamedResponse = await request.send();
-    var response = await http.Response.fromStream(streamedResponse);
-
+    var response = await http.post(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'title': newCollectionName,
+      }),
+    );
     if(response.statusCode >= 200) {
       return GeoVisioCollection.fromJson(json.decode(response.body));
     } else {

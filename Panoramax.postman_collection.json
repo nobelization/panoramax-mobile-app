@@ -33,12 +33,23 @@
 		},
 		{
 			"name": "Create Collection",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
 			"request": {
 				"method": "POST",
-				"header": [],
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json;charset=uft8",
+						"type": "default"
+					}
+				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"title\": \"FirstCollection\"\r\n}",
+					"raw": "{\r\n    \"title\": \"Anoth+er --\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -55,6 +66,47 @@
 					"path": [
 						"api",
 						"collections"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API info",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true,
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json;charset=uft8",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"title\": \"Another --\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5000/api/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						""
 					]
 				}
 			},
@@ -86,7 +138,7 @@
 					]
 				},
 				"url": {
-					"raw": "http://localhost:5000/api/collections/77d0424b-d87b-47a9-a935-03253cb1c111/items",
+					"raw": "http://localhost:5000/api/collections/7ed76872-2580-4a7b-95cd-afb6bc23229c/items",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -95,8 +147,29 @@
 					"path": [
 						"api",
 						"collections",
-						"77d0424b-d87b-47a9-a935-03253cb1c111",
+						"7ed76872-2580-4a7b-95cd-afb6bc23229c",
 						"items"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Collection",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/api/collections/77d0424b-d87b-47a9-a935-03253cb1c111",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"collections",
+						"77d0424b-d87b-47a9-a935-03253cb1c111"
 					]
 				}
 			},

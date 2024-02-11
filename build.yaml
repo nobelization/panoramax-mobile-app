@@ -1,0 +1,5 @@
+targets:
+  $default:
+    builders:
+      uuv_flutter|generateTests:
+        options:

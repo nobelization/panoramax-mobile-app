@@ -1,8 +1,16 @@
 {
-  "newSequenceNameField": "Nom",
-  "newSequenceNameField_placeholder": "Saisissez le nom de la nouvelle séquence",
-  "newSequenceSendButton": "Envoyer",
   "yourSequence": "Vos séquences",
   "element": "élément(s)",
-  "createSequence_tooltip": "Créer une nouvelle séquence"
+  "createSequence_tooltip": "Créer une nouvelle séquence",
+  "unknownError": "Oops ! Une erreur s'est produite...",
+  "emptyError": "Aucun élément trouvé",
+  "loading": "Chargement...",
+
+  "capture": "Prendre la une photo",
+  "switchCamera": "Changer de camera",
+  "createSequenceWithPicture_tooltip": "Créer une nouvelle séquence avec les photos prises",
+
+  "newSequenceNameField": "Nom",
+  "newSequenceNameField_placeholder": "Saisissez le nom de la nouvelle séquence",
+  "newSequenceSendButton": "Envoyer"
 }

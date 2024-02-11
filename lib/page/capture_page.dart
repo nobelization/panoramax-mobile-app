@@ -26,10 +26,8 @@ class _CapturePageState extends State<CapturePage> {
     initCamera(widget.cameras![0]);
   }
 
-  Future goToCollectionCreationPage(){
-    return Navigator.push(context,
-        MaterialPageRoute(builder: (_) => CollectionCreationPage(imgList: _imgListCaptured))
-    );
+  void goToCollectionCreationPage(){
+    context.push(Routes.newSequenceSend, extra: _imgListCaptured);
   }
 
   Future takePicture() async {
@@ -43,10 +41,6 @@ class _CapturePageState extends State<CapturePage> {
       await _cameraController.setFlashMode(FlashMode.off);
       final XFile rawImage = await _cameraController.takePicture();
       debugPrint(rawImage.path);
-      File imageFile = File(rawImage.path);
-
-      int currentUnix = DateTime.now().millisecondsSinceEpoch;
-      String fileFormat = imageFile.path.split('.').last;
 
       bool storagePermission = await Permission.storage.isGranted;
       bool mediaPermission = await Permission.accessMediaLocation.isGranted;
@@ -70,7 +64,7 @@ class _CapturePageState extends State<CapturePage> {
         locationPermission = (await Permission.location.request()).isGranted;
       }
 
-      bool isPermissionGranted = storagePermission && mediaPermission && manageExternalStoragePermission;
+      bool isPermissionGranted = locationPermission && mediaPermission && manageExternalStoragePermission;
 
       if (isPermissionGranted) {
         final exif = FlutterExif.fromPath(rawImage.path);
@@ -79,7 +73,8 @@ class _CapturePageState extends State<CapturePage> {
         await exif.setAltitude(currentLocation.altitude);
         await exif.saveAttributes();
         setState(() {
-          _imgListCaptured.add(new File(rawImage.path));
+          var capturedPicture = new File(rawImage.path);
+          _imgListCaptured.add(capturedPicture);
         });
       } else {
         throw Exception("No permission to move file");
@@ -98,6 +93,7 @@ class _CapturePageState extends State<CapturePage> {
         if (!mounted) return;
         setState(() {});
       });
+      await _cameraController.setFocusMode(FocusMode.locked);
     } on CameraException catch (e) {
       debugPrint("camera error $e");
     }
@@ -136,6 +132,7 @@ class _CapturePageState extends State<CapturePage> {
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(),
                           icon: const Icon(Icons.circle_outlined, color: Colors.white),
+                          tooltip: AppLocalizations.of(context)!.capture
                         )),
                   ]),
                 )
@@ -162,7 +159,8 @@ class _CapturePageState extends State<CapturePage> {
                                     () => _isRearCameraSelected = !_isRearCameraSelected);
                             initCamera(widget.cameras![_isRearCameraSelected ? 0 : 1]);
                           },
-                        )),
+                          tooltip: AppLocalizations.of(context)!.switchCamera
+                    )),
                     _imgListCaptured.length > 0 ? badges.Badge(
                       badgeContent: Text('${_imgListCaptured.length}'),
                       child: cartIcon,
@@ -174,6 +172,7 @@ class _CapturePageState extends State<CapturePage> {
                           icon: Icon(Icons.send_outlined,
                               color: Colors.white),
                           onPressed: goToCollectionCreationPage,
+                          tooltip: AppLocalizations.of(context)!.createSequenceWithPicture_tooltip
                         )),
                   ]),
                 )
