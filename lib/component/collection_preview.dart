@@ -93,7 +93,7 @@ class CollectionPreview extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Text(
-                    DATE_FORMATTER.format(DateTime.parse(
+                    DateFormat(DATE_FORMATTER).format(DateTime.parse(
                         collection.updated != null ?
                         collection.updated! :
                         collection.created

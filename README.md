@@ -22,7 +22,17 @@ samples, guidance on mobile development, and a full API reference.
 docker-compose up -d
 ```
 
+### Redirect WSL port (Only for docker WSL)
+```shell
+netsh interface portproxy add v4tov4 listenport=5000 listenaddress=0.0.0.0 connectport=5000 connectaddress=<your-wsl-ip>
+```
+To retrieve <your-wsl-ip> execute the following command from your wsl machine :
+```shell
+ip add | grep "eth0
+```
+
 ### Generating translation
 ```shell
-dart run build_runner build
+flutter clean
+flutter pub get
 ```

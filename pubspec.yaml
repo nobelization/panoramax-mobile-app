@@ -47,6 +47,8 @@ dependencies:
   flutter_localization: ^0.2.0
   intl: ^0.18.1
   camera: ^0.10.5+9
+  go_router: ^13.2.0
+  equatable: ^2.0.5
 
 dev_dependencies:
   flutter_test:

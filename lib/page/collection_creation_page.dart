@@ -23,10 +23,8 @@ class _CarouselWithIndicatorState extends State<CollectionCreationPage> {
     super.dispose();
   }
 
-  Future goToHomePage(){
-    return Navigator.push(context,
-        MaterialPageRoute(builder: (_) => HomePage())
-    );
+  void goToHomePage(){
+    context.push(Routes.homepage, extra: availableCameras);
   }
 
   @override
@@ -93,7 +91,6 @@ class _CarouselWithIndicatorState extends State<CollectionCreationPage> {
                     height: 50,
                     borderRadius: 8,
                     animate: true,
-                    color: Colors.green,
                     width: MediaQuery.of(context).size.width * 0.45,
                     loader: Container(
                       padding: const EdgeInsets.all(10),
