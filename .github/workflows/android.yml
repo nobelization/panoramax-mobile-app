@@ -20,5 +20,5 @@ jobs:
         java-version: '1.8'
         distribution: 'temurin'
     - uses: subosito/flutter-action@v1
-       with:
+      with:
           flutter-version: '2.5.0'
