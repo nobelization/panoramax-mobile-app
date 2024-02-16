@@ -14,11 +14,13 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: set up Java
-      uses: actions/setup-java@v3
+    - uses: subosito/flutter-action@v2
       with:
-        java-version: '1.8'
-        distribution: 'temurin'
-    - uses: subosito/flutter-action@v1
+          channel: 'stable'
+    - name: Build apk
+      run: flutter build apk --debug
+    - name: Upload APK
+      uses: actions/upload-artifact@v4
       with:
-          flutter-version: '2.5.0'
+         name: app_debug
+         path: app/build/app/outputs/flutter-apk/app-debug.apk
