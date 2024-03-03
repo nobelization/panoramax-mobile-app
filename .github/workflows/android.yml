@@ -9,18 +9,46 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v4
-    - uses: subosito/flutter-action@v2
-      with:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+            channel: 'stable'
+      - name: Build apk
+        run: flutter build apk --debug
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+           name: app_debug
+           path: build/app/outputs/flutter-apk/app-debug.apk
+
+  integration-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        api-level: [ 34 ]
+        target: [ playstore ]
+    needs: [ build ]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
           channel: 'stable'
-    - name: Build apk
-      run: flutter build apk --debug
-    - name: Upload APK
-      uses: actions/upload-artifact@v4
-      with:
-         name: app_debug
-         path: build/app/outputs/flutter-apk/app-debug.apk
+      - name: Retrieve dependencies
+        run: dart pub get
+      - name: Generate tests
+        run: dart run build_runner build --delete-conflicting-outputs
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Run Flutter Driver tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          target: ${{ matrix.target }}
+          api-level: ${{ matrix.api-level }}
+          arch: x86_64
+          profile: Nexus 6
+          script: flutter test integration_test

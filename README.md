@@ -31,8 +31,18 @@ To retrieve <your-wsl-ip> execute the following command from your wsl machine :
 ip add | grep "eth0
 ```
 
-### Generating translation
+### Generate translation
 ```shell
 flutter clean
 flutter pub get
+```
+
+### Generate integration tests
+```shell  
+dart run build_runner build --delete-conflicting-outputs
+```
+
+### Run integration tests
+```shell  
+flutter test integration_test
 ```
