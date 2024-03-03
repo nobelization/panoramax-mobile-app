@@ -36,8 +36,11 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _createCollection() async {
+    if (!await PermissionHelper.isPermissionGranted()) {
+      await PermissionHelper.askMissingPermission();
+    }
     await availableCameras().then((availableCameras) =>
-      context.push(Routes.newSequenceCapture, extra: availableCameras)
+        context.push(Routes.newSequenceCapture, extra: availableCameras)
     );
   }
   

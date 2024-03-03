@@ -38,46 +38,12 @@ class _CapturePageState extends State<CapturePage> {
       return null;
     }
     try {
-      await _cameraController.setFlashMode(FlashMode.off);
-      final XFile rawImage = await _cameraController.takePicture();
-      debugPrint(rawImage.path);
-
-      bool storagePermission = await Permission.storage.isGranted;
-      bool mediaPermission = await Permission.accessMediaLocation.isGranted;
-      bool manageExternalStoragePermission = await Permission.manageExternalStorage.isGranted;
-      bool locationPermission = await Permission.location.isGranted;
-
-      if (!storagePermission) {
-        storagePermission = await Permission.storage.request().isGranted;
-      }
-
-      if (!mediaPermission) {
-        mediaPermission =
-        await Permission.accessMediaLocation.request().isGranted;
-      }
-
-      if (!manageExternalStoragePermission) {
-        manageExternalStoragePermission = (await Permission.manageExternalStorage.request()).isGranted;
-      }
-
-      if (!locationPermission) {
-        locationPermission = (await Permission.location.request()).isGranted;
-      }
-
-      bool isPermissionGranted = locationPermission && mediaPermission && manageExternalStoragePermission;
-
-      if (isPermissionGranted) {
-        final exif = FlutterExif.fromPath(rawImage.path);
-        final currentLocation = await Geolocator.getCurrentPosition();
-        await exif.setLatLong(currentLocation.latitude, currentLocation.longitude);
-        await exif.setAltitude(currentLocation.altitude);
-        await exif.saveAttributes();
-        setState(() {
-          var capturedPicture = new File(rawImage.path);
-          _imgListCaptured.add(capturedPicture);
-        });
+      if (await PermissionHelper.isPermissionGranted()) {
+        XFile rawImage = await getPictureFromCamera();
+        await addExifTags(rawImage);
+        addImageToList(rawImage);
       } else {
-        throw Exception("No permission to move file");
+        await PermissionHelper.askMissingPermission();
       }
     } on CameraException catch (e) {
       debugPrint('Error occured while taking picture: $e');
@@ -85,9 +51,31 @@ class _CapturePageState extends State<CapturePage> {
     }
   }
 
+  void addImageToList(XFile rawImage) {
+    setState(() {
+      var capturedPicture = new File(rawImage.path);
+      _imgListCaptured.add(capturedPicture);
+    });
+  }
+
+  Future<XFile> getPictureFromCamera() async {
+    await _cameraController.setFlashMode(FlashMode.off);
+    final XFile rawImage = await _cameraController.takePicture();
+    debugPrint(rawImage.path);
+    return rawImage;
+  }
+
+  Future<void> addExifTags(XFile rawImage) async {
+    final exif = FlutterExif.fromPath(rawImage.path);
+    final currentLocation = await Geolocator.getCurrentPosition();
+    await exif.setLatLong(currentLocation.latitude, currentLocation.longitude);
+    await exif.setAltitude(currentLocation.altitude);
+    await exif.saveAttributes();
+  }
+
   Future initCamera(CameraDescription cameraDescription) async {
     _cameraController =
-        CameraController(cameraDescription, ResolutionPreset.high);
+        CameraController(cameraDescription, ResolutionPreset.high, enableAudio: false);
     try {
       await _cameraController.initialize().then((_) {
         if (!mounted) return;
