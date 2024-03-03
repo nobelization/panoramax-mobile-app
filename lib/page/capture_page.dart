@@ -39,11 +39,18 @@ class _CapturePageState extends State<CapturePage> {
     }
     try {
       if (await PermissionHelper.isPermissionGranted()) {
-        XFile rawImage = await getPictureFromCamera();
-        await addExifTags(rawImage);
-        addImageToList(rawImage);
+        await Future.wait([
+          getPictureFromCamera(),
+          Geolocator.getCurrentPosition()
+        ]).then((value) async {
+          final XFile rawImage = value[0] as XFile;
+          final Position currentLocation = value[1] as Position;
+          await addExifTags(rawImage, currentLocation);
+          addImageToList(rawImage);
+        });
       } else {
         await PermissionHelper.askMissingPermission();
+        takePicture();
       }
     } on CameraException catch (e) {
       debugPrint('Error occured while taking picture: $e');
@@ -65,9 +72,8 @@ class _CapturePageState extends State<CapturePage> {
     return rawImage;
   }
 
-  Future<void> addExifTags(XFile rawImage) async {
+  Future<void> addExifTags(XFile rawImage, Position currentLocation) async {
     final exif = FlutterExif.fromPath(rawImage.path);
-    final currentLocation = await Geolocator.getCurrentPosition();
     await exif.setLatLong(currentLocation.latitude, currentLocation.longitude);
     await exif.setAltitude(currentLocation.altitude);
     await exif.saveAttributes();
