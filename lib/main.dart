@@ -17,7 +17,7 @@ import 'package:go_router/go_router.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:loading_btn/loading_btn.dart';
-
+import 'package:permission_handler/permission_handler.dart';
 import 'service/api/api.dart';
 
 part 'component/app_bar.dart';
@@ -26,6 +26,7 @@ part 'page/homepage.dart';
 part 'page/capture_page.dart';
 part 'page/collection_creation_page.dart';
 part 'service/routing.dart';
+part 'service/permission_helper.dart';
 
 
 final String DATE_FORMATTER = 'dd/MM/y HH:mm:ss';
