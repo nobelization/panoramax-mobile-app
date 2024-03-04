@@ -34,7 +34,9 @@ class CollectionsApi {
 
     var response = await http.get(url);
     if(response.statusCode >= 200) {
-      return GeoVisioCollections.fromJson(json.decode(response.body));
+      var geovisioCollections = GeoVisioCollections.fromJson(json.decode(response.body));
+      geovisioCollections.collections.sort((a, b) => b.updated!.compareTo(a.updated!));
+      return geovisioCollections;
     } else {
       throw new Exception('${response.statusCode} - ${response.body}');
     }
