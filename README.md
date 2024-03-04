@@ -24,6 +24,7 @@ docker-compose up -d
 
 ### Redirect WSL port (Only for docker WSL)
 ```shell
+netsh interface portproxy delete v4tov4 listenport=5000 listenaddress=0.0.0.0
 netsh interface portproxy add v4tov4 listenport=5000 listenaddress=0.0.0.0 connectport=5000 connectaddress=<your-wsl-ip>
 ```
 To retrieve <your-wsl-ip> execute the following command from your wsl machine :
