@@ -9,6 +9,7 @@
   "capture": "Take a picture",
   "switchCamera": "Switch camera",
   "createSequenceWithPicture_tooltip": "Create a new sequence with captured pictures",
+  "waitDuringProcessing": "Processing, please wait...",
 
   "newSequenceNameField": "Name",
   "newSequenceNameField_placeholder": "Enter the new sequence name",

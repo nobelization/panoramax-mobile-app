@@ -17,7 +17,9 @@ import 'package:go_router/go_router.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:loading_btn/loading_btn.dart';
+import 'component/loader.dart';
 import 'service/api/api.dart';
+import 'constant.dart';
 
 part 'component/app_bar.dart';
 part 'component/collection_preview.dart';
@@ -42,7 +44,7 @@ class PanoramaxApp extends StatelessWidget {
     return MaterialApp.router(
       title: 'Panoramax',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
+        colorScheme: ColorScheme.fromSeed(seedColor: DEFAULT_COLOR),
         useMaterial3: true,
       ),
       localizationsDelegates: const [
