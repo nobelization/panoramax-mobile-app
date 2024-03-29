@@ -68,34 +68,26 @@ class _HomePageState extends State<HomePage> {
         },
         child: Scaffold(
             appBar: PanoramaxAppBar(context: context),
-            body: SingleChildScrollView(
-              child: Stack(
+        body: Column(
                 children: <Widget>[
                   Container(
                       margin: const EdgeInsets.fromLTRB(10, 10, 10, 10),
                       child: Semantics(
                         header: true,
-                        child: Text(
-                            AppLocalizations.of(context)!.yourSequence,
-                            style: GoogleFonts.nunito(
-                                fontSize: 25,
-                                fontWeight: FontWeight.w400
-                            )
+                child: Text(AppLocalizations.of(context)!.yourSequence,
+                    style: GoogleFonts.nunito(fontSize: 25, fontWeight: FontWeight.w400)),
                         ),
-                      )
-                  ),
-                  SizedBox(
-                      height: 720,
-                      child: displayBody(isLoading)
-                  )
-                ]
+            ),
+            Expanded(
+              child: displayBody(isLoading),
               ),
+          ],
             ),
             floatingActionButton: FloatingActionButton(
               onPressed: _createCollection,
               tooltip: AppLocalizations.of(context)!.createSequence_tooltip,
               child: const Icon(Icons.add),
-            )
+        ),
         ),
     );
   }
@@ -113,13 +105,10 @@ class CollectionListView extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView.builder(
       itemCount: collections.length,
-      shrinkWrap: true,
-      physics: BouncingScrollPhysics(
-          parent: AlwaysScrollableScrollPhysics()
-      ),
+      physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
       itemBuilder: (BuildContext context, int index) {
         return CollectionPreview(collections[index]);
-      }
+      },
     );
   }
 }
