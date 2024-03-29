@@ -10,6 +10,7 @@
   "switchCamera": "Changer de camera",
   "createSequenceWithPicture_tooltip": "Créer une nouvelle séquence avec les photos prises",
   "waitDuringProcessing": "Traitement en cours, veuillez patienter...",
+  "noCameraFoundError": "Pas de caméra trouvée pour cet appareil",
 
   "newSequenceNameField": "Nom",
   "newSequenceNameField_placeholder": "Saisissez le nom de la nouvelle séquence",
