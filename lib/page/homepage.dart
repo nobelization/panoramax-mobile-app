@@ -39,56 +39,57 @@ class _HomePageState extends State<HomePage> {
     if (!await PermissionHelper.isPermissionGranted()) {
       await PermissionHelper.askMissingPermission();
     }
-    await availableCameras().then((availableCameras) =>
-        context.push(Routes.newSequenceCapture, extra: availableCameras)
+    await availableCameras().then(
+      (availableCameras) => context.push(Routes.newSequenceCapture, extra: availableCameras),
     );
   }
-  
+
   Widget displayBody(isLoading) {
-    if(isLoading)
-      return LoaderIndicatorView();
-    else if(geoVisionCollections == null)
-      return UnkownErrorView();
-    else if(geoVisionCollections!.collections.length != 0)
+    if (isLoading) {
+      return const LoaderIndicatorView();
+    } else if (geoVisionCollections == null) {
+      return const UnknownErrorView();
+    } else if (geoVisionCollections!.collections.isNotEmpty) {
       return CollectionListView(collections: geoVisionCollections!.collections);
-    else
-      return NoElementView();
+    } else {
+      return const NoElementView();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
-        displacement: 250,
-        strokeWidth: 3,
-        triggerMode: RefreshIndicatorTriggerMode.onEdge,
-        onRefresh: () async {
-          setState(() {
-            getCollections();
-          });
-        },
-        child: Scaffold(
-            appBar: PanoramaxAppBar(context: context),
+      displacement: 250,
+      strokeWidth: 3,
+      triggerMode: RefreshIndicatorTriggerMode.onEdge,
+      onRefresh: () async {
+        setState(() {
+          getCollections();
+        });
+      },
+      child: Scaffold(
+        appBar: PanoramaxAppBar(context: context),
         body: Column(
-                children: <Widget>[
-                  Container(
-                      margin: const EdgeInsets.fromLTRB(10, 10, 10, 10),
-                      child: Semantics(
-                        header: true,
+          children: <Widget>[
+            Container(
+              margin: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+              child: Semantics(
+                header: true,
                 child: Text(AppLocalizations.of(context)!.yourSequence,
                     style: GoogleFonts.nunito(fontSize: 25, fontWeight: FontWeight.w400)),
-                        ),
+              ),
             ),
             Expanded(
               child: displayBody(isLoading),
-              ),
-          ],
             ),
-            floatingActionButton: FloatingActionButton(
-              onPressed: _createCollection,
-              tooltip: AppLocalizations.of(context)!.createSequence_tooltip,
-              child: const Icon(Icons.add),
+          ],
         ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: _createCollection,
+          tooltip: AppLocalizations.of(context)!.createSequence_tooltip,
+          child: const Icon(Icons.add),
         ),
+      ),
     );
   }
 }
@@ -121,14 +122,14 @@ class LoaderIndicatorView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Center(
-            child: Loader(
-              message: Text(AppLocalizations.of(context)!.loading),
-            ),
-          )
-        ]
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Center(
+          child: Loader(
+            message: Text(AppLocalizations.of(context)!.loading),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -146,20 +147,16 @@ class NoElementView extends StatelessWidget {
         Center(
           child: Text(
             AppLocalizations.of(context)!.emptyError,
-            style: GoogleFonts.nunito(
-                fontSize: 18,
-                color: Colors.grey,
-                fontWeight: FontWeight.w400
-            )
-          )
+            style: GoogleFonts.nunito(fontSize: 18, color: Colors.grey, fontWeight: FontWeight.w400),
+          ),
         )
-      ]
+      ],
     );
   }
 }
 
-class UnkownErrorView extends StatelessWidget {
-  const UnkownErrorView({
+class UnknownErrorView extends StatelessWidget {
+  const UnknownErrorView({
     super.key,
   });
 
@@ -171,14 +168,10 @@ class UnkownErrorView extends StatelessWidget {
         Center(
           child: Text(
             AppLocalizations.of(context)!.unknownError,
-            style: GoogleFonts.nunito(
-              fontSize: 20,
-              color: Colors.red,
-              fontWeight: FontWeight.w400
-            )
-          )
+            style: GoogleFonts.nunito(fontSize: 20, color: Colors.red, fontWeight: FontWeight.w400),
+          ),
         )
-      ]
+      ],
     );
   }
 }

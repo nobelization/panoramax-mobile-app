@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../constant.dart';
 
 class Loader extends StatelessWidget {
@@ -16,8 +15,8 @@ class Loader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: this.shadowBackground ?
-        Color.fromRGBO(0, 0, 0, 50) :
+      color: shadowBackground ?
+        const Color.fromRGBO(0, 0, 0, 50) :
         Colors.transparent
       ,
       child: Column(
