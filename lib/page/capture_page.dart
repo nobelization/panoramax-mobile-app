@@ -24,7 +24,10 @@ class _CapturePageState extends State<CapturePage> {
   @override
   void initState() {
     super.initState();
+
+    if (widget.cameras?.isNotEmpty ?? false) {
     initCamera(widget.cameras![0]);
+    }
   }
 
   void goToCollectionCreationPage(){
@@ -99,6 +102,14 @@ class _CapturePageState extends State<CapturePage> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.cameras?.isEmpty ?? true) {
+      return Scaffold(
+        appBar: AppBar(),
+        body:  Center(
+          child: Text(AppLocalizations.of(context)!.noCameraFoundError),
+        ),
+      );
+    }
     var height = MediaQuery.of(context).size.height * 0.12;
     var cartIcon = IconButton(
       onPressed: () {
