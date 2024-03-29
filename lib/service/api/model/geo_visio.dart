@@ -71,10 +71,7 @@ class GeoVisioCollection {
   GeoVisioCollection();
 
   String? getThumbUrl() {
-    var selfCollectionLink = this.links.firstWhere((link) => link.rel == "self");
-    if(selfCollectionLink == null) {
-      return null;
-    }
+    var selfCollectionLink = links.firstWhere((link) => link.rel == "self");
     return '${selfCollectionLink.href}/thumb.jpg';
   }
 }

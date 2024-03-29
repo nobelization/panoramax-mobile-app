@@ -26,11 +26,11 @@ class _CapturePageState extends State<CapturePage> {
     super.initState();
 
     if (widget.cameras?.isNotEmpty ?? false) {
-    initCamera(widget.cameras![0]);
+      initCamera(widget.cameras![0]);
     }
   }
 
-  void goToCollectionCreationPage(){
+  void goToCollectionCreationPage() {
     context.push(Routes.newSequenceSend, extra: _imgListCaptured);
   }
 
@@ -46,10 +46,12 @@ class _CapturePageState extends State<CapturePage> {
     }
     try {
       if (await PermissionHelper.isPermissionGranted()) {
-        await Future.wait([
-          getPictureFromCamera(),
-          Geolocator.getCurrentPosition()
-        ]).then((value) async {
+        await Future.wait(
+          [
+            getPictureFromCamera(),
+            Geolocator.getCurrentPosition(),
+          ],
+        ).then((value) async {
           final XFile rawImage = value[0] as XFile;
           final Position currentLocation = value[1] as Position;
           await addExifTags(rawImage, currentLocation);
@@ -87,8 +89,11 @@ class _CapturePageState extends State<CapturePage> {
   }
 
   Future initCamera(CameraDescription cameraDescription) async {
-    _cameraController =
-        CameraController(cameraDescription, ResolutionPreset.high, enableAudio: false);
+    _cameraController = CameraController(
+      cameraDescription,
+      ResolutionPreset.high,
+      enableAudio: false,
+    );
     try {
       await _cameraController.initialize().then((_) {
         if (!mounted) return;
@@ -112,131 +117,121 @@ class _CapturePageState extends State<CapturePage> {
     }
     var height = MediaQuery.of(context).size.height * 0.12;
     var cartIcon = IconButton(
-      onPressed: () {
-      },
+      onPressed: () {},
       iconSize: 30,
       padding: EdgeInsets.zero,
       constraints: const BoxConstraints(),
       icon: const Icon(Icons.add_shopping_cart_outlined, color: Colors.white),
     );
     return Stack(
-          children: [
-            cameraPreview(),
-            captureButton(height, context),
-            Positioned(
-                bottom: 0,
-                left: 0,
-                child: Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: height,
-                  decoration: const BoxDecoration(color: Colors.black),
-                  child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
-                    switchCameraButton(context),
-                    imageCart(cartIcon),
-                    createSequenceButton(context),
-                  ]),
-                )
+      children: [
+        cameraPreview(),
+        captureButton(height, context),
+        Positioned(
+          bottom: 0,
+          left: 0,
+          child: Container(
+            width: MediaQuery.of(context).size.width,
+            height: height,
+            decoration: const BoxDecoration(color: Colors.black),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                switchCameraButton(context),
+                imageCart(cartIcon),
+                createSequenceButton(context),
+              ],
             ),
-            if(_isProcessing) processingLoader(context)
-          ]
-        );
+          ),
+        ),
+        if (_isProcessing) processingLoader(context)
+      ],
+    );
   }
 
   Expanded switchCameraButton(BuildContext context) {
     return Expanded(
-                      child: IconButton(
-                        padding: EdgeInsets.zero,
-                        iconSize: 30,
-                        icon: Icon(
-                            _isRearCameraSelected
-                                ? CupertinoIcons.switch_camera
-                                : CupertinoIcons.switch_camera_solid,
-                            color: Colors.white),
-                        onPressed: () {
-                          setState(
-                                  () => _isRearCameraSelected = !_isRearCameraSelected);
-                          initCamera(widget.cameras![_isRearCameraSelected ? 0 : 1]);
-                        },
-                        tooltip: AppLocalizations.of(context)!.switchCamera
-                      )
-                  );
+      child: IconButton(
+          padding: EdgeInsets.zero,
+          iconSize: 30,
+          icon: Icon(_isRearCameraSelected ? CupertinoIcons.switch_camera : CupertinoIcons.switch_camera_solid,
+              color: Colors.white),
+          onPressed: () {
+            setState(() => _isRearCameraSelected = !_isRearCameraSelected);
+            initCamera(widget.cameras![_isRearCameraSelected ? 0 : 1]);
+          },
+          tooltip: AppLocalizations.of(context)!.switchCamera),
+    );
   }
 
   Expanded createSequenceButton(BuildContext context) {
     return Expanded(
-                      child: IconButton(
-                        padding: EdgeInsets.zero,
-                        iconSize: 30,
-                        icon: const Icon(
-                          Icons.send_outlined,
-                          color: Colors.white
-                        ),
-                        onPressed: goToCollectionCreationPage,
-                        tooltip: AppLocalizations.of(context)!.createSequenceWithPicture_tooltip
-                      )
-                  );
+        child: IconButton(
+            padding: EdgeInsets.zero,
+            iconSize: 30,
+            icon: const Icon(Icons.send_outlined, color: Colors.white),
+            onPressed: goToCollectionCreationPage,
+            tooltip: AppLocalizations.of(context)!.createSequenceWithPicture_tooltip));
   }
 
   Widget imageCart(IconButton cartIcon) {
-    return _imgListCaptured.isNotEmpty ?
-              badges.Badge(
-                    badgeContent: Text('${_imgListCaptured.length}'),
-                    child: cartIcon,
-              ):
-              cartIcon;
+    return _imgListCaptured.isNotEmpty
+        ? badges.Badge(
+            badgeContent: Text('${_imgListCaptured.length}'),
+            child: cartIcon,
+          )
+        : cartIcon;
   }
 
   Positioned captureButton(double height, BuildContext context) {
     return Positioned(
-              bottom: height,
-              left: 0,
-              child: Container(
-                width: MediaQuery.of(context).size.width,
-                height: height,
-                decoration: const BoxDecoration(color: Colors.transparent),
-                child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
-                  Expanded(
-                      child: IconButton(
-                        onPressed: takePicture,
-                        iconSize: 100,
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
-                        icon: const Icon(Icons.circle_outlined, color: Colors.white),
-                        tooltip: AppLocalizations.of(context)!.capture
-                      )),
-                ]),
-              )
-          );
+        bottom: height,
+        left: 0,
+        child: Container(
+          width: MediaQuery.of(context).size.width,
+          height: height,
+          decoration: const BoxDecoration(color: Colors.transparent),
+          child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+            Expanded(
+              child: IconButton(
+                  onPressed: takePicture,
+                  iconSize: 100,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                  icon: const Icon(Icons.circle_outlined, color: Colors.white),
+                  tooltip: AppLocalizations.of(context)!.capture),
+            ),
+          ]),
+        ));
   }
 
   StatelessWidget cameraPreview() {
     return _cameraController.value.isInitialized
-              ? CameraPreview(_cameraController)
-              : Container(
-                color: Colors.transparent,
-                child: const Center(child: CircularProgressIndicator()
-              )
-    );
+        ? CameraPreview(_cameraController)
+        : Container(
+            color: Colors.transparent,
+            child: const Center(child: CircularProgressIndicator()),
+          );
   }
 
   Positioned processingLoader(BuildContext context) {
     return Positioned(
-        top: 0,
-        bottom: 0,
-        left: 0,
-        right: 0,
-        child: Loader(
-            message: DefaultTextStyle(
-              style: Theme.of(context).textTheme.bodyLarge!,
-              child: Text(
-                AppLocalizations.of(context)!.waitDuringProcessing,
-                style: const TextStyle(
-                  color: Colors.white,
-                ),
-              ),
+      top: 0,
+      bottom: 0,
+      left: 0,
+      right: 0,
+      child: Loader(
+        message: DefaultTextStyle(
+          style: Theme.of(context).textTheme.bodyLarge!,
+          child: Text(
+            AppLocalizations.of(context)!.waitDuringProcessing,
+            style: const TextStyle(
+              color: Colors.white,
             ),
-            shadowBackground: true
-        )
+          ),
+        ),
+        shadowBackground: true,
+      ),
     );
   }
 }

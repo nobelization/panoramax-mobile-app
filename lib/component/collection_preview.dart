@@ -7,12 +7,12 @@ class CollectionPreview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.all(10),
+      margin: const EdgeInsets.all(10),
       height: 230,
       width: double.infinity,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.all(
+        borderRadius: const BorderRadius.all(
           Radius.circular(18),
         ),
         boxShadow: [
@@ -20,7 +20,7 @@ class CollectionPreview extends StatelessWidget {
             color: Colors.grey.shade200,
             spreadRadius: 4,
             blurRadius: 6,
-            offset: Offset(0, 3),
+            offset: const Offset(0, 3),
           ),
         ],
       ),
@@ -29,7 +29,7 @@ class CollectionPreview extends StatelessWidget {
           Container(
             height: 140,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.only(
+              borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(18),
                 topRight: Radius.circular(18),
               ),
@@ -45,9 +45,9 @@ class CollectionPreview extends StatelessWidget {
                   right: -15,
                   child: MaterialButton(
                     color: Colors.white,
-                    shape: CircleBorder(),
+                    shape: const CircleBorder(),
                     onPressed: () {},
-                    child: Icon(
+                    child: const Icon(
                       Icons.edit_rounded,
                       size: 20,
                     ),
@@ -57,7 +57,7 @@ class CollectionPreview extends StatelessWidget {
             ),
           ),
           Container(
-            margin: EdgeInsets.fromLTRB(10, 10, 10, 0),
+            margin: const EdgeInsets.fromLTRB(10, 10, 10, 0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -72,7 +72,7 @@ class CollectionPreview extends StatelessWidget {
             ),
           ),
           Container(
-            margin: EdgeInsets.symmetric(horizontal: 10),
+            margin: const EdgeInsets.symmetric(horizontal: 10),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -88,22 +88,20 @@ class CollectionPreview extends StatelessWidget {
             ),
           ),
           Container(
-            margin: EdgeInsets.fromLTRB(10, 3, 10, 0),
+            margin: const EdgeInsets.fromLTRB(10, 3, 10, 0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Text(
                     DateFormat(DATE_FORMATTER).format(DateTime.parse(
-                        collection.updated != null ?
-                        collection.updated! :
-                        collection.created
-                    )),
+                        collection.updated != null
+                            ? collection.updated!
+                            : collection.created)),
                     style: GoogleFonts.nunito(
                       fontSize: 14,
                       color: Colors.grey[500],
                       fontWeight: FontWeight.w400,
-                    )
-                )
+                    ))
               ],
             ),
           ),
@@ -111,5 +109,4 @@ class CollectionPreview extends StatelessWidget {
       ),
     );
   }
-  
 }

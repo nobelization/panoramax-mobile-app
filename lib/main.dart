@@ -30,7 +30,7 @@ part 'service/routing.dart';
 part 'service/permission_helper.dart';
 
 
-final String DATE_FORMATTER = 'dd/MM/y HH:mm:ss';
+const String DATE_FORMATTER = 'dd/MM/y HH:mm:ss';
 
 void main() {
   runApp(const PanoramaxApp());
