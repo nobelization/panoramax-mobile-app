@@ -47,6 +47,7 @@ dependencies:
   go_router: ^13.2.0
   equatable: ^2.0.5
   loading_animation_widget: 1.2.0+4
+  flutter_web_auth_2: ^3.1.1
 
 dev_dependencies:
   flutter_test:

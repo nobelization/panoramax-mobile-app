@@ -16,6 +16,17 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     isLoading = true;
     getCollections();
+    authenficate();
+  }
+
+  Future<void> authenficate() async {
+    // Present the dialog to the user
+    final result = await FlutterWebAuth2.authenticate(url: "http://10.0.2.2:5000/api/auth/login", callbackUrlScheme: "http");
+
+    // Extract token from resulting url
+    debugPrint(result);
+    final token = Uri.parse(result).queryParameters['token'];
+    debugPrint(token);
   }
 
   Future<void> getCollections() async {

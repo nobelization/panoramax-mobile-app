@@ -15,7 +15,7 @@ class _CarouselWithIndicatorState extends State<CollectionCreationPage> {
   int _current = 0;
   final CarouselController _carouselController = CarouselController();
   final collectionNameTextController = TextEditingController(
-    text: 'My collection ${DateFormat(DATE_FORMATTER).format(DateTime.now())}',
+    text: 'Collection ${DateFormat(DATE_FORMATTER).format(DateTime.now())}',
   );
   final _formKey = GlobalKey<FormState>();
 

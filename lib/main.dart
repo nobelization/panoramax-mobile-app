@@ -20,6 +20,7 @@ import 'package:loading_btn/loading_btn.dart';
 import 'component/loader.dart';
 import 'service/api/api.dart';
 import 'constant.dart';
+import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
 
 part 'component/app_bar.dart';
 part 'component/collection_preview.dart';
