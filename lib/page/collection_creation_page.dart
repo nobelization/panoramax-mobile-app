@@ -24,7 +24,7 @@ class _CarouselWithIndicatorState extends State<CollectionCreationPage> {
   }
 
   void goToHomePage(){
-    context.push(Routes.homepage, extra: availableCameras);
+    context.push(Routes.newSequenceDisplay, extra: availableCameras);
   }
 
   @override

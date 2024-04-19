@@ -1,9 +1,11 @@
 library panoramax;
 
+import 'dart:collection';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_exif_plugin/flutter_exif_plugin.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -17,13 +19,15 @@ import 'package:go_router/go_router.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:loading_btn/loading_btn.dart';
+import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
 import 'component/loader.dart';
 import 'service/api/api.dart';
 import 'constant.dart';
 
 part 'component/app_bar.dart';
 part 'component/collection_preview.dart';
-part 'page/homepage.dart';
+part 'page/instance_page.dart';
+part 'page/sequence_page.dart';
 part 'page/capture_page.dart';
 part 'page/collection_creation_page.dart';
 part 'service/routing.dart';

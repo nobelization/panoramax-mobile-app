@@ -42,9 +42,15 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: '/',
       builder: (BuildContext context, GoRouterState state) {
-        return const HomePage();
+        return const InstancePage();
       },
       routes: <RouteBase>[
+        GoRoute(
+          path: 'user/instance',
+          builder: (BuildContext context, GoRouterState state) {
+            return const SequencePage();
+          },
+        ),
         GoRoute(
           path: 'new-sequence/capture',
           builder: (BuildContext context, GoRouterState state) {
@@ -63,10 +69,11 @@ final GoRouter _router = GoRouter(
 );
 
 class Routes extends Equatable {
-  static const String homepage = "/";
+  static const String userInstance = "/user/instance";
+  static const String newSequenceDisplay = "/";
   static const String newSequenceCapture = "/new-sequence/capture";
   static const String newSequenceSend = "/new-sequence/send";
 
   @override
-  List<Object?> get props => [homepage, newSequenceCapture, newSequenceSend];
+  List<Object?> get props => [userInstance, newSequenceDisplay, newSequenceCapture, newSequenceSend];
 }
