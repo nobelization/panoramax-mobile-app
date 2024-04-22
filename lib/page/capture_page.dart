@@ -10,6 +10,7 @@ class CapturePage extends StatefulWidget {
 class _CapturePageState extends State<CapturePage> {
   late CameraController _cameraController;
   bool _isProcessing = false;
+  bool _isLoadingCamera = false;
   bool _isRearCameraSelected = true;
   final List<File> _imgListCaptured = [];
   List<CameraDescription>? cameras;
@@ -26,6 +27,7 @@ class _CapturePageState extends State<CapturePage> {
 
     availableCameras().then((value) {
       setState(() {
+        _isLoadingCamera = true;
         cameras = value;
         if (cameras?.isNotEmpty ?? false) {
           initCamera(cameras![0]);
@@ -101,7 +103,9 @@ class _CapturePageState extends State<CapturePage> {
     try {
       await _cameraController.initialize().then((_) {
         if (!mounted) return;
-        setState(() {});
+        setState(() {
+          _isLoadingCamera = false;
+        });
       });
       await _cameraController.setFocusMode(FocusMode.locked);
     } on CameraException catch (e) {
@@ -148,7 +152,8 @@ class _CapturePageState extends State<CapturePage> {
             ),
           ),
         ),
-        if (_isProcessing) processingLoader(context)
+        if (_isProcessing) processingLoader(context, true),
+        if (_isLoadingCamera) processingLoader(context, false)
       ],
     );
   }
@@ -222,7 +227,7 @@ class _CapturePageState extends State<CapturePage> {
           );
   }
 
-  Positioned processingLoader(BuildContext context) {
+  Positioned processingLoader(BuildContext context, bool hasText) {
     return Positioned(
       top: 0,
       bottom: 0,
@@ -231,12 +236,14 @@ class _CapturePageState extends State<CapturePage> {
       child: Loader(
         message: DefaultTextStyle(
           style: Theme.of(context).textTheme.bodyLarge!,
-          child: Text(
-            AppLocalizations.of(context)!.waitDuringProcessing,
-            style: const TextStyle(
-              color: Colors.white,
-            ),
-          ),
+          child: hasText
+              ? Text(
+                  AppLocalizations.of(context)!.waitDuringProcessing,
+                  style: const TextStyle(
+                    color: Colors.white,
+                  ),
+                )
+              : Container(),
         ),
         shadowBackground: true,
       ),
