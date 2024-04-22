@@ -23,7 +23,7 @@ import 'constant.dart';
 
 part 'component/app_bar.dart';
 part 'component/collection_preview.dart';
-part 'page/homepage.dart';
+part 'page/sequence_display_page.dart';
 part 'page/capture_page.dart';
 part 'page/collection_creation_page.dart';
 part 'service/routing.dart';

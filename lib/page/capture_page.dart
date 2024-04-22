@@ -1,9 +1,7 @@
 part of panoramax;
 
 class CapturePage extends StatefulWidget {
-  const CapturePage({Key? key, required this.cameras}) : super(key: key);
-
-  final List<CameraDescription>? cameras;
+  const CapturePage({Key? key}) : super(key: key);
 
   @override
   State<CapturePage> createState() => _CapturePageState();
@@ -14,6 +12,7 @@ class _CapturePageState extends State<CapturePage> {
   bool _isProcessing = false;
   bool _isRearCameraSelected = true;
   final List<File> _imgListCaptured = [];
+  List<CameraDescription>? cameras;
 
   @override
   void dispose() {
@@ -25,9 +24,14 @@ class _CapturePageState extends State<CapturePage> {
   void initState() {
     super.initState();
 
-    if (widget.cameras?.isNotEmpty ?? false) {
-      initCamera(widget.cameras![0]);
-    }
+    availableCameras().then((value) {
+      setState(() {
+        cameras = value;
+        if (cameras?.isNotEmpty ?? false) {
+          initCamera(cameras![0]);
+        }
+      });
+    });
   }
 
   void goToCollectionCreationPage() {
@@ -107,10 +111,10 @@ class _CapturePageState extends State<CapturePage> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.cameras?.isEmpty ?? true) {
+    if (cameras?.isEmpty ?? true) {
       return Scaffold(
         appBar: AppBar(),
-        body:  Center(
+        body: Center(
           child: Text(AppLocalizations.of(context)!.noCameraFoundError),
         ),
       );
@@ -154,11 +158,14 @@ class _CapturePageState extends State<CapturePage> {
       child: IconButton(
           padding: EdgeInsets.zero,
           iconSize: 30,
-          icon: Icon(_isRearCameraSelected ? CupertinoIcons.switch_camera : CupertinoIcons.switch_camera_solid,
+          icon: Icon(
+              _isRearCameraSelected
+                  ? CupertinoIcons.switch_camera
+                  : CupertinoIcons.switch_camera_solid,
               color: Colors.white),
           onPressed: () {
             setState(() => _isRearCameraSelected = !_isRearCameraSelected);
-            initCamera(widget.cameras![_isRearCameraSelected ? 0 : 1]);
+            initCamera(cameras![_isRearCameraSelected ? 0 : 1]);
           },
           tooltip: AppLocalizations.of(context)!.switchCamera),
     );
@@ -171,7 +178,8 @@ class _CapturePageState extends State<CapturePage> {
             iconSize: 30,
             icon: const Icon(Icons.send_outlined, color: Colors.white),
             onPressed: goToCollectionCreationPage,
-            tooltip: AppLocalizations.of(context)!.createSequenceWithPicture_tooltip));
+            tooltip: AppLocalizations.of(context)!
+                .createSequenceWithPicture_tooltip));
   }
 
   Widget imageCart(IconButton cartIcon) {

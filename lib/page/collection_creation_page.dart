@@ -26,7 +26,7 @@ class _CarouselWithIndicatorState extends State<CollectionCreationPage> {
   }
 
   void goToHomePage() {
-    context.push(Routes.homepage, extra: availableCameras);
+    context.push(Routes.newSequenceCapture);
   }
 
   @override
@@ -48,7 +48,8 @@ class _CarouselWithIndicatorState extends State<CollectionCreationPage> {
                           child: TextFormField(
                             decoration: InputDecoration(
                               border: const UnderlineInputBorder(),
-                              labelText: AppLocalizations.of(context)!.newSequenceNameField_placeholder,
+                              labelText: AppLocalizations.of(context)!
+                                  .newSequenceNameField_placeholder,
                             ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
@@ -80,7 +81,8 @@ class _CarouselWithIndicatorState extends State<CollectionCreationPage> {
                         children: widget.imgList.asMap().entries.map(
                           (entry) {
                             return GestureDetector(
-                              onTap: () => _carouselController.animateToPage(entry.key),
+                              onTap: () =>
+                                  _carouselController.animateToPage(entry.key),
                               child: Container(
                                 width: 12.0,
                                 height: 12.0,
@@ -90,7 +92,10 @@ class _CarouselWithIndicatorState extends State<CollectionCreationPage> {
                                 ),
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: (Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black)
+                                  color: (Theme.of(context).brightness ==
+                                              Brightness.dark
+                                          ? Colors.white
+                                          : Colors.black)
                                       .withOpacity(
                                     _current == entry.key ? 0.9 : 0.4,
                                   ),
@@ -112,16 +117,20 @@ class _CarouselWithIndicatorState extends State<CollectionCreationPage> {
                             width: 40,
                             height: 40,
                             child: const CircularProgressIndicator(
-                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(Colors.white),
                             ),
                           ),
-                          child: Text(AppLocalizations.of(context)!.newSequenceSendButton),
+                          child: Text(AppLocalizations.of(context)!
+                              .newSequenceSendButton),
                           onTap: (startLoading, stopLoading, btnState) async {
-                            if (_formKey.currentState!.validate() && btnState == ButtonState.idle) {
+                            if (_formKey.currentState!.validate() &&
+                                btnState == ButtonState.idle) {
                               startLoading();
                               // call your network api
                               await submitNewCollection(
-                                collectionName: collectionNameTextController.text,
+                                collectionName:
+                                    collectionNameTextController.text,
                                 picturesToUpload: widget.imgList,
                               );
                               stopLoading();
@@ -138,13 +147,18 @@ class _CarouselWithIndicatorState extends State<CollectionCreationPage> {
         ));
   }
 
-  Future<void> submitNewCollection({required String collectionName, required List<File> picturesToUpload}) {
-    return CollectionsApi.INSTANCE.apiCollectionsCreate(newCollectionName: collectionName).then((createdCollection) {
+  Future<void> submitNewCollection(
+      {required String collectionName, required List<File> picturesToUpload}) {
+    return CollectionsApi.INSTANCE
+        .apiCollectionsCreate(newCollectionName: collectionName)
+        .then((createdCollection) {
       debugPrint('Created Collection $createdCollection');
       picturesToUpload.asMap().forEach((index, pictureToUpload) async {
         await CollectionsApi.INSTANCE
             .apiCollectionsUploadPicture(
-                collectionId: createdCollection.id, position: index + 1, pictureToUpload: pictureToUpload)
+                collectionId: createdCollection.id,
+                position: index + 1,
+                pictureToUpload: pictureToUpload)
             .then((value) {
           debugPrint('Picture ${index + 1} uploaded');
         }).catchError((error) => throw Exception(error));
@@ -170,7 +184,10 @@ class _CarouselWithIndicatorState extends State<CollectionCreationPage> {
                     child: Container(
                       decoration: const BoxDecoration(
                         gradient: LinearGradient(
-                          colors: [Color.fromARGB(200, 0, 0, 0), Color.fromARGB(0, 0, 0, 0)],
+                          colors: [
+                            Color.fromARGB(200, 0, 0, 0),
+                            Color.fromARGB(0, 0, 0, 0)
+                          ],
                           begin: Alignment.bottomCenter,
                           end: Alignment.topCenter,
                         ),
