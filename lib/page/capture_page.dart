@@ -145,48 +145,26 @@ class _CapturePageState extends State<CapturePage> {
       constraints: const BoxConstraints(),
       icon: const Icon(Icons.add_shopping_cart_outlined, color: Colors.white),
     );
-    return Stack(
-      children: [
-        cameraPreview(),
-        captureButton(height, context),
-        Positioned(
-          bottom: 0,
-          left: 0,
-          child: Container(
-            width: MediaQuery.of(context).size.width,
-            height: height,
-            decoration: const BoxDecoration(color: Colors.black),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                switchCameraButton(context),
-                imageCart(cartIcon),
-                createSequenceButton(context),
-              ],
-            ),
-          ),
-        ),
-        if (_isProcessing) processingLoader(context)
-      ],
+    return OrientationBuilder(
+      builder: (context, orientation) {
+        return Stack(children: [
+          cameraPreview(),
+          orientation == Orientation.landscape
+              ? landscapeLayout(context)
+              : portraitLayout(context),
+          if (_isProcessing) processingLoader(context)
+        ]);
+      },
     );
   }
 
-  Expanded switchCameraButton(BuildContext context) {
-    return Expanded(
-      child: IconButton(
-          padding: EdgeInsets.zero,
-          iconSize: 30,
-          icon: Icon(
-              _isRearCameraSelected
-                  ? CupertinoIcons.switch_camera
-                  : CupertinoIcons.switch_camera_solid,
-              color: Colors.white),
-          onPressed: () {
-            setState(() => _isRearCameraSelected = !_isRearCameraSelected);
-            initCamera(widget.cameras![_isRearCameraSelected ? 0 : 1]);
-          },
-          tooltip: AppLocalizations.of(context)!.switchCamera),
-    );
+  Widget portraitLayout(BuildContext context) {
+    return Container(
+        );
+  }
+
+  Widget landscapeLayout(BuildContext context) {
+    return Container();
   }
 
   Expanded createSequenceButton(BuildContext context) {
@@ -233,7 +211,10 @@ class _CapturePageState extends State<CapturePage> {
 
   StatelessWidget cameraPreview() {
     return _cameraController.value.isInitialized
-        ? CameraPreview(_cameraController)
+        ? Container(
+            margin: EdgeInsets.all(30),
+            alignment: Alignment.topCenter,
+            child: CameraPreview(_cameraController))
         : Container(
             color: Colors.transparent,
             child: const Center(child: CircularProgressIndicator()),
