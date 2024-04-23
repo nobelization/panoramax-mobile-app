@@ -148,6 +148,11 @@ class _CapturePageState extends State<CapturePage> {
     return OrientationBuilder(
       builder: (context, orientation) {
         return Stack(children: [
+          Positioned.fill(
+            child: Container(
+              color: BLUE, // Couleur d'arrière-plan
+            ),
+          ),
           cameraPreview(),
           orientation == Orientation.landscape
               ? landscapeLayout(context)
@@ -160,7 +165,40 @@ class _CapturePageState extends State<CapturePage> {
 
   Widget portraitLayout(BuildContext context) {
     return Container(
-        );
+        // set the height property to take the screen width
+        width: MediaQuery.of(context).size.width,
+        child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                child: Container(color: Colors.transparent),
+              ),
+              Icon(Icons.screen_rotation, size: 120.0, color: Colors.white),
+              Padding(
+                  padding: EdgeInsets.all(50),
+                  child: Card(
+                      child: Padding(
+                          padding: EdgeInsets.all(16),
+                          child: Row(children: [
+                            Icon(
+                              Icons.info_outline,
+                              color: BLUE,
+                            ),
+                            Expanded(
+                                child: Padding(
+                                    padding: EdgeInsets.only(left: 8),
+                                    child: Text(
+                                        AppLocalizations.of(context)!
+                                            .switchCameraRequired,
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: BLUE,
+                                          fontSize: 16,
+                                        )))),
+                          ]))))
+            ]));
   }
 
   Widget landscapeLayout(BuildContext context) {
@@ -212,8 +250,7 @@ class _CapturePageState extends State<CapturePage> {
   StatelessWidget cameraPreview() {
     return _cameraController.value.isInitialized
         ? Container(
-            margin: EdgeInsets.all(30),
-            alignment: Alignment.topCenter,
+            alignment: Alignment.center,
             child: CameraPreview(_cameraController))
         : Container(
             color: Colors.transparent,

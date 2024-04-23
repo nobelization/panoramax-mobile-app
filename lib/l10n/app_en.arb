@@ -11,6 +11,7 @@
   "createSequenceWithPicture_tooltip": "Create a new sequence with captured pictures",
   "waitDuringProcessing": "Processing, please wait...",
   "noCameraFoundError": "No camera found for this device",
+  "switchCameraRequired": "Turn your phone to start capturing images",
 
   "newSequenceNameField": "Name",
   "newSequenceNameField_placeholder": "Enter the new sequence name",
