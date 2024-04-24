@@ -30,6 +30,7 @@ class _CapturePageState extends State<CapturePage> {
 
   @override
   void initState() {
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     super.initState();
 
     startLocationUpdates();
@@ -267,27 +268,6 @@ class _CapturePageState extends State<CapturePage> {
       ),
     );
   }
-
-  /*var height = MediaQuery.of(context).size.height * 0.12;
-    return Positioned(
-        bottom: height,
-        left: 0,
-        child: Container(
-          width: MediaQuery.of(context).size.width,
-          height: height,
-          decoration: const BoxDecoration(color: Colors.transparent),
-          child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
-            Expanded(
-              child: IconButton(
-                  onPressed: takePicture,
-                  iconSize: 100,
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                  icon: const Icon(Icons.circle_outlined, color: Colors.white),
-                  tooltip: AppLocalizations.of(context)!.capture),
-            ),
-          ]),
-        ));*/
 
   StatelessWidget cameraPreview() {
     return _cameraController.value.isInitialized
