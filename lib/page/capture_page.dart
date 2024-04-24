@@ -199,7 +199,6 @@ class _CapturePageState extends State<CapturePage> {
         margin: EdgeInsets.all(30),
         width: MediaQuery.of(context).size.width,
         child: Column(
-          //mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Expanded(
@@ -217,7 +216,9 @@ class _CapturePageState extends State<CapturePage> {
             Expanded(
                 child: Align(
                     alignment: Alignment.centerRight,
-                    child: createSequenceButton(context)))
+                    child: _imgListCaptured.isNotEmpty
+                        ? createSequenceButton(context)
+                        : Container()))
           ],
         ));
   }
