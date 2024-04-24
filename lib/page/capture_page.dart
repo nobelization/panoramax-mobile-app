@@ -30,7 +30,7 @@ class _CapturePageState extends State<CapturePage> {
 
   @override
   void initState() {
-      SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     super.initState();
 
     startLocationUpdates();
@@ -225,8 +225,8 @@ class _CapturePageState extends State<CapturePage> {
   Expanded createSequenceButton(BuildContext context) {
     return Expanded(
         child: Container(
-          height: 60,
-        width: 60,
+            height: 60,
+            width: 60,
             decoration:
                 BoxDecoration(shape: BoxShape.circle, color: Colors.blue),
             child: IconButton(
@@ -250,21 +250,15 @@ class _CapturePageState extends State<CapturePage> {
   }
 
   Widget galleryButton(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        if (_imgListCaptured.isEmpty) return; //Return if no image
-        goToCollectionCreationPage();
-      },
-      child: Container(
-        height: 60,
-        width: 60,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(10)),
-          image: _imgListCaptured.isNotEmpty
-              ? DecorationImage(
-                  image: FileImage(_imgListCaptured.last), fit: BoxFit.cover)
-              : null,
-        ),
+    return Container(
+      height: 60,
+      width: 60,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.all(Radius.circular(10)),
+        image: _imgListCaptured.isNotEmpty
+            ? DecorationImage(
+                image: FileImage(_imgListCaptured.last), fit: BoxFit.cover)
+            : null,
       ),
     );
   }
