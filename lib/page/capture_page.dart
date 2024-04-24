@@ -137,14 +137,6 @@ class _CapturePageState extends State<CapturePage> {
         ),
       );
     }
-    var height = MediaQuery.of(context).size.height * 0.12;
-    var cartIcon = IconButton(
-      onPressed: () {},
-      iconSize: 30,
-      padding: EdgeInsets.zero,
-      constraints: const BoxConstraints(),
-      icon: const Icon(Icons.add_shopping_cart_outlined, color: Colors.white),
-    );
     return OrientationBuilder(
       builder: (context, orientation) {
         return Stack(children: [
@@ -202,30 +194,81 @@ class _CapturePageState extends State<CapturePage> {
   }
 
   Widget landscapeLayout(BuildContext context) {
-    return Container();
+    return Container(
+        margin: EdgeInsets.all(30),
+        width: MediaQuery.of(context).size.width,
+        child: Column(
+          //mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Expanded(
+                child: Align(
+                    alignment: Alignment.centerRight,
+                    child: _imgListCaptured.isNotEmpty
+                        ? badges.Badge(
+                            position: badges.BadgePosition.bottomEnd(),
+                            badgeContent: Text('${_imgListCaptured.length}'),
+                            child: galleryButton(context))
+                        : galleryButton(context))),
+            Expanded(
+                child: Align(
+                    alignment: Alignment.centerRight, child: captureButton())),
+            Expanded(
+                child: Align(
+                    alignment: Alignment.centerRight,
+                    child: createSequenceButton(context)))
+          ],
+        ));
   }
 
   Expanded createSequenceButton(BuildContext context) {
     return Expanded(
-        child: IconButton(
-            padding: EdgeInsets.zero,
-            iconSize: 30,
-            icon: const Icon(Icons.send_outlined, color: Colors.white),
-            onPressed: goToCollectionCreationPage,
-            tooltip: AppLocalizations.of(context)!
-                .createSequenceWithPicture_tooltip));
+        child: Container(
+          height: 60,
+        width: 60,
+            decoration:
+                BoxDecoration(shape: BoxShape.circle, color: Colors.blue),
+            child: IconButton(
+                padding: EdgeInsets.zero,
+                iconSize: 30,
+                icon: const Icon(Icons.send_outlined, color: Colors.white),
+                onPressed: goToCollectionCreationPage,
+                tooltip: AppLocalizations.of(context)!
+                    .createSequenceWithPicture_tooltip)));
   }
 
-  Widget imageCart(IconButton cartIcon) {
-    return _imgListCaptured.isNotEmpty
-        ? badges.Badge(
-            badgeContent: Text('${_imgListCaptured.length}'),
-            child: cartIcon,
-          )
-        : cartIcon;
+  Widget captureButton() {
+    return GestureDetector(
+      onTap: takePicture,
+      child: Container(
+        height: 60,
+        width: 60,
+        decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white),
+      ),
+    );
   }
 
-  Positioned captureButton(double height, BuildContext context) {
+  Widget galleryButton(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        if (_imgListCaptured.isEmpty) return; //Return if no image
+        goToCollectionCreationPage();
+      },
+      child: Container(
+        height: 60,
+        width: 60,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(10)),
+          image: _imgListCaptured.isNotEmpty
+              ? DecorationImage(
+                  image: FileImage(_imgListCaptured.last), fit: BoxFit.cover)
+              : null,
+        ),
+      ),
+    );
+  }
+
+  /*var height = MediaQuery.of(context).size.height * 0.12;
     return Positioned(
         bottom: height,
         left: 0,
@@ -244,8 +287,7 @@ class _CapturePageState extends State<CapturePage> {
                   tooltip: AppLocalizations.of(context)!.capture),
             ),
           ]),
-        ));
-  }
+        ));*/
 
   StatelessWidget cameraPreview() {
     return _cameraController.value.isInitialized
