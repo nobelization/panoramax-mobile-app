@@ -15,6 +15,13 @@ class _CapturePageState extends State<CapturePage> {
   bool _isRearCameraSelected = true;
   final List<File> _imgListCaptured = [];
 
+  Stream<Position>? _positionStream;
+  Position? _currentPosition;
+  final LocationSettings locationSettings = LocationSettings(
+    accuracy: LocationAccuracy.high,
+    distanceFilter: 2, //The minimum distance (in meters) to trigger an update
+  );
+
   @override
   void dispose() {
     _cameraController.dispose();
@@ -25,8 +32,28 @@ class _CapturePageState extends State<CapturePage> {
   void initState() {
     super.initState();
 
+    startLocationUpdates();
+
     if (widget.cameras?.isNotEmpty ?? false) {
       initCamera(widget.cameras![0]);
+    }
+  }
+
+  void startLocationUpdates() async {
+    if (await PermissionHelper.isPermissionGranted()) {
+      _positionStream =
+          Geolocator.getPositionStream(locationSettings: locationSettings);
+
+      if (_positionStream != null) {
+        _positionStream!.listen((Position position) {
+          setState(() {
+            _currentPosition = position;
+          });
+        });
+      }
+    } else {
+      await PermissionHelper.askMissingPermission();
+      startLocationUpdates();
     }
   }
 
@@ -45,22 +72,16 @@ class _CapturePageState extends State<CapturePage> {
       return null;
     }
     try {
-      if (await PermissionHelper.isPermissionGranted()) {
-        await Future.wait(
-          [
-            getPictureFromCamera(),
-            Geolocator.getCurrentPosition(),
-          ],
-        ).then((value) async {
-          final XFile rawImage = value[0] as XFile;
-          final Position currentLocation = value[1] as Position;
-          await addExifTags(rawImage, currentLocation);
-          addImageToList(rawImage);
-        });
-      } else {
-        await PermissionHelper.askMissingPermission();
-        takePicture();
-      }
+      await Future.wait(
+        [
+          getPictureFromCamera(),
+        ],
+      ).then((value) async {
+        final XFile rawImage = value[0] as XFile;
+        final Position currentLocation = _currentPosition!;
+        await addExifTags(rawImage, currentLocation);
+        addImageToList(rawImage);
+      });
     } on CameraException catch (e) {
       debugPrint('Error occurred while taking picture: $e');
       return null;
@@ -82,6 +103,7 @@ class _CapturePageState extends State<CapturePage> {
   }
 
   Future<void> addExifTags(XFile rawImage, Position currentLocation) async {
+    print(currentLocation.latitude.toString() + " " + currentLocation.longitude.toString());
     final exif = FlutterExif.fromPath(rawImage.path);
     await exif.setLatLong(currentLocation.latitude, currentLocation.longitude);
     await exif.setAltitude(currentLocation.altitude);
@@ -110,7 +132,7 @@ class _CapturePageState extends State<CapturePage> {
     if (widget.cameras?.isEmpty ?? true) {
       return Scaffold(
         appBar: AppBar(),
-        body:  Center(
+        body: Center(
           child: Text(AppLocalizations.of(context)!.noCameraFoundError),
         ),
       );
@@ -154,7 +176,10 @@ class _CapturePageState extends State<CapturePage> {
       child: IconButton(
           padding: EdgeInsets.zero,
           iconSize: 30,
-          icon: Icon(_isRearCameraSelected ? CupertinoIcons.switch_camera : CupertinoIcons.switch_camera_solid,
+          icon: Icon(
+              _isRearCameraSelected
+                  ? CupertinoIcons.switch_camera
+                  : CupertinoIcons.switch_camera_solid,
               color: Colors.white),
           onPressed: () {
             setState(() => _isRearCameraSelected = !_isRearCameraSelected);
@@ -171,7 +196,8 @@ class _CapturePageState extends State<CapturePage> {
             iconSize: 30,
             icon: const Icon(Icons.send_outlined, color: Colors.white),
             onPressed: goToCollectionCreationPage,
-            tooltip: AppLocalizations.of(context)!.createSequenceWithPicture_tooltip));
+            tooltip: AppLocalizations.of(context)!
+                .createSequenceWithPicture_tooltip));
   }
 
   Widget imageCart(IconButton cartIcon) {
