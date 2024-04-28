@@ -15,6 +15,10 @@ class _CapturePageState extends State<CapturePage> {
   bool _isRearCameraSelected = true;
   final List<File> _imgListCaptured = [];
 
+  int _burstDuration = 3; //in seconds
+  bool _isBurstMode = false;
+  Timer? _timerBurst;
+
   @override
   void dispose() {
     _cameraController.dispose();
@@ -67,6 +71,27 @@ class _CapturePageState extends State<CapturePage> {
     }
   }
 
+  void takeBurstPictures() {
+    if (_timerBurst != null) {
+      stopBurstPictures();
+    } else {
+      startBurstPictures();
+    }
+  }
+
+  void stopBurstPictures() {
+    if (_timerBurst != null) {
+      _timerBurst!.cancel();
+      _timerBurst = null;
+    }
+  }
+
+  Future startBurstPictures() async {
+    _timerBurst = Timer.periodic(Duration(seconds: _burstDuration), (timer) {
+      takePicture();
+    });
+  }
+
   void addImageToList(XFile rawImage) {
     setState(() {
       _imgListCaptured.add(File(rawImage.path));
@@ -110,7 +135,7 @@ class _CapturePageState extends State<CapturePage> {
     if (widget.cameras?.isEmpty ?? true) {
       return Scaffold(
         appBar: AppBar(),
-        body:  Center(
+        body: Center(
           child: Text(AppLocalizations.of(context)!.noCameraFoundError),
         ),
       );
@@ -127,6 +152,7 @@ class _CapturePageState extends State<CapturePage> {
       children: [
         cameraPreview(),
         captureButton(height, context),
+        createBurstButtons(),
         Positioned(
           bottom: 0,
           left: 0,
@@ -149,12 +175,89 @@ class _CapturePageState extends State<CapturePage> {
     );
   }
 
+  Widget createBurstButtons() {
+    return Container(
+        padding: EdgeInsets.all(100),
+        height: MediaQuery.of(context).size.height,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            TextButton(
+                onPressed: () => switchMode(false),
+                child: Text("Photo".toUpperCase()),
+                style: _isBurstMode ? notSelectedButton() : selectedButton()),
+            TextButton(
+                onPressed: () => switchMode(true),
+                child: Text("Rafale".toUpperCase()),
+                style: _isBurstMode ? selectedButton() : notSelectedButton()),
+            timeButton()
+          ],
+        ));
+  }
+
+  void switchMode(bool isBurstMode) {
+    if (!isBurstMode) {
+      stopBurstPictures();
+    }
+    setState(() {
+      _isBurstMode = isBurstMode;
+    });
+  }
+
+  TextButton timeButton() {
+    return TextButton(
+        onPressed: () => (),
+        child: RichText(
+          text: TextSpan(children: [
+            WidgetSpan(
+                alignment: PlaceholderAlignment.middle,
+                child: Icon(Icons.photo_camera)),
+            TextSpan(text: "3/s", style: TextStyle(color: Colors.blue)),
+          ]),
+        ),
+        style: selectedTimeButton(),);
+  }
+
+ButtonStyle selectedTimeButton() {
+    return TextButton.styleFrom(
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(10)),
+        ),
+        foregroundColor: Colors.blue,
+        backgroundColor: Colors.white);
+  }
+
+  ButtonStyle selectedButton() {
+    return TextButton.styleFrom(
+        //minimumSize: Size(80, 0),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(10)),
+        ),
+        foregroundColor: Colors.white,
+        backgroundColor: Colors.blue);
+  }
+
+  ButtonStyle notSelectedButton() {
+    return TextButton.styleFrom(
+        minimumSize: Size(80, 0),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(10)),
+        ),
+        foregroundColor: Colors.blueGrey,
+        //backgroundColor: Colors.white,
+        side: BorderSide(width: 3, color: Colors.blueGrey));
+  }
+
   Expanded switchCameraButton(BuildContext context) {
     return Expanded(
       child: IconButton(
           padding: EdgeInsets.zero,
           iconSize: 30,
-          icon: Icon(_isRearCameraSelected ? CupertinoIcons.switch_camera : CupertinoIcons.switch_camera_solid,
+          icon: Icon(
+              _isRearCameraSelected
+                  ? CupertinoIcons.switch_camera
+                  : CupertinoIcons.switch_camera_solid,
               color: Colors.white),
           onPressed: () {
             setState(() => _isRearCameraSelected = !_isRearCameraSelected);
@@ -171,7 +274,8 @@ class _CapturePageState extends State<CapturePage> {
             iconSize: 30,
             icon: const Icon(Icons.send_outlined, color: Colors.white),
             onPressed: goToCollectionCreationPage,
-            tooltip: AppLocalizations.of(context)!.createSequenceWithPicture_tooltip));
+            tooltip: AppLocalizations.of(context)!
+                .createSequenceWithPicture_tooltip));
   }
 
   Widget imageCart(IconButton cartIcon) {
@@ -194,7 +298,7 @@ class _CapturePageState extends State<CapturePage> {
           child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
             Expanded(
               child: IconButton(
-                  onPressed: takePicture,
+                  onPressed: _isBurstMode ? takeBurstPictures : takePicture,
                   iconSize: 100,
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
