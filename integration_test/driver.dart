@@ -14,7 +14,7 @@ Future<void> addPermission(String permission) async {
       'shell',
       'pm',
       'grant',
-      'com.example.panoramax_mobile',
+      'com.panoramax.app',
       permission
     ],
   );
