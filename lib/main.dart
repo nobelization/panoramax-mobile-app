@@ -31,7 +31,7 @@ part 'service/routing.dart';
 part 'service/permission_helper.dart';
 
 
-const String DATE_FORMATTER = 'dd/MM/y HH:mm:ss';
+const String DATE_FORMATTER = 'dd/MM - HH:mm';
 
 void main() {
   GetIt.instance.registerLazySingleton<NavigationService>(() => NavigationService());

@@ -15,5 +15,12 @@
 
   "newSequenceNameField": "Nom",
   "newSequenceNameField_placeholder": "Saisissez le nom de la nouvelle séquence",
-  "newSequenceSendButton": "Envoyer"
+  "newSequenceSendButton": "Envoyer",
+
+  "newSequenceAppBarTitle": "Nouvelle collection",
+  "newSequenceFormLabelText": "Nom de la collection",
+  "newSequenceFormHintText": "Saisissez le nom de la collection",
+  "newSequenceFormValidationEmpty": "Le nom de la collection ne peut pas être vide",
+  "nameSerie": "Série du {date}",
+  "newSequenceCancel": "annuler et revenir à la prise de vue"
 }

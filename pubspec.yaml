@@ -40,14 +40,14 @@ dependencies:
   carousel_slider: ^4.2.1
   loading_btn: ^1.0.3
   cupertino_icons: ^1.0.2
-  google_fonts: ^6.1.0
+  google_fonts: 6.1.0
   flutter_localization: ^0.2.0
   intl: ^0.18.1
   camera: ^0.10.5+9
   equatable: ^2.0.5
   loading_animation_widget: 1.2.0+4
   flutter_launcher_icons: ^0.13.1
-  get_it: 7.7.0
+  get_it: 7.6.7
 
 dev_dependencies:
   flutter_test:

@@ -15,5 +15,13 @@
 
   "newSequenceNameField": "Name",
   "newSequenceNameField_placeholder": "Enter the new sequence name",
-  "newSequenceSendButton": "Send"
+  "newSequenceSendButton": "Send",
+
+  "newSequenceAppBarTitle": "New Collection",
+  "newSequenceFormLabelText": "Collection Name",
+  "newSequenceFormHintText": "Enter collection name",
+  "newSequenceFormValidationEmpty": "Collection name cannot be empty",
+  "nameSerie": "Serie from {date}",
+  "newSequenceCancel": "cancel and return to capturing"
+
 }
