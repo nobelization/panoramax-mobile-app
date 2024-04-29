@@ -27,6 +27,7 @@ part 'component/collection_preview.dart';
 part 'page/homepage.dart';
 part 'page/capture_page.dart';
 part 'page/collection_creation_page.dart';
+part 'page/instance_page.dart';
 part 'service/routing.dart';
 part 'service/permission_helper.dart';
 

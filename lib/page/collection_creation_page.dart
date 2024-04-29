@@ -29,122 +29,112 @@ class _CarouselWithIndicatorState extends State<CollectionCreationPage> {
     GetIt.instance<NavigationService>().pushTo(Routes.homepage, arguments: availableCameras);
   }
 
+  void goToInstancePage() {
+    GetIt.instance<NavigationService>.pushTo(Routes.instance, extra: widget.imgList);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: PanoramaxAppBar(context: context),
-        body: Form(
-          key: _formKey,
-          child: Scrollbar(
-            child: CustomScrollView(
-              slivers: [
-                SliverFillRemaining(
-                  hasScrollBody: false,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      Padding(
-                          padding: const EdgeInsets.fromLTRB(16, 64, 16, 16),
-                          child: TextFormField(
-                            decoration: InputDecoration(
-                              border: const UnderlineInputBorder(),
-                              labelText: AppLocalizations.of(context)!.newSequenceNameField_placeholder,
-                            ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter some text';
-                              }
-                              return null;
-                            },
-                            controller: collectionNameTextController,
-                          )),
-                      Flexible(
-                        fit: FlexFit.tight,
-                        child: CarouselSlider(
-                          items: buildImageSlider(),
-                          carouselController: _carouselController,
-                          options: CarouselOptions(
-                            autoPlay: true,
-                            enlargeCenterPage: true,
-                            aspectRatio: 2.0,
-                            onPageChanged: (index, reason) {
-                              setState(() {
-                                _current = index;
-                              });
-                            },
-                          ),
+      appBar: PanoramaxAppBar(context: context),
+      body: Form(
+        key: _formKey,
+        child: Scrollbar(
+          child: CustomScrollView(
+            slivers: [
+              SliverFillRemaining(
+                hasScrollBody: false,
+                child: Column(mainAxisSize: MainAxisSize.max, children: [
+                  Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 64, 16, 16),
+                      child: TextFormField(
+                        decoration: InputDecoration(
+                          border: const UnderlineInputBorder(),
+                          labelText: AppLocalizations.of(context)!
+                              .newSequenceNameField_placeholder,
                         ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter some text';
+                          }
+                          return null;
+                        },
+                        controller: collectionNameTextController,
+                      )),
+                  Flexible(
+                    fit: FlexFit.tight,
+                    child: CarouselSlider(
+                      items: buildImageSlider(),
+                      carouselController: _carouselController,
+                      options: CarouselOptions(
+                        autoPlay: true,
+                        enlargeCenterPage: true,
+                        aspectRatio: 2.0,
+                        onPageChanged: (index, reason) {
+                          setState(() {
+                            _current = index;
+                          });
+                        },
                       ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: widget.imgList.asMap().entries.map(
-                          (entry) {
-                            return GestureDetector(
-                              onTap: () => _carouselController.animateToPage(entry.key),
-                              child: Container(
-                                width: 12.0,
-                                height: 12.0,
-                                margin: const EdgeInsets.symmetric(
-                                  vertical: 8.0,
-                                  horizontal: 4.0,
-                                ),
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: (Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black)
-                                      .withOpacity(
-                                    _current == entry.key ? 0.9 : 0.4,
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
-                        ).toList(),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 64, 0, 32),
-                        child: LoadingBtn(
-                          height: 50,
-                          borderRadius: 8,
-                          animate: true,
-                          width: MediaQuery.of(context).size.width * 0.45,
-                          loader: Container(
-                            padding: const EdgeInsets.all(10),
-                            width: 40,
-                            height: 40,
-                            child: const CircularProgressIndicator(
-                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                            ),
-                          ),
-                          child: Text(AppLocalizations.of(context)!.newSequenceSendButton),
-                          onTap: (startLoading, stopLoading, btnState) async {
-                            if (_formKey.currentState!.validate() && btnState == ButtonState.idle) {
-                              startLoading();
-                              // call your network api
-                              await submitNewCollection(
-                                collectionName: collectionNameTextController.text,
-                                picturesToUpload: widget.imgList,
-                              );
-                              stopLoading();
-                            }
-                          },
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
-              ],
-            ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: widget.imgList.asMap().entries.map(
+                      (entry) {
+                        return GestureDetector(
+                          onTap: () =>
+                              _carouselController.animateToPage(entry.key),
+                          child: Container(
+                            width: 12.0,
+                            height: 12.0,
+                            margin: const EdgeInsets.symmetric(
+                              vertical: 8.0,
+                              horizontal: 4.0,
+                            ),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: (Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? Colors.white
+                                      : Colors.black)
+                                  .withOpacity(
+                                _current == entry.key ? 0.9 : 0.4,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ).toList(),
+                  ),
+                  Padding(
+                      padding: const EdgeInsets.fromLTRB(0, 64, 0, 32),
+                      child: TextButton(
+                        onPressed: goToInstancePage,
+                        child: Text(AppLocalizations.of(context)!
+                            .newSequenceSendButton),
+                      )),
+                ]),
+              )
+            ],
           ),
-        ));
+        ),
+      ),
+    );
   }
 
-  Future<void> submitNewCollection({required String collectionName, required List<File> picturesToUpload}) {
-    return CollectionsApi.INSTANCE.apiCollectionsCreate(newCollectionName: collectionName).then((createdCollection) {
+  Future<void> submitNewCollection(
+      {required String collectionName, required List<File> picturesToUpload}) {
+    return CollectionsApi.INSTANCE
+        .apiCollectionsCreate(newCollectionName: collectionName)
+        .then((createdCollection) {
       debugPrint('Created Collection $createdCollection');
       picturesToUpload.asMap().forEach((index, pictureToUpload) async {
         await CollectionsApi.INSTANCE
             .apiCollectionsUploadPicture(
-                collectionId: createdCollection.id, position: index + 1, pictureToUpload: pictureToUpload)
+                collectionId: createdCollection.id,
+                position: index + 1,
+                pictureToUpload: pictureToUpload)
             .then((value) {
           debugPrint('Picture ${index + 1} uploaded');
         }).catchError((error) => throw Exception(error));
@@ -170,7 +160,10 @@ class _CarouselWithIndicatorState extends State<CollectionCreationPage> {
                     child: Container(
                       decoration: const BoxDecoration(
                         gradient: LinearGradient(
-                          colors: [Color.fromARGB(200, 0, 0, 0), Color.fromARGB(0, 0, 0, 0)],
+                          colors: [
+                            Color.fromARGB(200, 0, 0, 0),
+                            Color.fromARGB(0, 0, 0, 0)
+                          ],
                           begin: Alignment.bottomCenter,
                           end: Alignment.topCenter,
                         ),
