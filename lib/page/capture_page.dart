@@ -87,6 +87,7 @@ class _CapturePageState extends State<CapturePage> {
   }
 
   Future startBurstPictures() async {
+    takePicture();
     _timerBurst = Timer.periodic(Duration(seconds: _burstDuration), (timer) {
       takePicture();
     });
@@ -183,15 +184,26 @@ class _CapturePageState extends State<CapturePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            TextButton(
-                onPressed: () => switchMode(false),
-                child: Text("Photo".toUpperCase()),
-                style: _isBurstMode ? notSelectedButton() : selectedButton()),
-            TextButton(
-                onPressed: () => switchMode(true),
-                child: Text("Rafale".toUpperCase()),
-                style: _isBurstMode ? selectedButton() : notSelectedButton()),
-            timeButton()
+            Expanded(
+                child:
+                    Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              TextButton(
+                  onPressed: () => switchMode(false),
+                  child: Text("Photo".toUpperCase()),
+                  style: _isBurstMode ? notSelectedButton() : selectedButton()),
+              SizedBox(width: 10),
+              TextButton(
+                  onPressed: () => switchMode(true),
+                  child: Text("Rafale".toUpperCase()),
+                  style: _isBurstMode ? selectedButton() : notSelectedButton()),
+            ])),
+            Expanded(
+                child:
+                    Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              timeButton(3),
+              SizedBox(width: 10),
+              timeButton(10),
+            ]))
           ],
         ));
   }
@@ -205,27 +217,46 @@ class _CapturePageState extends State<CapturePage> {
     });
   }
 
-  TextButton timeButton() {
-    return TextButton(
-        onPressed: () => (),
-        child: RichText(
-          text: TextSpan(children: [
-            WidgetSpan(
-                alignment: PlaceholderAlignment.middle,
-                child: Icon(Icons.photo_camera)),
-            TextSpan(text: "3/s", style: TextStyle(color: Colors.blue)),
-          ]),
-        ),
-        style: selectedTimeButton(),);
+  void setDurationBurst(int duration) {
+    if (_burstDuration != duration) {
+      stopBurstPictures();
+    }
+    setState(() {
+      _burstDuration = duration;
+    });
   }
 
-ButtonStyle selectedTimeButton() {
+  TextButton timeButton(int timeInSeconds) {
+    bool isSelected = timeInSeconds == _burstDuration;
+
+    return TextButton(
+        onPressed: () => setDurationBurst(timeInSeconds),
+        child: Row(
+          children: [
+            Icon(Icons.photo_camera),
+            SizedBox(
+                width: 5), // Espacement de 8 points entre l'icône et le texte
+            Text(
+              "$timeInSeconds/s",
+              style: TextStyle(color: isSelected ? Colors.blue : Colors.white),
+            ),
+          ],
+        ),
+        style: isSelected ? selectedTimeButton() : notSelectedTimeButton());
+  }
+
+  ButtonStyle selectedTimeButton() {
     return TextButton.styleFrom(
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(10)),
         ),
         foregroundColor: Colors.blue,
         backgroundColor: Colors.white);
+  }
+
+  ButtonStyle notSelectedTimeButton() {
+    return TextButton.styleFrom(
+        foregroundColor: Colors.white, backgroundColor: Colors.transparent);
   }
 
   ButtonStyle selectedButton() {
