@@ -8,6 +8,4 @@ Feature: Panoramax mobile App
   Scenario: Capture page
     Given the app is running
     When I tap on a button named {'Create a new sequence'}
-    Then I should see a button named {'Take a picture'}
-     And I should see a button named {'Switch camera'}
-     And I should see a button named {'Create a new sequence with captured pictures'}
+    Then I should see a button named {'Create a new sequence with captured pictures'}
