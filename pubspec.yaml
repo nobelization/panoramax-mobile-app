@@ -58,7 +58,7 @@ dev_dependencies:
     sdk: flutter
   test: ^1.3.0
   build_runner: ^2.4.7
-  uuv_flutter: ^0.0.1-beta.1
+  uuv_flutter: ^0.0.1-beta.4
 
 flutter_launcher_icons:
   android: "launcher_icon"

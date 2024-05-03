@@ -39,7 +39,9 @@ void main() {
 }
 
 class PanoramaxApp extends StatelessWidget {
-  const PanoramaxApp({super.key});
+  final String? selectedLocale;
+
+  const PanoramaxApp({super.key, this.selectedLocale});
 
   @override
   Widget build(BuildContext context) {
@@ -55,12 +57,20 @@ class PanoramaxApp extends StatelessWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: const [
-        Locale('en'),
-        Locale('fr'),
-      ],
+      supportedLocales: getSupportedLocales,
       routerConfig: _router
     );
+  }
+
+  List<Locale> get getSupportedLocales {
+    return this.selectedLocale != null ?
+            [
+              Locale(selectedLocale!),
+            ]:
+            const [
+              Locale('en'),
+              Locale('fr'),
+            ];
   }
 }
 

@@ -43,6 +43,10 @@ flutter pub get
 dart run build_runner build --delete-conflicting-outputs
 ```
 
+```shell  
+dart run build_runner watch --delete-conflicting-outputs
+```
+
 ### Run integration tests
 ```shell  
 flutter test integration_test
