@@ -40,7 +40,7 @@ class _HomePageState extends State<HomePage> {
       await PermissionHelper.askMissingPermission();
     }
     await availableCameras().then(
-      (availableCameras) => context.push(Routes.newSequenceCapture, extra: availableCameras),
+      (availableCameras) => GetIt.instance<NavigationService>().pushTo(Routes.newSequenceCapture, arguments: availableCameras)
     );
   }
 

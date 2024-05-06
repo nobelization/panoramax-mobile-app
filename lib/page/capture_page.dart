@@ -59,7 +59,7 @@ class _CapturePageState extends State<CapturePage> {
   }
 
   void goToCollectionCreationPage() {
-    context.push(Routes.newSequenceSend, extra: _imgListCaptured);
+    GetIt.instance<NavigationService>().pushTo(Routes.newSequenceSend, arguments: _imgListCaptured);
   }
 
   Future takePicture() async {
