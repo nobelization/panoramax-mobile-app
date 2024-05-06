@@ -241,15 +241,19 @@ class _CapturePageState extends State<CapturePage> {
 
   Widget captureButton() {
     return GestureDetector(
-      onTap: takePicture,
-      child: Tooltip(
-          message: AppLocalizations.of(context)!.capture,
-          child: Container(
-            height: 60,
-            width: 60,
-            decoration:
-                BoxDecoration(shape: BoxShape.circle, color: Colors.white),
-          )),
+      child: IconButton(
+        onPressed: takePicture,
+        iconSize: 100,
+        padding: EdgeInsets.zero,
+        constraints: const BoxConstraints(),
+        icon: Container(
+          height: 60,
+          width: 60,
+          decoration:
+          BoxDecoration(shape: BoxShape.circle, color: Colors.white),
+        ),
+        tooltip: AppLocalizations.of(context)!.capture
+      ),
     );
   }
 
