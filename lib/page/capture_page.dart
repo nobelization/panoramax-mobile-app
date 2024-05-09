@@ -19,6 +19,13 @@ class _CapturePageState extends State<CapturePage> {
   bool _isBurstMode = false;
   Timer? _timerBurst;
 
+  Stream<Position>? _positionStream;
+  Position? _currentPosition;
+  final LocationSettings locationSettings = LocationSettings(
+    accuracy: LocationAccuracy.high,
+    distanceFilter: 2, //The minimum distance (in meters) to trigger an update
+  );
+
   @override
   void dispose() {
     _cameraController.dispose();
@@ -27,15 +34,37 @@ class _CapturePageState extends State<CapturePage> {
 
   @override
   void initState() {
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     super.initState();
+
+    startLocationUpdates();
 
     if (widget.cameras?.isNotEmpty ?? false) {
       initCamera(widget.cameras![0]);
     }
   }
 
+  void startLocationUpdates() async {
+    if (await PermissionHelper.isPermissionGranted()) {
+      _positionStream =
+          Geolocator.getPositionStream(locationSettings: locationSettings);
+
+      if (_positionStream != null) {
+        _positionStream!.listen((Position position) {
+          setState(() {
+            _currentPosition = position;
+          });
+        });
+      }
+    } else {
+      await PermissionHelper.askMissingPermission();
+      startLocationUpdates();
+    }
+  }
+
   void goToCollectionCreationPage() {
-    context.push(Routes.newSequenceSend, extra: _imgListCaptured);
+    GetIt.instance<NavigationService>()
+        .pushTo(Routes.newSequenceSend, arguments: _imgListCaptured);
   }
 
   Future takePicture() async {
@@ -49,22 +78,16 @@ class _CapturePageState extends State<CapturePage> {
       return null;
     }
     try {
-      if (await PermissionHelper.isPermissionGranted()) {
-        await Future.wait(
-          [
-            getPictureFromCamera(),
-            Geolocator.getCurrentPosition(),
-          ],
-        ).then((value) async {
-          final XFile rawImage = value[0] as XFile;
-          final Position currentLocation = value[1] as Position;
-          await addExifTags(rawImage, currentLocation);
-          addImageToList(rawImage);
-        });
-      } else {
-        await PermissionHelper.askMissingPermission();
-        takePicture();
-      }
+      await Future.wait(
+        [
+          getPictureFromCamera(),
+        ],
+      ).then((value) async {
+        final XFile rawImage = value[0] as XFile;
+        final Position currentLocation = _currentPosition!;
+        await addExifTags(rawImage, currentLocation);
+        addImageToList(rawImage);
+      });
     } on CameraException catch (e) {
       debugPrint('Error occurred while taking picture: $e');
       return null;
@@ -108,6 +131,9 @@ class _CapturePageState extends State<CapturePage> {
   }
 
   Future<void> addExifTags(XFile rawImage, Position currentLocation) async {
+    print(currentLocation.latitude.toString() +
+        " " +
+        currentLocation.longitude.toString());
     final exif = FlutterExif.fromPath(rawImage.path);
     await exif.setLatLong(currentLocation.latitude, currentLocation.longitude);
     await exif.setAltitude(currentLocation.altitude);
@@ -141,6 +167,7 @@ class _CapturePageState extends State<CapturePage> {
         ),
       );
     }
+/*
     var height = MediaQuery.of(context).size.height * 0.12;
     var cartIcon = IconButton(
       onPressed: () {},
@@ -168,17 +195,28 @@ class _CapturePageState extends State<CapturePage> {
                 imageCart(cartIcon),
                 createSequenceButton(context),
               ],
+*/
+    return OrientationBuilder(
+      builder: (context, orientation) {
+        return Stack(children: [
+          Positioned.fill(
+            child: Container(
+              color: BLUE, // Couleur d'arrière-plan
             ),
           ),
-        ),
-        if (_isProcessing) processingLoader(context)
-      ],
+          cameraPreview(),
+          orientation == Orientation.landscape
+              ? landscapeLayout(context)
+              : portraitLayout(context),
+          if (_isProcessing) processingLoader(context)
+        ]);
+      },
     );
   }
 
   Widget createBurstButtons() {
     return Container(
-        padding: EdgeInsets.all(100),
+        padding: EdgeInsets.all(24),
         height: MediaQuery.of(context).size.height,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -280,26 +318,80 @@ class _CapturePageState extends State<CapturePage> {
         side: BorderSide(width: 3, color: Colors.blueGrey));
   }
 
-  Expanded switchCameraButton(BuildContext context) {
-    return Expanded(
-      child: IconButton(
-          padding: EdgeInsets.zero,
-          iconSize: 30,
-          icon: Icon(
-              _isRearCameraSelected
-                  ? CupertinoIcons.switch_camera
-                  : CupertinoIcons.switch_camera_solid,
-              color: Colors.white),
-          onPressed: () {
-            setState(() => _isRearCameraSelected = !_isRearCameraSelected);
-            initCamera(widget.cameras![_isRearCameraSelected ? 0 : 1]);
-          },
-          tooltip: AppLocalizations.of(context)!.switchCamera),
-    );
+  Widget portraitLayout(BuildContext context) {
+    return Container(
+        // set the height property to take the screen width
+        width: MediaQuery.of(context).size.width,
+        child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                child: Container(color: Colors.transparent),
+              ),
+              Icon(Icons.screen_rotation, size: 120.0, color: Colors.white),
+              Padding(
+                  padding: EdgeInsets.all(50),
+                  child: Card(
+                      child: Padding(
+                          padding: EdgeInsets.all(16),
+                          child: Row(children: [
+                            Icon(
+                              Icons.info_outline,
+                              color: BLUE,
+                            ),
+                            Expanded(
+                                child: Padding(
+                                    padding: EdgeInsets.only(left: 8),
+                                    child: Text(
+                                        AppLocalizations.of(context)!
+                                            .switchCameraRequired,
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: BLUE,
+                                          fontSize: 16,
+                                        )))),
+                          ]))))
+            ]));
+  }
+
+  Widget landscapeLayout(BuildContext context) {
+    return Container(
+        margin: EdgeInsets.all(30),
+        width: MediaQuery.of(context).size.width,
+        child: Stack(children: [
+          createBurstButtons(),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Expanded(
+                  child: Align(
+                      alignment: Alignment.centerRight,
+                      child: _imgListCaptured.isNotEmpty
+                          ? badges.Badge(
+                              position: badges.BadgePosition.bottomEnd(),
+                              badgeContent: Text('${_imgListCaptured.length}'),
+                              child: galleryButton(context))
+                          : galleryButton(context))),
+              Expanded(
+                  child: Align(
+                      alignment: Alignment.centerRight,
+                      child: captureButton())),
+              Expanded(
+                  child: Align(
+                      alignment: Alignment.centerRight,
+                      child: _imgListCaptured.isNotEmpty
+                          ? createSequenceButton(context)
+                          : Container()))
+            ],
+          )
+        ]));
   }
 
   Expanded createSequenceButton(BuildContext context) {
     return Expanded(
+/*<<<<<<< HEAD
         child: IconButton(
             padding: EdgeInsets.zero,
             iconSize: 30,
@@ -307,18 +399,40 @@ class _CapturePageState extends State<CapturePage> {
             onPressed: goToCollectionCreationPage,
             tooltip: AppLocalizations.of(context)!
                 .createSequenceWithPicture_tooltip));
+=======*/
+        child: Container(
+            height: 60,
+            width: 60,
+            decoration:
+                BoxDecoration(shape: BoxShape.circle, color: Colors.blue),
+            child: IconButton(
+                padding: EdgeInsets.zero,
+                iconSize: 30,
+                icon: const Icon(Icons.send_outlined, color: Colors.white),
+                onPressed: goToCollectionCreationPage,
+                tooltip: AppLocalizations.of(context)!
+                    .createSequenceWithPicture_tooltip)));
   }
 
-  Widget imageCart(IconButton cartIcon) {
-    return _imgListCaptured.isNotEmpty
-        ? badges.Badge(
-            badgeContent: Text('${_imgListCaptured.length}'),
-            child: cartIcon,
-          )
-        : cartIcon;
+  Widget captureButton() {
+    return GestureDetector(
+      child: IconButton(
+          onPressed: _isBurstMode ? takeBurstPictures : takePicture,
+          iconSize: 100,
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(),
+          icon: Container(
+            height: 60,
+            width: 60,
+            decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: (_timerBurst == null) ? Colors.white : Colors.red),
+          ),
+          tooltip: AppLocalizations.of(context)!.capture),
+    );
   }
 
-  Positioned captureButton(double height, BuildContext context) {
+  /*Positioned captureButton(double height, BuildContext context) {
     return Positioned(
         bottom: height,
         left: 0,
@@ -338,11 +452,27 @@ class _CapturePageState extends State<CapturePage> {
             ),
           ]),
         ));
+  }*/
+
+  Widget galleryButton(BuildContext context) {
+    return Container(
+      height: 60,
+      width: 60,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.all(Radius.circular(10)),
+        image: _imgListCaptured.isNotEmpty
+            ? DecorationImage(
+                image: FileImage(_imgListCaptured.last), fit: BoxFit.cover)
+            : null,
+      ),
+    );
   }
 
   StatelessWidget cameraPreview() {
     return _cameraController.value.isInitialized
-        ? CameraPreview(_cameraController)
+        ? Container(
+            alignment: Alignment.center,
+            child: CameraPreview(_cameraController))
         : Container(
             color: Colors.transparent,
             child: const Center(child: CircularProgressIndicator()),

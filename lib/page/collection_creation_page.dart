@@ -26,7 +26,7 @@ class _CarouselWithIndicatorState extends State<CollectionCreationPage> {
   }
 
   void goToHomePage() {
-    context.push(Routes.homepage, extra: availableCameras);
+    GetIt.instance<NavigationService>().pushTo(Routes.homepage, arguments: availableCameras);
   }
 
   @override
