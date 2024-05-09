@@ -30,7 +30,7 @@ class _CarouselWithIndicatorState extends State<CollectionCreationPage> {
   }
 
   void goToInstancePage() {
-    GetIt.instance<NavigationService>.pushTo(Routes.instance, extra: widget.imgList);
+    GetIt.instance<NavigationService>().pushTo(Routes.instance, arguments: widget.imgList);
   }
 
   @override

@@ -1,5 +1,15 @@
 part of panoramax;
 
+class Routes extends Equatable {
+  static const String homepage = "/";
+  static const String newSequenceCapture = "/new-sequence/capture";
+  static const String newSequenceSend = "/new-sequence/send";
+  static const String instance = "/instance";
+
+  @override
+  List<Object?> get props => [homepage, newSequenceCapture, newSequenceSend, instance];
+}
+
 class NavigationService {
   final GlobalKey<NavigatorState> navigatorkey = GlobalKey<NavigatorState>();
   dynamic pushTo(String route, {dynamic arguments}) {
