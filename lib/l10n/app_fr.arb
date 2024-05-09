@@ -15,5 +15,8 @@
 
   "newSequenceNameField": "Nom",
   "newSequenceNameField_placeholder": "Saisissez le nom de la nouvelle séquence",
-  "newSequenceSendButton": "Envoyer"
+  "newSequenceSendButton": "Envoyer",
+
+  "osmLicence": "Les images de cette instance sont sous licence CC-BY-SA 4.0",
+  "ignLicence": "Les images de cette instance sont sous licence etalab-2.0"
 }
