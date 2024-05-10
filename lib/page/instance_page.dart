@@ -19,7 +19,7 @@ class _InstanceState extends State<InstancePage> {
 
   void authentication(String instance) {
     setState(() {
-      API_HOSTNAME = "openstreetmap";
+      API_HOSTNAME = instance;
       url = "https://panoramax.${instance}.fr/api/auth/login";
       isInstanceChosen = true;
     });

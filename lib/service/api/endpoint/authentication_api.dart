@@ -4,7 +4,7 @@ class AuthenticationApi {
   static final AuthenticationApi INSTANCE = new AuthenticationApi();
 
   Future<GeoVisioToken> apiTokensGet(List<Cookie> cookies) async {
-  final url = Uri.https("https://panoramax.$API_HOSTNAME.fr", '/api/users/me/tokens');
+  final url = Uri.https("panoramax.$API_HOSTNAME.fr", '/api/users/me/tokens');
 
   final response = await http.get(url, headers: {'Cookie': 'session=.eJw9jEEOgjAQRa9iZm0TWlpw2OlFzNAOsYnMGChsCHe3ceHu5b2ffwDFqJsUGA7ICQYgF_vRYjLjxMF4S5VaRtOEPvjOT8zNDa4gNHNd399Z-PJQES7VKm3l9fz9OOs6xIB_-1l0z4mX2nSd4Ty_A8Ilzg.ZjePXw.kuxoHaI3me2znBGIQKml6G6QxPQ;'});
 
@@ -19,7 +19,7 @@ class AuthenticationApi {
 
   Future<GeoVisioJWTToken> apiTokenGet({required String tokenId}) async {
     // create path and map variables
-    var url =  Uri.https("https://panoramax.$API_HOSTNAME.fr", '/api/users/me/tokens/${tokenId}');
+    var url =  Uri.https("panoramax.$API_HOSTNAME.fr", '/api/users/me/tokens/${tokenId}');
 
     var response = await http.get(url, headers: {'Cookie': 'session=.eJw9jEEOgjAQRa9iZm0TWlpw2OlFzNAOsYnMGChsCHe3ceHu5b2ffwDFqJsUGA7ICQYgF_vRYjLjxMF4S5VaRtOEPvjOT8zNDa4gNHNd399Z-PJQES7VKm3l9fz9OOs6xIB_-1l0z4mX2nSd4Ty_A8Ilzg.ZjePXw.kuxoHaI3me2znBGIQKml6G6QxPQ;'});
 

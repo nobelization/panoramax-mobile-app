@@ -28,9 +28,9 @@ class CollectionsApi {
     }
 
     // create path and map variables
-    var url = API_IS_HTTPS ?
-              Uri.https(API_HOSTNAME, '/api/collections', queryParams) :
-              Uri.http(API_HOSTNAME, '/api/collections', queryParams);
+    var url = 
+              Uri.https("panoramax.$API_HOSTNAME.fr", '/api/collections', queryParams)
+              ;
 
     var response = await http.get(url);
     if(response.statusCode >= 200) {
@@ -44,9 +44,8 @@ class CollectionsApi {
 
 
   Future<GeoVisioCollection> apiCollectionsCreate({ required String newCollectionName }) async {
-    var url = API_IS_HTTPS ?
-      Uri.https(API_HOSTNAME, '/api/collections') :
-      Uri.http(API_HOSTNAME, '/api/collections');
+    var url = 
+      Uri.https("panoramax.$API_HOSTNAME.fr", '/api/collections');
 
     var response = await http.post(
       url,
@@ -65,9 +64,8 @@ class CollectionsApi {
   }
 
   Future<void> apiCollectionsUploadPicture({ required String collectionId, required int position, required  File pictureToUpload}) async {
-    var url = API_IS_HTTPS ?
-    Uri.https(API_HOSTNAME, '/api/collections/${collectionId}/items') :
-    Uri.http(API_HOSTNAME, '/api/collections/${collectionId}/items');
+    var url = 
+    Uri.https("panoramax.$API_HOSTNAME.fr", '/api/collections/${collectionId}/items');
 
     var request = http.MultipartRequest('POST', url)
       ..fields['position'] = '${position}'
