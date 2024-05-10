@@ -5,9 +5,16 @@ class Routes extends Equatable {
   static const String newSequenceCapture = "/new-sequence/capture";
   static const String newSequenceSend = "/new-sequence/send";
   static const String instance = "/instance";
+  static const String newSequenceUpload = "/new-sequence/upload";
 
   @override
-  List<Object?> get props => [homepage, newSequenceCapture, newSequenceSend, instance];
+  List<Object?> get props => [
+        homepage,
+        newSequenceCapture,
+        newSequenceSend,
+        instance,
+        newSequenceUpload
+      ];
 }
 
 class NavigationService {
@@ -37,6 +44,10 @@ Route<dynamic> generateRoutes(RouteSettings settings) {
       return MaterialPageRoute(
           builder: (_) =>
               InstancePage(imgList: settings.arguments as List<File>));
+    case "/new-sequence/upload":
+      return MaterialPageRoute(
+          builder: (_) =>
+              UploadPicturesPage(imgList: settings.arguments as List<File>));
     default:
       return MaterialPageRoute(builder: (_) => HomePage());
   }

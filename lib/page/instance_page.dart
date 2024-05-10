@@ -34,9 +34,10 @@ class _InstanceState extends State<InstancePage> {
         await AuthenticationApi.INSTANCE.apiTokenGet(tokenId: tokens.id);
 
     final SharedPreferences prefs = await SharedPreferences.getInstance();
+    print(token.jwt_token);
     prefs.setString('token', token.jwt_token);
 
-    GetIt.instance<NavigationService>().pushTo(Routes.homepage);
+    GetIt.instance<NavigationService>().pushTo(Routes.newSequenceUpload, arguments: widget.imgList);
   }
 
   @override
