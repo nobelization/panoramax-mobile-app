@@ -18,5 +18,11 @@
   "newSequenceSendButton": "Send",
 
   "osmLicence": "Les images de cette instance sont sous licence CC-BY-SA 4.0",
-  "ignLicence": "Les images de cette instance sont sous licence etalab-2.0"
+  "ignLicence": "Les images de cette instance sont sous licence etalab-2.0",
+
+  "newCollectionBack": "Back to the capture",
+  "newCollectionError": "Error {errorMessage}",
+  "newCollectionFail": "Failed to create collection",
+  "newCollectionUploadSuccess": "All photos have been exported",
+  "newCollectionLoading": "Sending {count} pictures"
 }
