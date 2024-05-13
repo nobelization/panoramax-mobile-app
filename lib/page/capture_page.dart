@@ -227,21 +227,15 @@ class _CapturePageState extends State<CapturePage> {
                     Row(mainAxisAlignment: MainAxisAlignment.center, children: [
               TextButton(
                   onPressed: () => switchMode(false),
-                  child: Text("Photo".toUpperCase()),
+                  child: Text(AppLocalizations.of(context)!.photo.toUpperCase()),
                   style: _isBurstMode ? notSelectedButton() : selectedButton()),
               SizedBox(width: 10),
               TextButton(
                   onPressed: () => switchMode(true),
-                  child: Text("Rafale".toUpperCase()),
+                  child: Text(
+                      AppLocalizations.of(context)!.sequence.toUpperCase()),
                   style: _isBurstMode ? selectedButton() : notSelectedButton()),
             ])),
-            Expanded(
-                child:
-                    Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              timeButton(3),
-              SizedBox(width: 10),
-              timeButton(10),
-            ]))
           ],
         ));
   }
@@ -253,34 +247,6 @@ class _CapturePageState extends State<CapturePage> {
     setState(() {
       _isBurstMode = isBurstMode;
     });
-  }
-
-  void setDurationBurst(int duration) {
-    if (_burstDuration != duration) {
-      stopBurstPictures();
-    }
-    setState(() {
-      _burstDuration = duration;
-    });
-  }
-
-  TextButton timeButton(int timeInSeconds) {
-    bool isSelected = timeInSeconds == _burstDuration;
-
-    return TextButton(
-        onPressed: () => setDurationBurst(timeInSeconds),
-        child: Row(
-          children: [
-            Icon(Icons.photo_camera),
-            SizedBox(
-                width: 5), // Espacement de 8 points entre l'icône et le texte
-            Text(
-              "$timeInSeconds/s",
-              style: TextStyle(color: isSelected ? Colors.blue : Colors.white),
-            ),
-          ],
-        ),
-        style: isSelected ? selectedTimeButton() : notSelectedTimeButton());
   }
 
   ButtonStyle selectedTimeButton() {
@@ -313,9 +279,9 @@ class _CapturePageState extends State<CapturePage> {
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(10)),
         ),
-        foregroundColor: Colors.blueGrey,
+        foregroundColor: Colors.white,
         //backgroundColor: Colors.white,
-        side: BorderSide(width: 3, color: Colors.blueGrey));
+        side: BorderSide(width: 3, color: Colors.white));
   }
 
   Widget portraitLayout(BuildContext context) {

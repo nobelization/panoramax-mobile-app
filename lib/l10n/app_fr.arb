@@ -7,11 +7,11 @@
   "loading": "Chargement...",
 
   "capture": "Prendre la une photo",
-  "switchCamera": "Changer de camera",
   "createSequenceWithPicture_tooltip": "Créer une nouvelle séquence avec les photos prises",
-  "waitDuringProcessing": "Traitement en cours, veuillez patienter...",
   "noCameraFoundError": "Pas de caméra trouvée pour cet appareil",
   "switchCameraRequired": "Tournez votre téléphone pour commencer la capture d'images",
+  "photo": "Photo",
+  "sequence": "Sequence",
 
   "newSequenceNameField": "Nom",
   "newSequenceNameField_placeholder": "Saisissez le nom de la nouvelle séquence",
