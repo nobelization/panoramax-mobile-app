@@ -432,28 +432,6 @@ class _CapturePageState extends State<CapturePage> {
     );
   }
 
-  /*Positioned captureButton(double height, BuildContext context) {
-    return Positioned(
-        bottom: height,
-        left: 0,
-        child: Container(
-          width: MediaQuery.of(context).size.width,
-          height: height,
-          decoration: const BoxDecoration(color: Colors.transparent),
-          child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
-            Expanded(
-              child: IconButton(
-                  onPressed: _isBurstMode ? takeBurstPictures : takePicture,
-                  iconSize: 100,
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                  icon: const Icon(Icons.circle_outlined, color: Colors.white),
-                  tooltip: AppLocalizations.of(context)!.capture),
-            ),
-          ]),
-        ));
-  }*/
-
   Widget galleryButton(BuildContext context) {
     return Container(
       height: 60,
@@ -488,12 +466,7 @@ class _CapturePageState extends State<CapturePage> {
       child: Loader(
         message: DefaultTextStyle(
           style: Theme.of(context).textTheme.bodyLarge!,
-          child: Text(
-            AppLocalizations.of(context)!.waitDuringProcessing,
-            style: const TextStyle(
-              color: Colors.white,
-            ),
-          ),
+          child: Container(),
         ),
         shadowBackground: true,
       ),
