@@ -17,6 +17,7 @@ class _CapturePageState extends State<CapturePage> {
 
   int _burstDuration = 3; //in seconds
   bool _isBurstMode = false;
+  bool _isBurstPlay = false;
   Timer? _timerBurst;
 
   Stream<Position>? _positionStream;
@@ -100,6 +101,9 @@ class _CapturePageState extends State<CapturePage> {
     } else {
       startBurstPictures();
     }
+    setState(() {
+      _isBurstPlay = !_isBurstPlay;
+    });
   }
 
   void stopBurstPictures() {
@@ -392,7 +396,7 @@ class _CapturePageState extends State<CapturePage> {
             width: 60,
             decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: (_timerBurst == null) ? Colors.white : Colors.red),
+                color: _isBurstPlay ? Colors.red : Colors.white),
           ),
           tooltip: AppLocalizations.of(context)!.capture),
     );
