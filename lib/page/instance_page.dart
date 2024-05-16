@@ -31,7 +31,7 @@ class _InstanceState extends State<InstancePage> {
 
     var tokens = await AuthenticationApi.INSTANCE.apiTokensGet(cookies);
     var token =
-        await AuthenticationApi.INSTANCE.apiTokenGet(tokenId: tokens.id);
+        await AuthenticationApi.INSTANCE.apiTokenGet(tokens.id, cookies);
 
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     print(token.jwt_token);
