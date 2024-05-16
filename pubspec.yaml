@@ -42,7 +42,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   google_fonts: 6.1.0
   flutter_localization: ^0.2.0
-  intl: ^0.18.1
+  intl: any
   camera: ^0.10.5+9
   equatable: ^2.0.5
   loading_animation_widget: 1.2.0+4
