@@ -15,6 +15,11 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
             channel: 'stable'
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          kotlin-version: '1.7.1'
       - name: Build apk
         run: flutter build apk --debug
       - name: Upload APK
