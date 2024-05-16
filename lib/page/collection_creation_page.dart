@@ -22,6 +22,12 @@ class _CarouselWithIndicatorState extends State<CollectionCreationPage> {
   void dispose() {
     collectionNameTextController.dispose();
     super.dispose();
+    SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+    DeviceOrientation.landscapeLeft,
+    DeviceOrientation.landscapeRight
+  ]);
   }
 
   @override
@@ -44,6 +50,12 @@ class _CarouselWithIndicatorState extends State<CollectionCreationPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: BLUE,
+        leading: BackButton(
+     color: Colors.white
+   ),
+      ),
         backgroundColor: BLUE,
         body: SafeArea(
           child: Padding(
@@ -115,21 +127,6 @@ class _CarouselWithIndicatorState extends State<CollectionCreationPage> {
                     },
                   ),
                 ),
-                GestureDetector(
-                    onTap: goToCapturePage,
-                    child: Container(
-                        padding: const EdgeInsets.only(bottom: 1.0),
-                        decoration: BoxDecoration(
-                            border: Border(
-                                bottom: BorderSide(
-                                    width: 1.0, color: Colors.white))),
-                        child: Text(
-                          AppLocalizations.of(context)!.newSequenceCancel,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
-                          ),
-                        ))),
               ],
             ),
           ),
