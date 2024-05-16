@@ -21,7 +21,7 @@
   "newSequenceFormLabelText": "Collection Name",
   "newSequenceFormHintText": "Enter collection name",
   "newSequenceFormValidationEmpty": "Collection name cannot be empty",
-  "nameSerie": "Serie from {date}",
+  "nameSerie": "Sequence from {date}",
   "newSequenceCancel": "cancel and return to capturing"
 
 }
