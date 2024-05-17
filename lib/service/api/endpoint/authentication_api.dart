@@ -33,6 +33,7 @@ class AuthenticationApi {
     for (var cookie in cookies) {
       if (cookie.name == "session") {
         session = 'session=${cookie.value}';
+      }
     }
 
     final response = await http.get(url, headers: {'cookie': session});
@@ -46,3 +47,4 @@ class AuthenticationApi {
     }
   }
 }
+
