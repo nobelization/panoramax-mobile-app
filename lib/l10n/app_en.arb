@@ -17,8 +17,11 @@
   "newSequenceNameField_placeholder": "Enter the new sequence name",
   "newSequenceSendButton": "Send",
 
-  "osmLicence": "Les images de cette instance sont sous licence CC-BY-SA 4.0",
-  "ignLicence": "Les images de cette instance sont sous licence etalab-2.0",
+  "osmLicence": "Photos around the world published in open data (CC-BY-SA 4.0 license)",
+  "instanceOsmTitle": "OpenStreetMap",
+  "ignLicence": "Photos in France published in open data (etalab-2.0 license)",
+  "instanceIgnTitle: "ING",
+  "instanceShare": "Share",
 
   "newCollectionBack": "Back to the capture",
   "newCollectionError": "Error {errorMessage}",

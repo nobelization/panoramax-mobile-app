@@ -12,41 +12,40 @@ class CollectionCreationPage extends StatefulWidget {
 }
 
 class CollectionCreationPageState extends State<CollectionCreationPage> {
-
   @override
   void dispose() {
     super.dispose();
     SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
-    DeviceOrientation.landscapeLeft,
-    DeviceOrientation.landscapeRight
-  ]);
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight
+    ]);
   }
 
   @override
   void initState() {
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [SystemUiOverlay.top]);
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
+        overlays: [SystemUiOverlay.top]);
     SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
-  ]);
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
     super.initState();
   }
 
   void goToInstancePage() {
-    GetIt.instance<NavigationService>().pushTo(Routes.instance, arguments: widget.imgList);
+    GetIt.instance<NavigationService>()
+        .pushTo(Routes.instance, arguments: widget.imgList);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: BLUE,
-        leading: BackButton(
-     color: Colors.white
-   ),
-      ),
+        appBar: AppBar(
+          backgroundColor: BLUE,
+          leading: BackButton(color: Colors.white),
+        ),
         backgroundColor: BLUE,
         body: SafeArea(
           child: Padding(
@@ -85,13 +84,15 @@ class CollectionCreationPageState extends State<CollectionCreationPage> {
                               .toList(),
                         ))),
                 Padding(
-                      padding: const EdgeInsets.fromLTRB(0, 64, 0, 32),
-                      child: TextButton(
-                        onPressed: goToInstancePage,
-                        style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.white)),
-                        child: Text(AppLocalizations.of(context)!
-                            .newSequenceSendButton),
-                      )),
+                    padding: const EdgeInsets.fromLTRB(0, 64, 0, 32),
+                    child: TextButton(
+                      onPressed: goToInstancePage,
+                      style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all(Colors.white)),
+                      child: Text(
+                          AppLocalizations.of(context)!.newSequenceSendButton),
+                    )),
               ],
             ),
           ),

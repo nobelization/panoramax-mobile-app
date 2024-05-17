@@ -37,12 +37,16 @@ class _InstanceState extends State<InstancePage> {
     print(token.jwt_token);
     prefs.setString('token', token.jwt_token);
 
-    GetIt.instance<NavigationService>().pushTo(Routes.newSequenceUpload, arguments: widget.imgList);
+    GetIt.instance<NavigationService>()
+        .pushTo(Routes.newSequenceUpload, arguments: widget.imgList);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        appBar: AppBar(
+          leading: BackButton(color: Colors.black),
+        ),
         body: isInstanceChosen
             ? WebViewWidget(
                 controller: WebViewController()
@@ -63,10 +67,10 @@ class _InstanceState extends State<InstancePage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text("A qui voulez-vous envoyer vos photos ?"),
+                    Text(AppLocalizations.of(context)!.instanceShare),
                     TextButton(
                         onPressed: () => {authentication("openstreetmap")},
-                        child: /*const Text("OpenStreetMap")*/
+                        child: 
                             cardButton("OpenStreetMap")),
                     TextButton(
                         onPressed: () => {authentication("ign")},
@@ -83,8 +87,6 @@ class _InstanceState extends State<InstancePage> {
             SizedBox(
                 height: 80,
                 child: Image(image: AssetImage("assets/$name.png"))),
-            /*SvgPicture.asset("assets/osm_logo.svg",
-            semanticsLabel: "openStreetMap logo"),*/
             Padding(
                 padding: EdgeInsets.all(8),
                 child: Text(name == "OpenStreetMap"
