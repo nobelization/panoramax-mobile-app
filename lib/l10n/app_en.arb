@@ -7,11 +7,11 @@
   "loading": "Loading...",
 
   "capture": "Take a picture",
-  "switchCamera": "Switch camera",
   "createSequenceWithPicture_tooltip": "Create a new sequence with captured pictures",
-  "waitDuringProcessing": "Processing, please wait...",
   "noCameraFoundError": "No camera found for this device",
   "switchCameraRequired": "Turn your phone to start capturing images",
+  "photo": "Photo",
+  "sequence": "Sequence",
 
   "newSequenceNameField": "Name",
   "newSequenceNameField_placeholder": "Enter the new sequence name",
@@ -24,5 +24,13 @@
   "newCollectionError": "Error {errorMessage}",
   "newCollectionFail": "Failed to create collection",
   "newCollectionUploadSuccess": "All photos have been exported",
-  "newCollectionLoading": "Sending {count} pictures"
+  "newCollectionLoading": "Sending {count} pictures",
+
+  "newSequenceAppBarTitle": "New Collection",
+  "newSequenceFormLabelText": "Collection Name",
+  "newSequenceFormHintText": "Enter collection name",
+  "newSequenceFormValidationEmpty": "Collection name cannot be empty",
+  "nameSerie": "Sequence from {date}",
+  "newSequenceCancel": "cancel and return to capturing"
+
 }

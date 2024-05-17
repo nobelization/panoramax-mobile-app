@@ -1,12 +1,12 @@
 library panoramax;
 
+import 'dart:async';
 import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter_exif_plugin/flutter_exif_plugin.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:panoramax_mobile/service/api/model/geo_visio.dart';
@@ -38,7 +38,7 @@ part 'service/routing.dart';
 part 'service/permission_helper.dart';
 
 
-const String DATE_FORMATTER = 'dd/MM/y HH:mm:ss';
+const String DATE_FORMATTER = 'dd/MM - HH:mm';
 
 void main() {
   GetIt.instance.registerLazySingleton<NavigationService>(() => NavigationService());

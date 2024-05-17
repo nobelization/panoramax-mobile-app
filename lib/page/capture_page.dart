@@ -15,6 +15,11 @@ class _CapturePageState extends State<CapturePage> {
   bool _isRearCameraSelected = true;
   final List<File> _imgListCaptured = [];
 
+  int _burstDuration = 3; //in seconds
+  bool _isBurstMode = false;
+  bool _isBurstPlay = false;
+  Timer? _timerBurst;
+
   Stream<Position>? _positionStream;
   Position? _currentPosition;
   final LocationSettings locationSettings = LocationSettings(
@@ -25,12 +30,22 @@ class _CapturePageState extends State<CapturePage> {
   @override
   void dispose() {
     _cameraController.dispose();
+    SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
     super.dispose();
   }
 
   @override
   void initState() {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitDown,
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight
+  ]);
     super.initState();
 
     startLocationUpdates();
@@ -59,7 +74,8 @@ class _CapturePageState extends State<CapturePage> {
   }
 
   void goToCollectionCreationPage() {
-    GetIt.instance<NavigationService>().pushTo(Routes.newSequenceSend, arguments: _imgListCaptured);
+    GetIt.instance<NavigationService>()
+        .pushTo(Routes.newSequenceSend, arguments: _imgListCaptured);
   }
 
   Future takePicture() async {
@@ -89,6 +105,31 @@ class _CapturePageState extends State<CapturePage> {
     }
   }
 
+  void takeBurstPictures() {
+    if (_timerBurst != null) {
+      stopBurstPictures();
+    } else {
+      startBurstPictures();
+    }
+    setState(() {
+      _isBurstPlay = !_isBurstPlay;
+    });
+  }
+
+  void stopBurstPictures() {
+    if (_timerBurst != null) {
+      _timerBurst!.cancel();
+      _timerBurst = null;
+    }
+  }
+
+  Future startBurstPictures() async {
+    takePicture();
+    _timerBurst = Timer.periodic(Duration(seconds: _burstDuration), (timer) {
+      takePicture();
+    });
+  }
+
   void addImageToList(XFile rawImage) {
     setState(() {
       _imgListCaptured.add(File(rawImage.path));
@@ -104,7 +145,9 @@ class _CapturePageState extends State<CapturePage> {
   }
 
   Future<void> addExifTags(XFile rawImage, Position currentLocation) async {
-    print(currentLocation.latitude.toString() + " " + currentLocation.longitude.toString());
+    print(currentLocation.latitude.toString() +
+        " " +
+        currentLocation.longitude.toString());
     final exif = FlutterExif.fromPath(rawImage.path);
     await exif.setLatLong(currentLocation.latitude, currentLocation.longitude);
     await exif.setAltitude(currentLocation.altitude);
@@ -138,6 +181,35 @@ class _CapturePageState extends State<CapturePage> {
         ),
       );
     }
+/*
+    var height = MediaQuery.of(context).size.height * 0.12;
+    var cartIcon = IconButton(
+      onPressed: () {},
+      iconSize: 30,
+      padding: EdgeInsets.zero,
+      constraints: const BoxConstraints(),
+      icon: const Icon(Icons.add_shopping_cart_outlined, color: Colors.white),
+    );
+    return Stack(
+      children: [
+        cameraPreview(),
+        captureButton(height, context),
+        createBurstButtons(),
+        Positioned(
+          bottom: 0,
+          left: 0,
+          child: Container(
+            width: MediaQuery.of(context).size.width,
+            height: height,
+            decoration: const BoxDecoration(color: Colors.black),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                switchCameraButton(context),
+                imageCart(cartIcon),
+                createSequenceButton(context),
+              ],
+*/
     return OrientationBuilder(
       builder: (context, orientation) {
         return Stack(children: [
@@ -154,6 +226,76 @@ class _CapturePageState extends State<CapturePage> {
         ]);
       },
     );
+  }
+
+  Widget createBurstButtons() {
+    return Container(
+        padding: EdgeInsets.all(24),
+        height: MediaQuery.of(context).size.height,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Expanded(
+                child:
+                    Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              TextButton(
+                  onPressed: () => switchMode(false),
+                  child: Text(AppLocalizations.of(context)!.photo.toUpperCase()),
+                  style: _isBurstMode ? notSelectedButton() : selectedButton()),
+              SizedBox(width: 10),
+              TextButton(
+                  onPressed: () => switchMode(true),
+                  child: Text(
+                      AppLocalizations.of(context)!.sequence.toUpperCase()),
+                  style: _isBurstMode ? selectedButton() : notSelectedButton()),
+            ])),
+          ],
+        ));
+  }
+
+  void switchMode(bool isBurstMode) {
+    if (!isBurstMode) {
+      stopBurstPictures();
+    }
+    setState(() {
+      _isBurstMode = isBurstMode;
+    });
+  }
+
+  ButtonStyle selectedTimeButton() {
+    return TextButton.styleFrom(
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(10)),
+        ),
+        foregroundColor: Colors.blue,
+        backgroundColor: Colors.white);
+  }
+
+  ButtonStyle notSelectedTimeButton() {
+    return TextButton.styleFrom(
+        foregroundColor: Colors.white, backgroundColor: Colors.transparent);
+  }
+
+  ButtonStyle selectedButton() {
+    return TextButton.styleFrom(
+        //minimumSize: Size(80, 0),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(10)),
+        ),
+        foregroundColor: Colors.white,
+        backgroundColor: Colors.blue);
+  }
+
+  ButtonStyle notSelectedButton() {
+    return TextButton.styleFrom(
+        minimumSize: Size(80, 0),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(10)),
+        ),
+        foregroundColor: Colors.white,
+        //backgroundColor: Colors.white,
+        side: BorderSide(width: 3, color: Colors.white));
   }
 
   Widget portraitLayout(BuildContext context) {
@@ -198,33 +340,46 @@ class _CapturePageState extends State<CapturePage> {
     return Container(
         margin: EdgeInsets.all(30),
         width: MediaQuery.of(context).size.width,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Expanded(
-                child: Align(
-                    alignment: Alignment.centerRight,
-                    child: _imgListCaptured.isNotEmpty
-                        ? badges.Badge(
-                            position: badges.BadgePosition.bottomEnd(),
-                            badgeContent: Text('${_imgListCaptured.length}'),
-                            child: galleryButton(context))
-                        : galleryButton(context))),
-            Expanded(
-                child: Align(
-                    alignment: Alignment.centerRight, child: captureButton())),
-            Expanded(
-                child: Align(
-                    alignment: Alignment.centerRight,
-                    child: _imgListCaptured.isNotEmpty
-                        ? createSequenceButton(context)
-                        : Container()))
-          ],
-        ));
+        child: Stack(children: [
+          createBurstButtons(),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Expanded(
+                  child: Align(
+                      alignment: Alignment.centerRight,
+                      child: _imgListCaptured.isNotEmpty
+                          ? badges.Badge(
+                              position: badges.BadgePosition.bottomEnd(),
+                              badgeContent: Text('${_imgListCaptured.length}'),
+                              child: galleryButton(context))
+                          : galleryButton(context))),
+              Expanded(
+                  child: Align(
+                      alignment: Alignment.centerRight,
+                      child: captureButton())),
+              Expanded(
+                  child: Align(
+                      alignment: Alignment.centerRight,
+                      child: _imgListCaptured.isNotEmpty
+                          ? createSequenceButton(context)
+                          : Container()))
+            ],
+          )
+        ]));
   }
 
   Expanded createSequenceButton(BuildContext context) {
     return Expanded(
+/*<<<<<<< HEAD
+        child: IconButton(
+            padding: EdgeInsets.zero,
+            iconSize: 30,
+            icon: const Icon(Icons.send_outlined, color: Colors.white),
+            onPressed: goToCollectionCreationPage,
+            tooltip: AppLocalizations.of(context)!
+                .createSequenceWithPicture_tooltip));
+=======*/
         child: Container(
             height: 60,
             width: 60,
@@ -242,18 +397,18 @@ class _CapturePageState extends State<CapturePage> {
   Widget captureButton() {
     return GestureDetector(
       child: IconButton(
-        onPressed: takePicture,
-        iconSize: 100,
-        padding: EdgeInsets.zero,
-        constraints: const BoxConstraints(),
-        icon: Container(
-          height: 60,
-          width: 60,
-          decoration:
-          BoxDecoration(shape: BoxShape.circle, color: Colors.white),
-        ),
-        tooltip: AppLocalizations.of(context)!.capture
-      ),
+          onPressed: _isBurstMode ? takeBurstPictures : takePicture,
+          iconSize: 100,
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(),
+          icon: Container(
+            height: 60,
+            width: 60,
+            decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: _isBurstPlay ? Colors.red : Colors.white),
+          ),
+          tooltip: AppLocalizations.of(context)!.capture),
     );
   }
 
@@ -291,12 +446,7 @@ class _CapturePageState extends State<CapturePage> {
       child: Loader(
         message: DefaultTextStyle(
           style: Theme.of(context).textTheme.bodyLarge!,
-          child: Text(
-            AppLocalizations.of(context)!.waitDuringProcessing,
-            style: const TextStyle(
-              color: Colors.white,
-            ),
-          ),
+          child: Container(),
         ),
         shadowBackground: true,
       ),
