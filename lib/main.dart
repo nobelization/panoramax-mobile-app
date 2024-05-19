@@ -23,6 +23,7 @@ import 'package:get_it/get_it.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_cookie_manager/webview_cookie_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_image/flutter_image.dart';
 import 'component/loader.dart';
 import 'service/api/api.dart';
 import 'constant.dart';
