@@ -8,6 +8,10 @@ class PermissionHelper {
     return locationPermission && cameraPermission;
   }
 
+  static Future<bool> isLocationPermanentlyDenied() async {
+    return await Permission.location.status.isPermanentlyDenied;
+  }
+
   static Future<void> askMissingPermission() async {
     bool locationPermission = await Permission.location.isGranted;
     bool cameraPermission = await Permission.camera.isGranted;
