@@ -77,6 +77,12 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
   }
 
   void startLocationUpdates() async {
+    //check if GPS is enabled
+    if (!await Geolocator.isLocationServiceEnabled()) {
+      showGPSDialog();
+      return;
+    }
+
     print("test startLocationUpdates call");
     if (await PermissionHelper.isPermissionGranted()) {
       _positionStream =
@@ -393,7 +399,7 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
   Widget captureButton() {
     return GestureDetector(
       child: IconButton(
-          //si le GPS n'est pas actif, le bouton capture ne fait rien, sinon on regarde dans quel mode on est
+          //if the GPS is not active, the capture button does nothing, otherwise we see what mode we are in
           onPressed: (_currentPosition == null)
               ? startLocationUpdates
               : _isBurstMode
@@ -455,6 +461,33 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
         ),
         shadowBackground: true,
       ),
+    );
+  }
+
+  Future<void> showGPSDialog() async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(AppLocalizations.of(context)!.gpsIsDisableTitle),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(AppLocalizations.of(context)!.gpsIsDisableContent),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text("Close"),
+              onPressed: () {
+                startLocationUpdates;
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 

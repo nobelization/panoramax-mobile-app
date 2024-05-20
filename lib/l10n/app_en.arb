@@ -19,6 +19,8 @@
   "permissionDenied": "Permission denied",
   "permissionLocationRequired": "You must accept geolocation to be able to use the application",
   "goToSettings": "Go to settings",
+  "gpsIsDisableContent": "Please activate your GPS, the application cannot work without it",
+  "gpsIsDisableTitle": "GPS disabled",
 
   "osmLicence": "Photos around the world published in open data (CC-BY-SA 4.0 license)",
   "instanceOsmTitle": "OpenStreetMap France",
