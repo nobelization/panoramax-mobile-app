@@ -51,3 +51,8 @@ dart run build_runner watch --delete-conflicting-outputs
 ```shell  
 flutter test integration_test
 ```
+
+### Build apk for Android
+```shell  
+flutter build apk --release
+```
