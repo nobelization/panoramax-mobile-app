@@ -55,8 +55,8 @@ class _InstanceState extends State<InstancePage> {
                   ..setJavaScriptMode(JavaScriptMode.unrestricted)
                   ..setNavigationDelegate(NavigationDelegate(
                     onNavigationRequest: (request) {
-                      if (request.url.contains(
-                          "https://panoramax.$API_HOSTNAME.fr/api/auth/redirect")) {
+                      if (request.url ==
+                          "https://panoramax.$API_HOSTNAME.fr/") {
                         getToken();
                       }
                       return NavigationDecision.navigate;
