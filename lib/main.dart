@@ -6,7 +6,6 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:camera/camera.dart';
-import 'package:flutter_exif_plugin/flutter_exif_plugin.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:panoramax_mobile/service/api/model/geo_visio.dart';
@@ -24,6 +23,8 @@ import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_cookie_manager/webview_cookie_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_image/flutter_image.dart';
+import 'package:native_exif/native_exif.dart';
+import 'package:app_settings/app_settings.dart';
 import 'component/loader.dart';
 import 'service/api/api.dart';
 import 'constant.dart';
@@ -38,11 +39,11 @@ part 'page/upload_pictures_page.dart';
 part 'service/routing.dart';
 part 'service/permission_helper.dart';
 
-
 const String DATE_FORMATTER = 'dd/MM - HH:mm';
 
 void main() {
-  GetIt.instance.registerLazySingleton<NavigationService>(() => NavigationService());
+  GetIt.instance
+      .registerLazySingleton<NavigationService>(() => NavigationService());
   runApp(const PanoramaxApp());
 }
 
@@ -54,34 +55,31 @@ class PanoramaxApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Panoramax',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: DEFAULT_COLOR),
-        useMaterial3: true,
-      ),
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: getSupportedLocales,
-      initialRoute: Routes.homepage,
-      onGenerateRoute: generateRoutes,
-      navigatorKey: GetIt.instance<NavigationService>().navigatorkey
-    );
+        title: 'Panoramax',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: DEFAULT_COLOR),
+          useMaterial3: true,
+        ),
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: getSupportedLocales,
+        initialRoute: Routes.homepage,
+        onGenerateRoute: generateRoutes,
+        navigatorKey: GetIt.instance<NavigationService>().navigatorkey);
   }
 
   List<Locale> get getSupportedLocales {
-    return this.selectedLocale != null ?
-            [
-              Locale(selectedLocale!),
-            ]:
-            const [
-              Locale('en'),
-              Locale('fr'),
-            ];
+    return this.selectedLocale != null
+        ? [
+            Locale(selectedLocale!),
+          ]
+        : const [
+            Locale('en'),
+            Locale('fr'),
+          ];
   }
 }
-
-

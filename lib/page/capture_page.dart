@@ -83,27 +83,58 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
       return;
     }
 
-    print("test startLocationUpdates call");
-    if (await PermissionHelper.isPermissionGranted()) {
-      _positionStream =
-          Geolocator.getPositionStream(locationSettings: locationSettings);
-
-      if (_positionStream != null) {
-        _positionStream!.listen((Position position) {
-          setState(() {
-            _currentPosition = position;
-          });
-        });
-      }
+    if (Platform.isIOS) {
+      Geolocator.checkPermission().then((permission) async {
+        print(permission.toString());
+        switch (permission) {
+          case LocationPermission.denied:
+          case LocationPermission.unableToDetermine:
+            await Geolocator.requestPermission();
+            break;
+          case LocationPermission.always:
+          case LocationPermission.whileInUse:
+            _positionStream = Geolocator.getPositionStream(
+                locationSettings: locationSettings);
+            if (_positionStream != null) {
+              _positionStream!.listen((Position position) {
+                setState(() {
+                  _currentPosition = position;
+                });
+              });
+            }
+            break;
+          case LocationPermission.deniedForever:
+            showPermissionDialog();
+            setState(() {
+              _isPermissionDialogOpen = true;
+            });
+            break;
+          default:
+            break;
+        }
+      });
     } else {
-      if (await PermissionHelper.isLocationPermanentlyDenied()) {
-        showPermissionDialog();
-        setState(() {
-          _isPermissionDialogOpen = true;
-        });
+      if (await PermissionHelper.isPermissionGranted()) {
+        _positionStream =
+            Geolocator.getPositionStream(locationSettings: locationSettings);
+
+        if (_positionStream != null) {
+          _positionStream!.listen((Position position) {
+            setState(() {
+              _currentPosition = position;
+            });
+          });
+        }
       } else {
-        await PermissionHelper.askMissingPermission();
-        startLocationUpdates();
+        if (await PermissionHelper.isLocationPermanentlyDenied()) {
+          showPermissionDialog();
+          setState(() {
+            _isPermissionDialogOpen = true;
+          });
+        } else {
+          await PermissionHelper.askMissingPermission();
+          startLocationUpdates();
+        }
       }
     }
   }
@@ -187,10 +218,13 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
     print(currentLocation.latitude.toString() +
         " " +
         currentLocation.longitude.toString());
-    final exif = FlutterExif.fromPath(rawImage.path);
-    await exif.setLatLong(currentLocation.latitude, currentLocation.longitude);
-    await exif.setAltitude(currentLocation.altitude);
-    await exif.saveAttributes();
+
+    var exif = await Exif.fromPath(rawImage.path);
+    await exif.writeAttributes({
+      'GPSLatitude': currentLocation.latitude,
+      'GPSLongitude': currentLocation.longitude,
+      'GPSAltitude': currentLocation.altitude
+    });
   }
 
   Future initCamera(CameraDescription cameraDescription) async {
