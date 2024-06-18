@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.2.3 <4.0.0'
+  sdk: '>=3.3.3 <4.0.0'
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -53,6 +53,7 @@ dependencies:
   flutter_image: ^4.1.11
   native_exif: ^0.6.0
   app_settings: ^5.1.1
+  flutter_exif_plugin: ^1.1.0
 
 dev_dependencies:
   flutter_test:

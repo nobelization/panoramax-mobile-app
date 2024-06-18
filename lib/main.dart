@@ -25,6 +25,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_image/flutter_image.dart';
 import 'package:native_exif/native_exif.dart';
 import 'package:app_settings/app_settings.dart';
+import 'package:flutter_exif_plugin/flutter_exif_plugin.dart';
 import 'component/loader.dart';
 import 'service/api/api.dart';
 import 'constant.dart';

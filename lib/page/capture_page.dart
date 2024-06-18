@@ -66,12 +66,6 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      //startLocationUpdates();
-      if (_isPermissionDialogOpen) {
-        Navigator.of(context).pop();
-        _isPermissionDialogOpen = false;
-        print("test didChangeAppLifecycleState");
-      }
       startLocationUpdates();
     }
   }
@@ -83,60 +77,38 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
       return;
     }
 
-    if (Platform.isIOS) {
-      Geolocator.checkPermission().then((permission) async {
-        print(permission.toString());
-        switch (permission) {
-          case LocationPermission.denied:
-          case LocationPermission.unableToDetermine:
-            await Geolocator.requestPermission();
-            break;
-          case LocationPermission.always:
-          case LocationPermission.whileInUse:
-            _positionStream = Geolocator.getPositionStream(
-                locationSettings: locationSettings);
-            if (_positionStream != null) {
-              _positionStream!.listen((Position position) {
-                setState(() {
-                  _currentPosition = position;
-                });
+    Geolocator.checkPermission().then((permission) async {
+      print(permission.toString());
+      switch (permission) {
+        case LocationPermission.denied:
+        case LocationPermission.unableToDetermine:
+        case LocationPermission.deniedForever:
+          var result = await Geolocator.requestPermission();
+          if (result == LocationPermission.deniedForever &&
+              !_isPermissionDialogOpen) {
+            await showPermissionDialog();
+          }
+          break;
+        case LocationPermission.always:
+        case LocationPermission.whileInUse:
+          if (_isPermissionDialogOpen) {
+            Navigator.of(context).pop();
+            _isPermissionDialogOpen = false;
+          }
+          _positionStream =
+              Geolocator.getPositionStream(locationSettings: locationSettings);
+          if (_positionStream != null) {
+            _positionStream!.listen((Position position) {
+              setState(() {
+                _currentPosition = position;
               });
-            }
-            break;
-          case LocationPermission.deniedForever:
-            showPermissionDialog();
-            setState(() {
-              _isPermissionDialogOpen = true;
             });
-            break;
-          default:
-            break;
-        }
-      });
-    } else {
-      if (await PermissionHelper.isPermissionGranted()) {
-        _positionStream =
-            Geolocator.getPositionStream(locationSettings: locationSettings);
-
-        if (_positionStream != null) {
-          _positionStream!.listen((Position position) {
-            setState(() {
-              _currentPosition = position;
-            });
-          });
-        }
-      } else {
-        if (await PermissionHelper.isLocationPermanentlyDenied()) {
-          showPermissionDialog();
-          setState(() {
-            _isPermissionDialogOpen = true;
-          });
-        } else {
-          await PermissionHelper.askMissingPermission();
-          startLocationUpdates();
-        }
+          }
+          break;
+        default:
+          break;
       }
-    }
+    });
   }
 
   void goToSettings() async {
@@ -215,16 +187,24 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
   }
 
   Future<void> addExifTags(XFile rawImage, Position currentLocation) async {
-    print(currentLocation.latitude.toString() +
+    print("add exif tag : " + currentLocation.latitude.toString() +
         " " +
         currentLocation.longitude.toString());
 
-    var exif = await Exif.fromPath(rawImage.path);
-    await exif.writeAttributes({
-      'GPSLatitude': currentLocation.latitude,
-      'GPSLongitude': currentLocation.longitude,
-      'GPSAltitude': currentLocation.altitude
-    });
+    if (Platform.isIOS) {
+      var exif = await Exif.fromPath(rawImage.path);
+      await exif.writeAttributes({
+        'GPSLatitude': currentLocation.latitude,
+        'GPSLongitude': currentLocation.longitude,
+        'GPSAltitude': currentLocation.altitude
+      });
+    } else {
+      final exif = FlutterExif.fromPath(rawImage.path);
+      await exif.setLatLong(
+          currentLocation.latitude, currentLocation.longitude);
+      await exif.setAltitude(currentLocation.altitude);
+      await exif.saveAttributes();
+    }
   }
 
   Future initCamera(CameraDescription cameraDescription) async {
@@ -526,6 +506,7 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
   }
 
   Future<void> showPermissionDialog() async {
+    _isPermissionDialogOpen = true;
     return showDialog<void>(
       context: context,
       barrierDismissible: false, // user must tap button!
