@@ -29,6 +29,8 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
     distanceFilter: 2, //The minimum distance (in meters) to trigger an update
   );
 
+  late GravityOrientationDetector _orientationDetector;
+
   @override
   void dispose() {
     _cameraController.dispose();
@@ -37,6 +39,8 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
       DeviceOrientation.portraitDown,
     ]);
     WidgetsBinding.instance.removeObserver(this);
+
+    _orientationDetector.dispose();
 
     super.dispose();
   }
@@ -51,6 +55,9 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
       DeviceOrientation.landscapeRight
     ]);
     super.initState();
+
+    _orientationDetector = GravityOrientationDetector();
+    _orientationDetector.init();
 
     startLocationUpdates();
     WidgetsBinding.instance.addObserver(this);
@@ -187,7 +194,8 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
   }
 
   Future<void> addExifTags(XFile rawImage, Position currentLocation) async {
-    print("add exif tag : " + currentLocation.latitude.toString() +
+    print("add exif tag : " +
+        currentLocation.latitude.toString() +
         " " +
         currentLocation.longitude.toString());
 
@@ -234,8 +242,23 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
         ),
       );
     }
-    return OrientationBuilder(
+    return StreamBuilder(
+      stream: _orientationDetector.orientationStream,
       builder: (context, orientation) {
+        var beta = null;
+        if (orientation.hasData) {
+          beta = orientation.data!.beta;
+          if (beta > 1) {
+            SystemChrome.setPreferredOrientations(
+                [DeviceOrientation.landscapeRight]);
+          } else if (beta < -1) {
+            SystemChrome.setPreferredOrientations(
+                [DeviceOrientation.landscapeLeft]);
+          } else {
+            SystemChrome.setPreferredOrientations(
+                [DeviceOrientation.portraitUp]);
+          }
+        }
         return Stack(children: [
           Positioned.fill(
             child: Container(
@@ -243,7 +266,7 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
             ),
           ),
           cameraPreview(),
-          orientation == Orientation.landscape
+          (beta > 1 || beta < -1)
               ? landscapeLayout(context)
               : portraitLayout(context),
           if (_isProcessing) processingLoader(context)
@@ -396,18 +419,18 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
 
   Expanded createSequenceButton(BuildContext context) {
     return Expanded(
-        child: Container(
+        /* child: Container(
             height: 60,
             width: 60,
             decoration:
-                BoxDecoration(shape: BoxShape.circle, color: Colors.blue),
-            child: IconButton(
-                padding: EdgeInsets.zero,
-                iconSize: 30,
-                icon: const Icon(Icons.send_outlined, color: Colors.white),
-                onPressed: goToCollectionCreationPage,
-                tooltip: AppLocalizations.of(context)!
-                    .createSequenceWithPicture_tooltip)));
+                BoxDecoration(shape: BoxShape.circle, color: Colors.blue),*/
+        child: IconButton(
+            padding: EdgeInsets.zero,
+            iconSize: 30,
+            icon: const Icon(Icons.send_outlined, color: Colors.white),
+            onPressed: goToCollectionCreationPage,
+            tooltip: AppLocalizations.of(context)!
+                .createSequenceWithPicture_tooltip));
   }
 
   Widget captureButton() {

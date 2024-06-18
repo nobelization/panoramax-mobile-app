@@ -3,6 +3,7 @@ library panoramax;
 import 'dart:async';
 import 'dart:io';
 import 'dart:ui';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:camera/camera.dart';
@@ -26,6 +27,7 @@ import 'package:flutter_image/flutter_image.dart';
 import 'package:native_exif/native_exif.dart';
 import 'package:app_settings/app_settings.dart';
 import 'package:flutter_exif_plugin/flutter_exif_plugin.dart';
+import 'package:sensors/sensors.dart';
 import 'component/loader.dart';
 import 'service/api/api.dart';
 import 'constant.dart';
@@ -39,6 +41,7 @@ part 'page/instance_page.dart';
 part 'page/upload_pictures_page.dart';
 part 'service/routing.dart';
 part 'service/permission_helper.dart';
+part 'utils/gravity_orientation_detector.dart';
 
 const String DATE_FORMATTER = 'dd/MM - HH:mm';
 

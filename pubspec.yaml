@@ -54,6 +54,7 @@ dependencies:
   native_exif: ^0.6.0
   app_settings: ^5.1.1
   flutter_exif_plugin: ^1.1.0
+  sensors: ^2.0.3
 
 dev_dependencies:
   flutter_test:
