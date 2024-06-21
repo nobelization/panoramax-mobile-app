@@ -23,6 +23,12 @@ class NavigationService {
     return navigatorkey.currentState?.pushNamed(route, arguments: arguments);
   }
 
+  dynamic pushReplacementTo(String route, {dynamic arguments}) {
+    return navigatorkey.currentState?.pushReplacementNamed(route, arguments: arguments);
+  }
+
+
+
   dynamic goBack() {
     return navigatorkey.currentState?.pop();
   }

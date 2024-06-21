@@ -5,9 +5,10 @@ class GravityOrientationDetector {
       StreamController<OrientationData>.broadcast();
 
   Stream<OrientationData> get orientationStream => _streamController.stream;
+  late final StreamSubscription<AccelerometerEvent> subscription;
 
   void init() {
-    accelerometerEvents.listen((AccelerometerEvent event) {
+    subscription = accelerometerEvents.listen((AccelerometerEvent event) {
       final ax = event.x;
       final ay = event.y;
       final az = event.z;

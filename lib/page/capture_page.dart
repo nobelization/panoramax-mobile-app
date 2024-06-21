@@ -29,7 +29,7 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
     distanceFilter: 2, //The minimum distance (in meters) to trigger an update
   );
 
-  late GravityOrientationDetector _orientationDetector;
+  late final GravityOrientationDetector _orientationDetector;
 
   @override
   void dispose() {
@@ -39,8 +39,6 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
       DeviceOrientation.portraitDown,
     ]);
     WidgetsBinding.instance.removeObserver(this);
-
-    _orientationDetector.dispose();
 
     super.dispose();
   }
@@ -123,6 +121,10 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
   }
 
   void goToCollectionCreationPage() {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
     GetIt.instance<NavigationService>()
         .pushTo(Routes.newSequenceSend, arguments: _imgListCaptured);
   }
@@ -234,6 +236,7 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    var orientationDevice = "landscape";
     if (widget.cameras?.isEmpty ?? true) {
       return Scaffold(
         appBar: AppBar(),
@@ -246,17 +249,22 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
       stream: _orientationDetector.orientationStream,
       builder: (context, orientation) {
         var beta = null;
+        var alpha = null;
         if (orientation.hasData) {
           beta = orientation.data!.beta;
-          if (beta > 1) {
+          alpha = orientation.data!.alpha.abs();
+          if (beta > 0.8) {
             SystemChrome.setPreferredOrientations(
                 [DeviceOrientation.landscapeRight]);
-          } else if (beta < -1) {
+            orientationDevice = "landscape";
+          } else if (beta < -0.8) {
             SystemChrome.setPreferredOrientations(
                 [DeviceOrientation.landscapeLeft]);
-          } else {
+            orientationDevice = "landscape";
+          } else if (alpha > 0.3) {
             SystemChrome.setPreferredOrientations(
                 [DeviceOrientation.portraitUp]);
+            orientationDevice = "portrait";
           }
         }
         return Stack(children: [
@@ -266,7 +274,7 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
             ),
           ),
           cameraPreview(),
-          (beta > 1 || beta < -1)
+          (orientationDevice == "landscape")
               ? landscapeLayout(context)
               : portraitLayout(context),
           if (_isProcessing) processingLoader(context)
@@ -417,20 +425,20 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
         ]));
   }
 
-  Expanded createSequenceButton(BuildContext context) {
-    return Expanded(
-        /* child: Container(
+  Widget createSequenceButton(BuildContext context) {
+    //return Expanded(
+    /* child: Container(
             height: 60,
             width: 60,
             decoration:
                 BoxDecoration(shape: BoxShape.circle, color: Colors.blue),*/
-        child: IconButton(
-            padding: EdgeInsets.zero,
-            iconSize: 30,
-            icon: const Icon(Icons.send_outlined, color: Colors.white),
-            onPressed: goToCollectionCreationPage,
-            tooltip: AppLocalizations.of(context)!
-                .createSequenceWithPicture_tooltip));
+    return IconButton(
+        padding: EdgeInsets.zero,
+        iconSize: 30,
+        icon: const Icon(Icons.send_outlined, color: Colors.white),
+        onPressed: goToCollectionCreationPage,
+        tooltip:
+            AppLocalizations.of(context)!.createSequenceWithPicture_tooltip);
   }
 
   Widget captureButton() {
