@@ -63,25 +63,26 @@ class _InstanceState extends State<InstancePage> {
                     },
                   ))
                   ..loadRequest(Uri.parse(url!)))
-            : Align(
-                alignment: Alignment.center,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(AppLocalizations.of(context)!.instanceShare),
-                    CustomCard(
-                        AppLocalizations.of(context)!.instanceOsmTitle,
-                        AppLocalizations.of(context)!.osmLicence,
-                        "assets/OpenStreetMap.png",
-                        "openstreetmap"),
-                    CustomCard(
-                        AppLocalizations.of(context)!.instanceIgnTitle,
-                        AppLocalizations.of(context)!.ignLicence,
-                        "assets/ign.png",
-                        "ign"),
-                  ],
-                )));
+            : SingleChildScrollView(
+                child: Align(
+                    alignment: Alignment.center,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(AppLocalizations.of(context)!.instanceShare),
+                        CustomCard(
+                            AppLocalizations.of(context)!.instanceOsmTitle,
+                            AppLocalizations.of(context)!.osmLicence,
+                            "assets/OpenStreetMap.png",
+                            "openstreetmap"),
+                        CustomCard(
+                            AppLocalizations.of(context)!.instanceIgnTitle,
+                            AppLocalizations.of(context)!.ignLicence,
+                            "assets/ign.png",
+                            "ign"),
+                      ],
+                    ))));
   }
 
   Widget CustomCard(
