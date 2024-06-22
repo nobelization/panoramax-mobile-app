@@ -1,4 +1,6 @@
 {
+  "common_close": "Close",
+
   "yourSequence": "Your sequences",
   "element": "element(s)",
   "createSequence_tooltip": "Create a new sequence",

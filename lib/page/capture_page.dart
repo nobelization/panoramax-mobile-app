@@ -524,7 +524,7 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
           ),
           actions: <Widget>[
             TextButton(
-              child: Text("Close"),
+              child: Text(AppLocalizations.of(context)!.common_close),
               onPressed: () {
                 startLocationUpdates;
                 Navigator.of(context).pop();
@@ -553,7 +553,7 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
           ),
           actions: <Widget>[
             TextButton(
-              child: Text("Close"),
+              child: Text(AppLocalizations.of(context)!.common_close),
               onPressed: () {
                 Navigator.of(context).pop();
                 _isPermissionDialogOpen = false;
