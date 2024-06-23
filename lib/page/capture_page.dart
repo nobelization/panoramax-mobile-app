@@ -228,7 +228,7 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
         if (!mounted) return;
         setState(() {});
       });
-      await _cameraController.setFocusMode(FocusMode.locked);
+      await _cameraController.setFocusMode(FocusMode.auto);
     } on CameraException catch (e) {
       debugPrint("camera error $e");
     }
