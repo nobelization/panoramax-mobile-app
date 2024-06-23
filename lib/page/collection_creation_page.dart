@@ -61,28 +61,21 @@ class CollectionCreationPageState extends State<CollectionCreationPage> {
                 Expanded(
                     child: SingleChildScrollView(
                         padding: const EdgeInsets.all(16.0),
-                        child: GridView.count(
-                          physics: NeverScrollableScrollPhysics(),
-                          padding: const EdgeInsets.all(10.0),
-                          shrinkWrap: true,
-                          crossAxisCount: 3,
-                          mainAxisSpacing: 5,
-                          crossAxisSpacing: 5,
-                          childAspectRatio: (16 / 9),
-                          children: widget.imgList
-                              .map(
-                                (item) => GridTile(
-                                  child: Stack(
-                                    children: <Widget>[
-                                      Image.file(
-                                        item,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              )
-                              .toList(),
-                        ))),
+                        child: Align(
+                            child: Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: [
+                            ...widget.imgList
+                                .map((item) => Container(
+                                    height: 100,
+                                    child: Image.file(
+                                      item,
+                                      fit: BoxFit.cover,
+                                    )))
+                                .toList()
+                          ],
+                        )))),
                 Padding(
                     padding: const EdgeInsets.fromLTRB(0, 64, 0, 32),
                     child: TextButton(
