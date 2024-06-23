@@ -288,26 +288,26 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
         padding: EdgeInsets.all(24),
         height: MediaQuery.of(context).size.height,
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Expanded(
-                child:
-                    Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              TextButton(
-                  onPressed: () => switchMode(false),
-                  child:
-                      Text(AppLocalizations.of(context)!.photo.toUpperCase()),
-                  style: _isBurstMode ? notSelectedButton() : selectedButton()),
-              SizedBox(width: 10),
-              TextButton(
-                  onPressed: () => switchMode(true),
-                  child: Text(
-                      AppLocalizations.of(context)!.sequence.toUpperCase()),
-                  style: _isBurstMode ? selectedButton() : notSelectedButton()),
-            ])),
-          ],
+          children: listBurstButtons(),
         ));
+  }
+
+  List<Widget> listBurstButtons() {
+    return [
+      Expanded(
+          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+        TextButton(
+            onPressed: () => switchMode(false),
+            child: Text(AppLocalizations.of(context)!.photo.toUpperCase()),
+            style: _isBurstMode ? notSelectedButton() : selectedButton()),
+        SizedBox(width: 10),
+        TextButton(
+            onPressed: () => switchMode(true),
+            child: Text(AppLocalizations.of(context)!.sequence.toUpperCase()),
+            style: _isBurstMode ? selectedButton() : notSelectedButton()),
+      ])),
+    ];
   }
 
   void switchMode(bool isBurstMode) {
@@ -335,7 +335,6 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
 
   ButtonStyle selectedButton() {
     return TextButton.styleFrom(
-        //minimumSize: Size(80, 0),
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(10)),
         ),
@@ -350,46 +349,98 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
           borderRadius: BorderRadius.all(Radius.circular(10)),
         ),
         foregroundColor: Colors.white,
-        //backgroundColor: Colors.white,
         side: BorderSide(width: 3, color: Colors.white));
   }
 
   Widget portraitLayout(BuildContext context) {
-    return Container(
-        // set the height property to take the screen width
-        width: MediaQuery.of(context).size.width,
-        child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              BackdropFilter(
+    return Stack(
+      children: [
+        _isBurstMode
+            ? BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                 child: Container(color: Colors.transparent),
-              ),
-              Icon(Icons.screen_rotation, size: 120.0, color: Colors.white),
-              Padding(
-                  padding: EdgeInsets.all(50),
-                  child: Card(
-                      child: Padding(
-                          padding: EdgeInsets.all(16),
-                          child: Row(children: [
-                            Icon(
-                              Icons.info_outline,
-                              color: BLUE,
-                            ),
-                            Expanded(
-                                child: Padding(
-                                    padding: EdgeInsets.only(left: 8),
-                                    child: Text(
-                                        AppLocalizations.of(context)!
-                                            .switchCameraRequired,
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: BLUE,
-                                          fontSize: 16,
-                                        )))),
-                          ]))))
-            ]));
+              )
+            : Container(),
+        Center(
+          child: _isBurstMode ? askTurnDevice() : Container(),
+        ),
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            Padding(
+                padding: EdgeInsets.all(20),
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: listActionBar())),
+            Padding(
+              padding: EdgeInsets.all(16),
+              child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: listBurstButtons()),
+            )
+          ]),
+        ),
+      ],
+    );
+  }
+
+  List<Widget> listActionBar() {
+    return [
+      _imgListCaptured.isNotEmpty
+          ? badges.Badge(
+              position: badges.BadgePosition.bottomEnd(),
+              badgeContent: Text('${_imgListCaptured.length}'),
+              child: galleryButton(context))
+          : galleryButton(context),
+      !_isBurstMode ? captureButton() : Spacer(),
+      _imgListCaptured.isNotEmpty ? createSequenceButton(context) : Container(),
+    ];
+  }
+
+  Widget actionBarPortrait() {
+    return Container(
+        padding: EdgeInsets.all(24),
+        height: MediaQuery.of(context).size.height,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Expanded(
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: listActionBar())),
+          ],
+        ));
+  }
+
+  Widget askTurnDevice() {
+    return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Icon(Icons.screen_rotation, size: 120.0, color: Colors.white),
+          Padding(
+              padding: EdgeInsets.all(50),
+              child: Card(
+                  child: Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Row(children: [
+                        Icon(
+                          Icons.info_outline,
+                          color: BLUE,
+                        ),
+                        Expanded(
+                            child: Padding(
+                                padding: EdgeInsets.only(left: 8),
+                                child: Text(
+                                    AppLocalizations.of(context)!
+                                        .switchCameraRequired,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: BLUE,
+                                      fontSize: 16,
+                                    )))),
+                      ]))))
+        ]);
   }
 
   Widget landscapeLayout(BuildContext context) {
@@ -398,30 +449,14 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
         width: MediaQuery.of(context).size.width,
         child: Stack(children: [
           createBurstButtons(),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Expanded(
-                  child: Align(
-                      alignment: Alignment.centerRight,
-                      child: _imgListCaptured.isNotEmpty
-                          ? badges.Badge(
-                              position: badges.BadgePosition.bottomEnd(),
-                              badgeContent: Text('${_imgListCaptured.length}'),
-                              child: galleryButton(context))
-                          : galleryButton(context))),
-              Expanded(
-                  child: Align(
-                      alignment: Alignment.centerRight,
-                      child: captureButton())),
-              Expanded(
-                  child: Align(
-                      alignment: Alignment.centerRight,
-                      child: _imgListCaptured.isNotEmpty
-                          ? createSequenceButton(context)
-                          : Container()))
-            ],
-          )
+          Container(
+              padding: EdgeInsets.all(24),
+              width: MediaQuery.of(context).size.width,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: listActionBar(),
+              ))
         ]));
   }
 
