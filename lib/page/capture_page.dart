@@ -30,6 +30,7 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
   );
 
   late final GravityOrientationDetector _orientationDetector;
+  var isPortraitOrientation = true;
 
   @override
   void dispose() {
@@ -236,7 +237,6 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    var orientationDevice = "landscape";
     if (widget.cameras?.isEmpty ?? true) {
       return Scaffold(
         appBar: AppBar(),
@@ -256,15 +256,15 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
           if (beta > 0.8) {
             SystemChrome.setPreferredOrientations(
                 [DeviceOrientation.landscapeRight]);
-            orientationDevice = "landscape";
+            isPortraitOrientation = false;
           } else if (beta < -0.8) {
             SystemChrome.setPreferredOrientations(
                 [DeviceOrientation.landscapeLeft]);
-            orientationDevice = "landscape";
+            isPortraitOrientation = false;
           } else if (alpha > 0.3) {
             SystemChrome.setPreferredOrientations(
                 [DeviceOrientation.portraitUp]);
-            orientationDevice = "portrait";
+            isPortraitOrientation = true;
           }
         }
         return Stack(children: [
@@ -274,7 +274,7 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
             ),
           ),
           cameraPreview(),
-          (orientationDevice == "landscape")
+          (!isPortraitOrientation)
               ? landscapeLayout(context)
               : portraitLayout(context),
           if (_isProcessing) processingLoader(context)
@@ -392,7 +392,7 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
               badgeContent: Text('${_imgListCaptured.length}'),
               child: galleryButton(context))
           : galleryButton(context),
-      !_isBurstMode ? captureButton() : Spacer(),
+      (!_isBurstMode || !isPortraitOrientation) ? captureButton() : Spacer(),
       _imgListCaptured.isNotEmpty ? createSequenceButton(context) : Container(),
     ];
   }
