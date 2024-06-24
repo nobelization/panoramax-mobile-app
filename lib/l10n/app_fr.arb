@@ -1,7 +1,7 @@
 {
   "common_close": "Fermer",
   
-  "yourSequence": "Vos séquences",
+  "yourSequence": "Les séquences",
   "element": "élément(s)",
   "createSequence_tooltip": "Créer une nouvelle séquence",
   "unknownError": "Oops ! Une erreur s'est produite...",
@@ -18,7 +18,7 @@
   "permissionLocationRequired": "Vous devez obligatoirement accepter la géolocalisation pour pouvoir utiliser l'application",
   "permissionCameraRequired": "Vous devez obligatoirement autoriser la caméra pour pouvoir prendre des photos",
   "goToSettings": "Aller aux options",
-  "gpsIsDisableContent": "Merci d'activer votre GPS, l'application ne peut pas fonctionner sans ca",
+  "gpsIsDisableContent": "Merci d'activer votre GPS, l'application ne peut pas fonctionner sans",
   "gpsIsDisableTitle": "GPS non activé",
   "goToGpsEnable": "Activer le GPS",
 
@@ -34,14 +34,14 @@
 
   "newCollectionBack": "Retour à l'appareil photo",
   "newCollectionError": "Erreur {errorMessage}",
-  "newCollectionFail": "Échec de la création de la collection",
-  "newCollectionUploadSuccess": "Toutes les photos ont été exportées",
+  "newCollectionFail": "Échec lors de la création de la séquence",
+  "newCollectionUploadSuccess": "Toutes les photos ont été envoyées",
   "newCollectionLoading": "Envoi en cours {count} photos",
 
-  "newSequenceAppBarTitle": "Nouvelle collection",
-  "newSequenceFormLabelText": "Nom de la collection",
-  "newSequenceFormHintText": "Saisissez le nom de la collection",
-  "newSequenceFormValidationEmpty": "Le nom de la collection ne peut pas être vide",
+  "newSequenceAppBarTitle": "Nouvelle séquence",
+  "newSequenceFormLabelText": "Nom de la séquence",
+  "newSequenceFormHintText": "Saisissez le nom de la séquence",
+  "newSequenceFormValidationEmpty": "Le nom de la séquence ne peut pas être vide",
   "nameSerie": "Séquence du {date}",
   "newSequenceCancel": "annuler et revenir à la prise de vue"
 }
