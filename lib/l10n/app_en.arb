@@ -31,10 +31,10 @@
   "gpsIsDisableContent": "Please activate your GPS, the application cannot work without it",
   "gpsIsDisableTitle": "GPS disabled",
 
-  "osmLicence": "Photos around the world published in open data (CC-BY-SA 4.0 license)",
+  "osmLicence": "Photos around the world published under CC-BY-SA 4.0 license",
   "instanceOsmTitle": "OpenStreetMap France",
-  "ignLicence": "Photos in France published in open data (etalab-2.0 license)",
-  "instanceIgnTitle": "Institut Géographique Nationale",
+  "ignLicence": "Photos in France published under Licence ouvert 2.0 (CC-BY)",
+  "instanceIgnTitle": "Institut Géographique National",
   "instanceShare": "Share",
 
   "newCollectionBack": "Back to the capture",
