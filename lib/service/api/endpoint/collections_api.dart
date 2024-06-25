@@ -32,8 +32,9 @@ class CollectionsApi {
     }
 
     // create path and map variables
-    var url = Uri.https(
-        "panoramax.$API_HOSTNAME.fr", '/api/collections', queryParams);
+    final instance = getInstance();
+    var url =
+        Uri.https("panoramax.$instance.fr", '/api/collections', queryParams);
 
     var response = await http.get(url);
     if (response.statusCode >= 200) {
@@ -49,10 +50,10 @@ class CollectionsApi {
 
   Future<GeoVisioCollection> apiCollectionsCreate(
       {required String newCollectionName}) async {
-    var url = Uri.https("panoramax.$API_HOSTNAME.fr", '/api/collections');
+    final instance = await getInstance();
+    var url = Uri.https("panoramax.$instance.fr", '/api/collections');
 
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
+    final token = await getToken();
 
     var response = await http.post(
       url,
@@ -75,11 +76,11 @@ class CollectionsApi {
       {required String collectionId,
       required int position,
       required File pictureToUpload}) async {
+    final instance = await getInstance();
     var url = Uri.https(
-        "panoramax.$API_HOSTNAME.fr", '/api/collections/${collectionId}/items');
+        "panoramax.$instance.fr", '/api/collections/${collectionId}/items');
 
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
+    final token = await getToken();
 
     var request = http.MultipartRequest('POST', url)
       ..headers['Content-Type'] = 'application/json; charset=UTF-8'
