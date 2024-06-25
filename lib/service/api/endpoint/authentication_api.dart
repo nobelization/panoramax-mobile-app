@@ -4,7 +4,8 @@ class AuthenticationApi {
   static final AuthenticationApi INSTANCE = new AuthenticationApi();
 
   Future<GeoVisioToken> apiTokensGet(List<Cookie> cookies) async {
-    final url = Uri.https("panoramax.$API_HOSTNAME.fr", '/api/users/me/tokens');
+    final instance = await getInstance();
+    final url = Uri.https("panoramax.$instance.fr", '/api/users/me/tokens');
 
     var session = null;
     for (var cookie in cookies) {
@@ -24,10 +25,12 @@ class AuthenticationApi {
     }
   }
 
-  Future<GeoVisioJWTToken> apiTokenGet(String tokenId, List<Cookie> cookies) async {
+  Future<GeoVisioJWTToken> apiTokenGet(
+      String tokenId, List<Cookie> cookies) async {
     // create path and map variables
-    var url = Uri.https(
-        "panoramax.$API_HOSTNAME.fr", '/api/users/me/tokens/${tokenId}');
+    final instance = await getInstance();
+    var url =
+        Uri.https("panoramax.$instance.fr", '/api/users/me/tokens/${tokenId}');
 
     var session = null;
     for (var cookie in cookies) {
@@ -38,7 +41,7 @@ class AuthenticationApi {
 
     final response = await http.get(url, headers: {'cookie': session});
 
-    if (response.statusCode >= 200) {
+    if (response.statusCode >= 200 && response.statusCode < 400) {
       var geoVisioJWTToken =
           GeoVisioJWTToken.fromJson(json.decode(response.body));
       return geoVisioJWTToken;
@@ -47,4 +50,3 @@ class AuthenticationApi {
     }
   }
 }
-

@@ -43,6 +43,7 @@ part 'page/upload_pictures_page.dart';
 part 'service/routing.dart';
 part 'service/permission_helper.dart';
 part 'utils/gravity_orientation_detector.dart';
+part 'user.dart';
 
 const String DATE_FORMATTER = 'dd/MM - HH:mm';
 
