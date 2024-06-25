@@ -83,12 +83,12 @@ class CollectionsApi {
 
     var request = http.MultipartRequest('POST', url)
       ..headers['Content-Type'] = 'application/json; charset=UTF-8'
-      ..headers['Authorization'] = 'Bearer: $token'
+      ..headers['Authorization'] = 'Bearer $token'
       ..fields['position'] = '${position}'
       ..files.add(
           await http.MultipartFile.fromPath('picture', pictureToUpload.path));
     var response = await request.send();
-    if (response.statusCode >= 200) {
+    if (response.statusCode >= 200 && response.statusCode < 400) {
       return;
     } else {
       throw new Exception('${response.statusCode} - ${response.reasonPhrase}');

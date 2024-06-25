@@ -63,16 +63,16 @@ class _UploadPicturesState extends State<UploadPicturesPage> {
     for (var i = 0; i < widget.imgList.length; i++) {
       await CollectionsApi.INSTANCE.apiCollectionsUploadPicture(
         collectionId: collectionId,
-        position: i,
+        position: i + 1,
         pictureToUpload: widget.imgList[i],
       );
     }
   }
 
   Future<void> goToCapture() async {
-    await availableCameras().then(
-      (availableCameras) => GetIt.instance<NavigationService>().pushTo(Routes.newSequenceCapture, arguments: availableCameras)
-    );
+    await availableCameras().then((availableCameras) =>
+        GetIt.instance<NavigationService>()
+            .pushTo(Routes.newSequenceCapture, arguments: availableCameras));
   }
 
   @override
