@@ -1,4 +1,4 @@
-package com.panoramax.app
+package app.panoramax.beta
 
 import io.flutter.embedding.android.FlutterActivity
 
