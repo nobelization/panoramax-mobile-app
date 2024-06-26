@@ -1,9 +1,7 @@
 part of panoramax;
 
 class CapturePage extends StatefulWidget {
-  const CapturePage({Key? key, required this.cameras}) : super(key: key);
-
-  final List<CameraDescription>? cameras;
+  const CapturePage({Key? key}) : super(key: key);
 
   @override
   State<CapturePage> createState() => _CapturePageState();
@@ -16,6 +14,7 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
   bool _isRearCameraSelected = true;
   bool _isPermissionDialogOpen = false;
   final List<File> _imgListCaptured = [];
+  List<CameraDescription>? cameras;
 
   int _burstDuration = 3; //in seconds
   bool _isBurstMode = false;
@@ -65,9 +64,14 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
       _stateHistoryList.add(WidgetsBinding.instance.lifecycleState!);
     }
 
-    if (widget.cameras?.isNotEmpty ?? false) {
-      initCamera(widget.cameras![0]);
-    }
+    availableCameras().then((value) {
+      setState(() {
+        cameras = value;
+        if (cameras?.isNotEmpty ?? false) {
+          initCamera(cameras![0]);
+        }
+      });
+    });
   }
 
   @override
@@ -239,7 +243,7 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     WakelockPlus.enable();
-    if (widget.cameras?.isEmpty ?? true) {
+    if (cameras?.isEmpty ?? true) {
       return Scaffold(
         appBar: AppBar(),
         body: Center(
