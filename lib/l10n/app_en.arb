@@ -14,12 +14,12 @@
   "switchCameraRequired": "Turn your phone to start capturing images",
   "photo": "Photo",
   "sequence": "Sequence",
-  "permissionDenied": "Permission refusée",
-  "permissionLocationRequired": "Vous devez obligatoirement accepter la géolocalisation pour pouvoir utiliser l'application",
-  "permissionCameraRequired": "Vous devez obligatoirement autoriser la caméra pour pouvoir prendre des photos",
-  "goToSettings": "Aller aux options",
-  "gpsIsDisableContent": "Merci d'activer votre GPS, l'application ne peut pas fonctionner sans ca",
-  "gpsIsDisableTitle": "GPS non activé",
+  "permissionDenied": "Permission denied",
+  "permissionLocationRequired": "You must accept geolocation to use the application",
+  "permissionCameraRequired": "You must authorize the access to the camera in order to take pictures.",
+  "goToSettings": "Go to settings",
+  "gpsIsDisableContent": "Please activate your GPS, the application cannot work without it.",
+  "gpsIsDisableTitle": "GPS not activated",
   "goToGpsEnable": "activate GPS",
 
   "newSequenceNameField": "Name",
@@ -43,10 +43,10 @@
   "newCollectionUploadSuccess": "All photos have been exported",
   "newCollectionLoading": "Sending {count} pictures",
 
-  "newSequenceAppBarTitle": "New Collection",
-  "newSequenceFormLabelText": "Collection Name",
-  "newSequenceFormHintText": "Enter collection name",
-  "newSequenceFormValidationEmpty": "Collection name cannot be empty",
+  "newSequenceAppBarTitle": "New sequence",
+  "newSequenceFormLabelText": "Sequence Name",
+  "newSequenceFormHintText": "Enter sequence name",
+  "newSequenceFormValidationEmpty": "Sequence name cannot be empty",
   "nameSerie": "Sequence from {date}",
   "newSequenceCancel": "cancel and return to capturing"
 
