@@ -1,15 +1,15 @@
 part of panoramax;
 
 class Routes extends Equatable {
-  static const String homepage = "/";
-  static const String newSequenceCapture = "/new-sequence/capture";
+  //static const String homepage = "/";
+  static const String newSequenceCapture = "/";
   static const String newSequenceSend = "/new-sequence/send";
   static const String instance = "/instance";
   static const String newSequenceUpload = "/new-sequence/upload";
 
   @override
   List<Object?> get props => [
-        homepage,
+        //homepage,
         newSequenceCapture,
         newSequenceSend,
         instance,
@@ -24,10 +24,9 @@ class NavigationService {
   }
 
   dynamic pushReplacementTo(String route, {dynamic arguments}) {
-    return navigatorkey.currentState?.pushReplacementNamed(route, arguments: arguments);
+    return navigatorkey.currentState
+        ?.pushReplacementNamed(route, arguments: arguments);
   }
-
-
 
   dynamic goBack() {
     return navigatorkey.currentState?.pop();
@@ -37,11 +36,7 @@ class NavigationService {
 Route<dynamic> generateRoutes(RouteSettings settings) {
   switch (settings.name) {
     case "/":
-      return MaterialPageRoute(builder: (_) => HomePage());
-    case "/new-sequence/capture":
-      return MaterialPageRoute(
-          builder: (_) => CapturePage(
-              cameras: settings.arguments as List<CameraDescription>));
+      return MaterialPageRoute(builder: (_) => CapturePage());
     case "/new-sequence/send":
       return MaterialPageRoute(
           builder: (_) => CollectionCreationPage(
