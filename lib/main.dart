@@ -73,7 +73,7 @@ class PanoramaxApp extends StatelessWidget {
           GlobalCupertinoLocalizations.delegate,
         ],
         supportedLocales: getSupportedLocales,
-        initialRoute: Routes.homepage,
+        initialRoute: Routes.newSequenceCapture,
         onGenerateRoute: generateRoutes,
         navigatorKey: GetIt.instance<NavigationService>().navigatorkey);
   }
