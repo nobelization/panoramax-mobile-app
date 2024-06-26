@@ -89,8 +89,13 @@ class _UploadPicturesState extends State<UploadPicturesPage> {
     }
   }
 
-  void goToCapture() {
-    GetIt.instance<NavigationService>().pushTo(Routes.newSequenceCapture);
+  Future<void> goToCapture() async {
+    if (!await PermissionHelper.isPermissionGranted()) {
+      await PermissionHelper.askMissingPermission();
+    }
+    await availableCameras().then((availableCameras) =>
+        GetIt.instance<NavigationService>()
+            .pushTo(Routes.newSequenceCapture, arguments: availableCameras));
   }
 
   @override
