@@ -10,12 +10,6 @@ Future<void> main() async {
 Future<void> addPermission(String permission) async {
   await Process.run(
     'adb',
-    [
-      'shell',
-      'pm',
-      'grant',
-      'com.panoramax.app',
-      permission
-    ],
+    ['shell', 'pm', 'grant', 'app.panoramax.beta', permission],
   );
 }
