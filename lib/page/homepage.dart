@@ -24,7 +24,8 @@ class _HomePageState extends State<HomePage> {
       isLoading = true;
     });
     try {
-      refreshedCollections = await CollectionsApi.INSTANCE.apiCollectionsGet();
+      refreshedCollections =
+          await CollectionsApi.INSTANCE.apiCollectionsGetAll();
     } catch (e) {
       print(e);
     } finally {
@@ -39,9 +40,9 @@ class _HomePageState extends State<HomePage> {
     if (!await PermissionHelper.isPermissionGranted()) {
       await PermissionHelper.askMissingPermission();
     }
-    await availableCameras().then(
-      (availableCameras) => GetIt.instance<NavigationService>().pushTo(Routes.newSequenceCapture, arguments: availableCameras)
-    );
+    await availableCameras().then((availableCameras) =>
+        GetIt.instance<NavigationService>()
+            .pushTo(Routes.newSequenceCapture, arguments: availableCameras));
   }
 
   Widget displayBody(isLoading) {
@@ -76,7 +77,8 @@ class _HomePageState extends State<HomePage> {
               child: Semantics(
                 header: true,
                 child: Text(AppLocalizations.of(context)!.yourSequence,
-                    style: GoogleFonts.nunito(fontSize: 25, fontWeight: FontWeight.w400)),
+                    style: GoogleFonts.nunito(
+                        fontSize: 25, fontWeight: FontWeight.w400)),
               ),
             ),
             Expanded(
@@ -106,7 +108,8 @@ class CollectionListView extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView.builder(
       itemCount: collections.length,
-      physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+      physics:
+          const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
       itemBuilder: (BuildContext context, int index) {
         return CollectionPreview(collections[index]);
       },
@@ -147,7 +150,8 @@ class NoElementView extends StatelessWidget {
         Center(
           child: Text(
             AppLocalizations.of(context)!.emptyError,
-            style: GoogleFonts.nunito(fontSize: 18, color: Colors.grey, fontWeight: FontWeight.w400),
+            style: GoogleFonts.nunito(
+                fontSize: 18, color: Colors.grey, fontWeight: FontWeight.w400),
           ),
         )
       ],
@@ -168,7 +172,8 @@ class UnknownErrorView extends StatelessWidget {
         Center(
           child: Text(
             AppLocalizations.of(context)!.unknownError,
-            style: GoogleFonts.nunito(fontSize: 20, color: Colors.red, fontWeight: FontWeight.w400),
+            style: GoogleFonts.nunito(
+                fontSize: 20, color: Colors.red, fontWeight: FontWeight.w400),
           ),
         )
       ],

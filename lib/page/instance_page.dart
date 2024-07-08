@@ -25,9 +25,10 @@ class _InstanceState extends State<InstancePage> {
     });
   }
 
-  void getToken() async {
+  void getJWTToken() async {
+    final instance = await getInstance();
     final cookies =
-        await cookieManager.getCookies('https://panoramax.${getInstance()}.fr');
+        await cookieManager.getCookies('https://panoramax.$instance.fr');
 
     var tokens = await AuthenticationApi.INSTANCE.apiTokensGet(cookies);
     var token =
@@ -41,8 +42,9 @@ class _InstanceState extends State<InstancePage> {
 
   void initState() {
     super.initState();
-    getInstance().then((instance) {
-      if (instance != null) {
+    getInstance().then((instance) async {
+      final token = await getToken();
+      if (instance != null && token != null) {
         GetIt.instance<NavigationService>()
             .pushTo(Routes.newSequenceUpload, arguments: widget.imgList);
       }
@@ -60,12 +62,17 @@ class _InstanceState extends State<InstancePage> {
                 controller: WebViewController()
                   ..setJavaScriptMode(JavaScriptMode.unrestricted)
                   ..setNavigationDelegate(NavigationDelegate(
-                    onNavigationRequest: (request) {
-                      if (request.url ==
-                          "https://panoramax.${getInstance()}.fr/") {
-                        getToken();
-                      }
-                      return NavigationDecision.navigate;
+                    onNavigationRequest: (request) async {
+                      bool shouldNavigate = true;
+                      await getInstance().then((instance) {
+                        if (request.url == "https://panoramax.$instance.fr/") {
+                          getJWTToken();
+                          shouldNavigate = false;
+                        }
+                      });
+                      return shouldNavigate
+                          ? NavigationDecision.navigate
+                          : NavigationDecision.prevent;
                     },
                   ))
                   ..loadRequest(Uri.parse(url!)))

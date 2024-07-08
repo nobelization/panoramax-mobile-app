@@ -7,7 +7,7 @@ class CollectionsApi {
   ///
   /// List available collections
   ///
-  Future<GeoVisioCollections?> apiCollectionsGet(
+  Future<GeoVisioCollections?> apiCollectionsGetAll(
       {int? limit,
       String? format,
       List<int>? bbox,
@@ -32,7 +32,7 @@ class CollectionsApi {
     }
 
     // create path and map variables
-    final instance = getInstance();
+    final instance = await getInstance();
     var url =
         Uri.https("panoramax.$instance.fr", '/api/collections', queryParams);
 
@@ -93,6 +93,45 @@ class CollectionsApi {
       return;
     } else {
       throw new Exception('${response.statusCode} - ${response.reasonPhrase}');
+    }
+  }
+
+  Future<GeoVisioCatalog> getMeCatalog() async {
+    final instance = await getInstance();
+    var url = Uri.https("panoramax.$instance.fr", '/api/users/me/catalog');
+
+    final token = await getToken();
+
+    var response = await http.get(url, headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+      'Authorization': 'Bearer $token'
+    });
+    if (response.statusCode >= 200 && response.statusCode < 400) {
+      var geovisioCatalog =
+          GeoVisioCatalog.fromJson(json.decode(response.body));
+      return geovisioCatalog;
+    } else {
+      throw new Exception('${response.statusCode} - ${response.body}');
+    }
+  }
+
+  Future<GeoVisioCollectionImportStatus> getGeovisioStatus(
+      {required String collectionId}) async {
+    final instance = await getInstance();
+    var url = Uri.https("panoramax.$instance.fr",
+        '/api/collections/${collectionId}/geovisio_status');
+
+    final token = await getToken();
+    var response = await http.get(url, headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+      'Authorization': 'Bearer $token'
+    });
+    if (response.statusCode >= 200 && response.statusCode < 400) {
+      var geovisioStatus =
+          GeoVisioCollectionImportStatus.fromJson(json.decode(response.body));
+      return geovisioStatus;
+    } else {
+      throw new Exception('${response.statusCode} - ${response.body}');
     }
   }
 }
