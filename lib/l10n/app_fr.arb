@@ -8,6 +8,14 @@
   "emptyError": "Aucun élément trouvé",
   "loading": "Chargement...",
 
+  "mySequences": "Mes séquences",
+  "pictures": "photos",
+  "shooting": "Prise de vue",
+  "sendingInProgress": "Envoi en cours",
+  "sendingCompleted": "Envoi terminé",
+  "publishing": "Publication",
+  "blurringInProgress": "Floutage en cours",
+
   "capture": "Prendre une photo",
   "createSequenceWithPicture_tooltip": "Créer une nouvelle séquence avec les photos prises",
   "noCameraFoundError": "Pas de caméra trouvée pour cet appareil",

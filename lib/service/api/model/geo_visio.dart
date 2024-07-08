@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:json_annotation/json_annotation.dart';
 
 part 'geo_visio.g.dart';
@@ -5,17 +7,27 @@ part 'geo_visio.g.dart';
 @JsonSerializable()
 class GeoVisioLink {
   late String href;
-  late String rel;
+  late String? rel;
   String? type;
   String? title;
   String? method;
   Object? headers;
   Object? body;
   bool? merge;
+  String? created;
+  @JsonKey(name: "geovisio:status")
+  String? geovisio_status;
+  String? id;
+  @JsonKey(name: "stats:items")
+  StatsItems? stats_items;
 
   factory GeoVisioLink.fromJson(Map<String, dynamic> json) =>
       _$GeoVisioLinkFromJson(json);
   Map<String, dynamic> toJson() => _$GeoVisioLinkToJson(this);
+
+  String? getThumbUrl() {
+    return '$href/thumb.jpg';
+  }
 
   GeoVisioLink();
 }
@@ -86,4 +98,50 @@ class GeoVisioCollections {
   Map<String, dynamic> toJson() => _$GeoVisioCollectionsToJson(this);
 
   GeoVisioCollections();
+}
+
+@JsonSerializable()
+class GeoVisioCatalog {
+  late String stac_version;
+  List<String>? stac_extension;
+  final String type = "Collection";
+  late String id;
+  String? title;
+  late String description;
+  late List<GeoVisioLink> links;
+
+  factory GeoVisioCatalog.fromJson(Map<String, dynamic> json) =>
+      _$GeoVisioCatalogFromJson(json);
+  Map<String, dynamic> toJson() => _$GeoVisioCatalogToJson(this);
+
+  GeoVisioCatalog();
+}
+
+@JsonSerializable()
+class GeoVisioCollectionImportStatus {
+  late String status;
+  late List<StatusItem> items;
+
+  factory GeoVisioCollectionImportStatus.fromJson(Map<String, dynamic> json) =>
+      _$GeoVisioCollectionImportStatusFromJson(json);
+  Map<String, dynamic> toJson() => _$GeoVisioCollectionImportStatusToJson(this);
+
+  GeoVisioCollectionImportStatus();
+}
+
+@JsonSerializable()
+class StatusItem {
+  String? id;
+  String? status;
+  bool? processing_in_progress;
+  int? rank;
+  int? nb_errors;
+  String? process_error;
+  String? processed_at;
+
+  factory StatusItem.fromJson(Map<String, dynamic> json) =>
+      _$StatusItemFromJson(json);
+  Map<String, dynamic> toJson() => _$StatusItemToJson(this);
+
+  StatusItem();
 }
