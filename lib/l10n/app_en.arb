@@ -15,6 +15,7 @@
   "sendingCompleted": "Sending completed",
   "publishing": "Publishing",
   "blurringInProgress": "Blurring in progress",
+  "share": "Share",
 
   "capture": "Take a picture",
   "createSequenceWithPicture_tooltip": "Create a new sequence with captured pictures",
