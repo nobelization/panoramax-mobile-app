@@ -11,35 +11,35 @@ class UploadPicturesPage extends StatefulWidget {
 
 class _UploadPicturesState extends State<UploadPicturesPage> {
   late bool isLoading;
-  GeoVisioCatalog? sequences;
-  Map<GeoVisioLink, GeoVisioCollectionImportStatus> mapStatus = Map();
+  GeoVisioCollection? sequences;
 
   @override
   void initState() {
     super.initState();
     isLoading = true;
-    uploadImages();
+    //uploadImages();
     getMyCollections();
   }
 
   Future<void> getMyCollections() async {
-    GeoVisioCatalog? refreshedSequences;
+    GeoVisioCollection? refreshedSequences;
     setState(() {
       isLoading = true;
     });
     try {
-      refreshedSequences = await CollectionsApi.INSTANCE.getMeCatalog();
+      refreshedSequences = await CollectionsApi.INSTANCE.getMeCollection();
     } catch (e) {
       print(e);
     } finally {
       setState(() {
         sequences = refreshedSequences;
-        getStatusOfSequences();
+        isLoading = false;
+        //getStatusOfSequences();
       });
     }
   }
 
-  Future<void> getStatusOfSequences() async {
+  /*Future<void> getStatusOfSequences() async {
     Map<GeoVisioLink, GeoVisioCollectionImportStatus> mapRefresh = Map();
     setState(() {
       isLoading = true;
@@ -62,7 +62,7 @@ class _UploadPicturesState extends State<UploadPicturesPage> {
         isLoading = false;
       });
     }
-  }
+  }*/
 
   Widget displayBodySequences(isLoading) {
     if (isLoading) {
@@ -70,7 +70,7 @@ class _UploadPicturesState extends State<UploadPicturesPage> {
     } else if (sequences == null || sequences?.links == null) {
       return const UnknownErrorView();
     } else if (sequences!.links.isNotEmpty) {
-      return SequencesListView(mapStatus: mapStatus);
+      return SequencesListView(links: sequences!.links);
     } else {
       return const NoElementView();
     }
@@ -116,7 +116,6 @@ class _UploadPicturesState extends State<UploadPicturesPage> {
         triggerMode: RefreshIndicatorTriggerMode.onEdge,
         onRefresh: () async {
           setState(() {
-            isLoading = true;
             getMyCollections();
           });
         },
@@ -145,23 +144,21 @@ class _UploadPicturesState extends State<UploadPicturesPage> {
 class SequencesListView extends StatelessWidget {
   const SequencesListView({
     super.key,
-    required this.mapStatus,
+    required this.links,
   });
 
-  final Map<GeoVisioLink, GeoVisioCollectionImportStatus> mapStatus;
+  final List<GeoVisioLink> links;
 
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      itemCount: mapStatus.length,
+      itemCount: links.length,
       physics:
           const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
       itemBuilder: (BuildContext context, int index) {
-        GeoVisioLink key = mapStatus.keys.elementAt(index);
-        GeoVisioCollectionImportStatus value =
-            mapStatus.values.elementAt(index);
-        if (key.geovisio_status != "hidden") {
-          return SequenceCard(key, value);
+        if (links[index].rel == "child" &&
+            links[index].geovisio_status != "hidden") {
+          return SequenceCard(links[index]);
         } else {
           return Container();
         }

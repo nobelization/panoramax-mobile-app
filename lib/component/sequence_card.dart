@@ -1,15 +1,33 @@
 part of panoramax;
 
-class SequenceCard extends StatelessWidget {
+class SequenceCard extends StatefulWidget {
+  const SequenceCard(this.sequence, {super.key});
+
   final GeoVisioLink sequence;
-  final GeoVisioCollectionImportStatus geovisioStatus;
-  const SequenceCard(this.sequence, this.geovisioStatus, {super.key});
+
+  @override
+  State<StatefulWidget> createState() => _SequenceCardState();
+}
+
+class _SequenceCardState extends State<SequenceCard> {
+  late int itemCount;
+  GeoVisioCollectionImportStatus? geovisioStatus;
+
+  @override
+  void initState() {
+    super.initState();
+    itemCount = widget.sequence.stats_items!.count;
+    if (widget.sequence.geovisio_status != "preparing") {
+      getStatus();
+    }
+  }
+
+  Future<void> getStatus() async {}
 
   @override
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.all(10),
-      height: 230,
       width: double.infinity,
       decoration: BoxDecoration(
         color: Colors.white,
@@ -27,7 +45,7 @@ class SequenceCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          geovisioStatus.status == "ready"
+          widget.sequence.geovisio_status == "ready"
               ? Container(
                   height: 140,
                   decoration: BoxDecoration(
@@ -36,7 +54,8 @@ class SequenceCard extends StatelessWidget {
                         topRight: Radius.circular(18),
                       ),
                       image: DecorationImage(
-                        image: Image.network(sequence.getThumbUrl()!).image,
+                        image:
+                            Image.network(widget.sequence.getThumbUrl()!).image,
                         fit: BoxFit.cover,
                       )))
               : Container(
@@ -52,7 +71,7 @@ class SequenceCard extends StatelessWidget {
                           child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                        geovisioStatus.status == "preparing"
+                        widget.sequence.geovisio_status == "preparing"
                             ? Icon(
                                 Icons.check_circle_outline,
                                 color: Colors.blue,
@@ -62,61 +81,64 @@ class SequenceCard extends StatelessWidget {
                                 strokeWidth: 4, // thickness of the circle
                                 color: Colors.blue, // color of the progress bar
                               ),
-                        Text(geovisioStatus.status == "preparing"
+                        Text(widget.sequence.geovisio_status == "preparing"
                             ? AppLocalizations.of(context)!.sendingCompleted
                             : AppLocalizations.of(context)!.sendingInProgress)
                       ])))),
           Container(
-            margin: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  '${geovisioStatus.items.length} ${AppLocalizations.of(context)!.element}',
-                  style: GoogleFonts.nunito(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w800,
+              margin: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '$itemCount ${AppLocalizations.of(context)!.pictures}',
+                        style: GoogleFonts.nunito(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
-          ),
-          /*Container(
-            margin: const EdgeInsets.symmetric(horizontal: 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  '${sequence.stats_items?.count} ${AppLocalizations.of(context)!.photo}',
-                  style: GoogleFonts.nunito(
-                    fontSize: 14,
-                    color: Colors.grey[500],
-                    fontWeight: FontWeight.w400,
-                  ),
-                )
-              ],
-            ),
-          ),*/
-          Container(
-            margin: const EdgeInsets.fromLTRB(10, 3, 10, 0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Text(
-                    sequence.created != null
-                        ? DateFormat(DATE_FORMATTER)
-                            .format(DateTime.parse(sequence.created!))
-                        : "",
-                    style: GoogleFonts.nunito(
-                      fontSize: 14,
-                      color: Colors.grey[500],
-                      fontWeight: FontWeight.w400,
-                    ))
-              ],
-            ),
-          ),
+                  Shooting(),
+                  widget.sequence.geovisio_status == "ready"
+                      ? Publishing()
+                      : Container()
+                ],
+              )),
         ],
       ),
+    );
+  }
+
+  Widget Shooting() {
+    String? date = widget.sequence.extent?.temporal?.interval?[0]?[0];
+    DateFormat dateFormat = DateFormat.yMMMd('fr_FR').add_Hm();
+    return Row(
+      children: [
+        const Icon(Icons.photo_camera),
+        Padding(
+            padding: EdgeInsets.all(8),
+            child: Text(AppLocalizations.of(context)!.shooting)),
+        Spacer(),
+        Text(date == null ? "" : dateFormat.format(DateTime.parse(date)))
+      ],
+    );
+  }
+
+  Widget Publishing() {
+    DateFormat dateFormat = DateFormat.yMMMd('fr_FR').add_Hm();
+    String? date = widget.sequence.created;
+    return Row(
+      children: [
+        const Icon(Icons.cloud_upload),
+        Padding(
+            padding: EdgeInsets.all(8),
+            child: Text(AppLocalizations.of(context)!.publishing)),
+        Spacer(),
+        Text(date == null ? "" : dateFormat.format(DateTime.parse(date)))
+      ],
     );
   }
 }

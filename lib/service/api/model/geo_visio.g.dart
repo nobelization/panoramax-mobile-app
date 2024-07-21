@@ -20,7 +20,10 @@ GeoVisioLink _$GeoVisioLinkFromJson(Map<String, dynamic> json) => GeoVisioLink()
   ..id = json['id'] as String?
   ..stats_items = json['stats:items'] == null
       ? null
-      : StatsItems.fromJson(json['stats:items'] as Map<String, dynamic>);
+      : StatsItems.fromJson(json['stats:items'] as Map<String, dynamic>)
+  ..extent = json['extent'] == null
+      ? null
+      : GeoVisioExtent.fromJson(json['extent'] as Map<String, dynamic>);
 
 Map<String, dynamic> _$GeoVisioLinkToJson(GeoVisioLink instance) =>
     <String, dynamic>{
@@ -36,6 +39,29 @@ Map<String, dynamic> _$GeoVisioLinkToJson(GeoVisioLink instance) =>
       'geovisio:status': instance.geovisio_status,
       'id': instance.id,
       'stats:items': instance.stats_items,
+      'extent': instance.extent,
+    };
+
+GeoVisioExtent _$GeoVisioExtentFromJson(Map<String, dynamic> json) =>
+    GeoVisioExtent()
+      ..spatial = json['spatial']
+      ..temporal = json['temporal'] == null
+          ? null
+          : Temporal.fromJson(json['temporal'] as Map<String, dynamic>);
+
+Map<String, dynamic> _$GeoVisioExtentToJson(GeoVisioExtent instance) =>
+    <String, dynamic>{
+      'spatial': instance.spatial,
+      'temporal': instance.temporal,
+    };
+
+Temporal _$TemporalFromJson(Map<String, dynamic> json) => Temporal()
+  ..interval = (json['interval'] as List<dynamic>?)
+      ?.map((e) => (e as List<dynamic>?)?.map((e) => e as String?).toList())
+      .toList();
+
+Map<String, dynamic> _$TemporalToJson(Temporal instance) => <String, dynamic>{
+      'interval': instance.interval,
     };
 
 GeoVisioProvider _$GeoVisioProviderFromJson(Map<String, dynamic> json) =>
