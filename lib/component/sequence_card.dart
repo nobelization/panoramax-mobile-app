@@ -24,6 +24,15 @@ class _SequenceCardState extends State<SequenceCard> {
 
   Future<void> getStatus() async {}
 
+  Future<void> openUrl() async {
+    final instance = await getInstance();
+    final Uri url =
+        Uri.https("panoramax.$instance.fr", '/sequence/${widget.sequence.id}');
+    if (!await launchUrl(url)) {
+      throw Exception("Could not launch $url");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -57,24 +66,40 @@ class _SequenceCardState extends State<SequenceCard> {
         margin: const EdgeInsets.fromLTRB(10, 10, 10, 0),
         child: Column(
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  '$itemCount ${AppLocalizations.of(context)!.pictures}',
-                  style: GoogleFonts.nunito(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-              ],
-            ),
+            PictureCount(),
             Shooting(),
             widget.sequence.geovisio_status == "ready"
                 ? Publishing()
                 : Container()
           ],
         ));
+  }
+
+  Widget PictureCount() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          '$itemCount ${AppLocalizations.of(context)!.pictures}',
+          style: GoogleFonts.nunito(
+            fontSize: 18,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        widget.sequence.geovisio_status == "ready"
+            ? FloatingActionButton(
+                onPressed: openUrl,
+                child: Icon(
+                  Icons.share,
+                  //size: 14,
+                ),
+                shape: CircleBorder(),
+                mini: true,
+                backgroundColor: Colors.grey,
+                tooltip: AppLocalizations.of(context)!.share)
+            : Container(),
+      ],
+    );
   }
 
   Widget Shooting() {

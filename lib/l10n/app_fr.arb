@@ -15,6 +15,7 @@
   "sendingCompleted": "Envoi terminé",
   "publishing": "Publication",
   "blurringInProgress": "Floutage en cours",
+  "share": "Partager",
 
   "capture": "Prendre une photo",
   "createSequenceWithPicture_tooltip": "Créer une nouvelle séquence avec les photos prises",
