@@ -96,6 +96,43 @@ class CollectionsApi {
     }
   }
 
+  Future<GeoVisioCollection> getMeCollection(
+      {int? limit, List<int>? bbox, String? filter, String? sortby}) async {
+    // query params
+    Map<String, String> queryParams = {};
+    if (limit != null) {
+      queryParams.putIfAbsent("limit", limit as String Function());
+    }
+    if (sortby != null) {
+      queryParams.putIfAbsent("sortby", sortby as String Function());
+    }
+    if (bbox != null) {
+      queryParams.putIfAbsent("bbox", bbox as String Function());
+    }
+    if (filter != null) {
+      queryParams.putIfAbsent("filter", filter as String Function());
+    }
+
+    final token = await getToken();
+
+    final instance = await getInstance();
+    var url = Uri.https(
+        "panoramax.$instance.fr", '/api/users/me/collection', queryParams);
+
+    var response = await http.get(url, headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+      'Authorization': 'Bearer $token'
+    });
+
+    if (response.statusCode >= 200) {
+      var geovisioCollection =
+          GeoVisioCollection.fromJson(json.decode(response.body));
+      return geovisioCollection;
+    } else {
+      throw new Exception('${response.statusCode} - ${response.body}');
+    }
+  }
+
   Future<GeoVisioCatalog> getMeCatalog() async {
     final instance = await getInstance();
     var url = Uri.https("panoramax.$instance.fr", '/api/users/me/catalog');

@@ -20,6 +20,7 @@ class GeoVisioLink {
   String? id;
   @JsonKey(name: "stats:items")
   StatsItems? stats_items;
+  GeoVisioExtent? extent;
 
   factory GeoVisioLink.fromJson(Map<String, dynamic> json) =>
       _$GeoVisioLinkFromJson(json);
@@ -30,6 +31,28 @@ class GeoVisioLink {
   }
 
   GeoVisioLink();
+}
+
+@JsonSerializable()
+class GeoVisioExtent {
+  Object? spatial;
+  Temporal? temporal;
+
+  factory GeoVisioExtent.fromJson(Map<String, dynamic> json) =>
+      _$GeoVisioExtentFromJson(json);
+  Map<String, dynamic> toJson() => _$GeoVisioExtentToJson(this);
+
+  GeoVisioExtent();
+}
+
+@JsonSerializable()
+class Temporal {
+  List<List<String?>?>? interval;
+  factory Temporal.fromJson(Map<String, dynamic> json) =>
+      _$TemporalFromJson(json);
+  Map<String, dynamic> toJson() => _$TemporalToJson(this);
+
+  Temporal();
 }
 
 @JsonSerializable()
