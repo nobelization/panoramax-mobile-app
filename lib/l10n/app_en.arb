@@ -1,4 +1,6 @@
 {
+  "common_close": "Close",
+
   "yourSequence": "Your sequences",
   "element": "element(s)",
   "createSequence_tooltip": "Create a new sequence",
@@ -12,10 +14,34 @@
   "switchCameraRequired": "Turn your phone to start capturing images",
   "photo": "Photo",
   "sequence": "Sequence",
+  "permissionDenied": "Permission refusée",
+  "permissionLocationRequired": "Vous devez obligatoirement accepter la géolocalisation pour pouvoir utiliser l'application",
+  "permissionCameraRequired": "Vous devez obligatoirement autoriser la caméra pour pouvoir prendre des photos",
+  "goToSettings": "Aller aux options",
+  "gpsIsDisableContent": "Merci d'activer votre GPS, l'application ne peut pas fonctionner sans ca",
+  "gpsIsDisableTitle": "GPS non activé",
+  "goToGpsEnable": "activate GPS",
 
   "newSequenceNameField": "Name",
   "newSequenceNameField_placeholder": "Enter the new sequence name",
   "newSequenceSendButton": "Send",
+  "permissionDenied": "Permission denied",
+  "permissionLocationRequired": "You must accept geolocation to be able to use the application",
+  "goToSettings": "Go to settings",
+  "gpsIsDisableContent": "Please activate your GPS, the application cannot work without it",
+  "gpsIsDisableTitle": "GPS disabled",
+
+  "osmLicence": "Photos around the world published under CC-BY-SA 4.0 license",
+  "instanceOsmTitle": "OpenStreetMap France",
+  "ignLicence": "Photos in France published under Licence ouvert 2.0 (CC-BY)",
+  "instanceIgnTitle": "Institut Géographique National",
+  "instanceShare": "Share",
+
+  "newCollectionBack": "Back to the capture",
+  "newCollectionError": "Error {errorMessage}",
+  "newCollectionFail": "Failed to create collection",
+  "newCollectionUploadSuccess": "All photos have been exported",
+  "newCollectionLoading": "Sending {count} pictures",
 
   "newSequenceAppBarTitle": "New Collection",
   "newSequenceFormLabelText": "Collection Name",

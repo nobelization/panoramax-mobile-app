@@ -7,55 +7,45 @@ class CollectionCreationPage extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    return _CarouselWithIndicatorState();
+    return CollectionCreationPageState();
   }
 }
 
-class _CarouselWithIndicatorState extends State<CollectionCreationPage> {
-  int _current = 0;
-  final collectionNameTextController = TextEditingController(
-    text: 'My collection ${DateFormat(DATE_FORMATTER).format(DateTime.now())}',
-  );
-  final _formKey = GlobalKey<FormState>();
-
+class CollectionCreationPageState extends State<CollectionCreationPage> {
   @override
   void dispose() {
-    collectionNameTextController.dispose();
     super.dispose();
     SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
-    DeviceOrientation.landscapeLeft,
-    DeviceOrientation.landscapeRight
-  ]);
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight
+    ]);
   }
 
   @override
   void initState() {
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [SystemUiOverlay.top]);
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
+        overlays: [SystemUiOverlay.top]);
     SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
-  ]);
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
     super.initState();
   }
 
-  void goToCapturePage() async {
-    await availableCameras().then(
-      (availableCameras) =>
-          GetIt.instance<NavigationService>().pushTo(Routes.newSequenceCapture, arguments: availableCameras),
-    );
+  void goToInstancePage() {
+    GetIt.instance<NavigationService>()
+        .pushTo(Routes.instance, arguments: widget.imgList);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: BLUE,
-        leading: BackButton(
-     color: Colors.white
-   ),
-      ),
+        appBar: AppBar(
+          backgroundColor: BLUE,
+          leading: BackButton(color: Colors.white),
+        ),
         backgroundColor: BLUE,
         body: SafeArea(
           child: Padding(
@@ -71,85 +61,34 @@ class _CarouselWithIndicatorState extends State<CollectionCreationPage> {
                 Expanded(
                     child: SingleChildScrollView(
                         padding: const EdgeInsets.all(16.0),
-                        child: GridView.count(
-                          physics: NeverScrollableScrollPhysics(),
-                          padding: const EdgeInsets.all(10.0),
-                          shrinkWrap: true,
-                          crossAxisCount: 3,
-                          mainAxisSpacing: 5,
-                          crossAxisSpacing: 5,
-                          childAspectRatio: (16 / 9),
-                          children: widget.imgList
-                              .map(
-                                (item) => GridTile(
-                                  child: Stack(
-                                    children: <Widget>[
-                                      Image.file(
-                                        item,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              )
-                              .toList(),
-                        ))),
+                        child: Align(
+                            child: Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: [
+                            ...widget.imgList
+                                .map((item) => Container(
+                                    height: 100,
+                                    child: Image.file(
+                                      item,
+                                      fit: BoxFit.cover,
+                                    )))
+                                .toList()
+                          ],
+                        )))),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 64, 0, 32),
-                  child: LoadingBtn(
-                    height: 50,
-                    borderRadius: 8,
-                    animate: true,
-                    color: Colors.blue,
-                    width: MediaQuery.of(context).size.width * 0.45,
-                    loader: Container(
-                      padding: const EdgeInsets.all(10),
-                      width: 40,
-                      height: 40,
-                      child: const CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                      ),
-                    ),
-                    child: Text(
-                      AppLocalizations.of(context)!.newSequenceSendButton,
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    onTap: (startLoading, stopLoading, btnState) async {
-                      if (_formKey.currentState!.validate() &&
-                          btnState == ButtonState.idle) {
-                        startLoading();
-                        // call your network api
-                        await submitNewCollection(
-                          collectionName: collectionNameTextController.text,
-                          picturesToUpload: widget.imgList,
-                        );
-                        stopLoading();
-                      }
-                    },
-                  ),
-                ),
+                    padding: const EdgeInsets.fromLTRB(0, 64, 0, 32),
+                    child: TextButton(
+                      onPressed: goToInstancePage,
+                      style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all(Colors.white)),
+                      child: Text(
+                          AppLocalizations.of(context)!.newSequenceSendButton),
+                    )),
               ],
             ),
           ),
         ));
-  }
-
-  Future<void> submitNewCollection(
-      {required String collectionName, required List<File> picturesToUpload}) {
-    return CollectionsApi.INSTANCE
-        .apiCollectionsCreate(newCollectionName: collectionName)
-        .then((createdCollection) {
-      debugPrint('Created Collection $createdCollection');
-      picturesToUpload.asMap().forEach((index, pictureToUpload) async {
-        await CollectionsApi.INSTANCE
-            .apiCollectionsUploadPicture(
-                collectionId: createdCollection.id,
-                position: index + 1,
-                pictureToUpload: pictureToUpload)
-            .then((value) {
-          debugPrint('Picture ${index + 1} uploaded');
-        }).catchError((error) => throw Exception(error));
-      });
-      goToCapturePage();
-    }).catchError((error) => throw Exception(error));
   }
 }

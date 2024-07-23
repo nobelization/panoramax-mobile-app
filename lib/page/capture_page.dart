@@ -9,10 +9,12 @@ class CapturePage extends StatefulWidget {
   State<CapturePage> createState() => _CapturePageState();
 }
 
-class _CapturePageState extends State<CapturePage> {
+class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
+  final List<AppLifecycleState> _stateHistoryList = <AppLifecycleState>[];
   late CameraController _cameraController;
   bool _isProcessing = false;
   bool _isRearCameraSelected = true;
+  bool _isPermissionDialogOpen = false;
   final List<File> _imgListCaptured = [];
 
   int _burstDuration = 3; //in seconds
@@ -27,13 +29,18 @@ class _CapturePageState extends State<CapturePage> {
     distanceFilter: 2, //The minimum distance (in meters) to trigger an update
   );
 
+  late final GravityOrientationDetector _orientationDetector;
+  var isPortraitOrientation = true;
+
   @override
   void dispose() {
     _cameraController.dispose();
     SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
-  ]);
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+    WidgetsBinding.instance.removeObserver(this);
+
     super.dispose();
   }
 
@@ -45,35 +52,80 @@ class _CapturePageState extends State<CapturePage> {
       DeviceOrientation.portraitUp,
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight
-  ]);
+    ]);
     super.initState();
 
+    _orientationDetector = GravityOrientationDetector();
+    _orientationDetector.init();
+
     startLocationUpdates();
+    WidgetsBinding.instance.addObserver(this);
+    if (WidgetsBinding.instance.lifecycleState != null) {
+      _stateHistoryList.add(WidgetsBinding.instance.lifecycleState!);
+    }
 
     if (widget.cameras?.isNotEmpty ?? false) {
       initCamera(widget.cameras![0]);
     }
   }
 
-  void startLocationUpdates() async {
-    if (await PermissionHelper.isPermissionGranted()) {
-      _positionStream =
-          Geolocator.getPositionStream(locationSettings: locationSettings);
-
-      if (_positionStream != null) {
-        _positionStream!.listen((Position position) {
-          setState(() {
-            _currentPosition = position;
-          });
-        });
-      }
-    } else {
-      await PermissionHelper.askMissingPermission();
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
       startLocationUpdates();
     }
   }
 
+  void startLocationUpdates() async {
+    //check if GPS is enabled
+    if (!await Geolocator.isLocationServiceEnabled()) {
+      showGPSDialog();
+      return;
+    }
+
+    Geolocator.checkPermission().then((permission) async {
+      print(permission.toString());
+      switch (permission) {
+        case LocationPermission.denied:
+        case LocationPermission.unableToDetermine:
+        case LocationPermission.deniedForever:
+          var result = await Geolocator.requestPermission();
+          if (result == LocationPermission.deniedForever &&
+              !_isPermissionDialogOpen) {
+            await showPermissionDialog();
+          }
+          break;
+        case LocationPermission.always:
+        case LocationPermission.whileInUse:
+          if (_isPermissionDialogOpen) {
+            Navigator.of(context).pop();
+            _isPermissionDialogOpen = false;
+          }
+          _positionStream =
+              Geolocator.getPositionStream(locationSettings: locationSettings);
+          if (_positionStream != null) {
+            _positionStream!.listen((Position position) {
+              setState(() {
+                _currentPosition = position;
+              });
+            });
+          }
+          break;
+        default:
+          break;
+      }
+    });
+  }
+
+  void goToSettings() async {
+    await Geolocator.openAppSettings();
+  }
+
   void goToCollectionCreationPage() {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
     GetIt.instance<NavigationService>()
         .pushTo(Routes.newSequenceSend, arguments: _imgListCaptured);
   }
@@ -145,13 +197,25 @@ class _CapturePageState extends State<CapturePage> {
   }
 
   Future<void> addExifTags(XFile rawImage, Position currentLocation) async {
-    print(currentLocation.latitude.toString() +
+    print("add exif tag : " +
+        currentLocation.latitude.toString() +
         " " +
         currentLocation.longitude.toString());
-    final exif = FlutterExif.fromPath(rawImage.path);
-    await exif.setLatLong(currentLocation.latitude, currentLocation.longitude);
-    await exif.setAltitude(currentLocation.altitude);
-    await exif.saveAttributes();
+
+    if (Platform.isIOS) {
+      var exif = await Exif.fromPath(rawImage.path);
+      await exif.writeAttributes({
+        'GPSLatitude': currentLocation.latitude,
+        'GPSLongitude': currentLocation.longitude,
+        'GPSAltitude': currentLocation.altitude
+      });
+    } else {
+      final exif = FlutterExif.fromPath(rawImage.path);
+      await exif.setLatLong(
+          currentLocation.latitude, currentLocation.longitude);
+      await exif.setAltitude(currentLocation.altitude);
+      await exif.saveAttributes();
+    }
   }
 
   Future initCamera(CameraDescription cameraDescription) async {
@@ -165,7 +229,7 @@ class _CapturePageState extends State<CapturePage> {
         if (!mounted) return;
         setState(() {});
       });
-      await _cameraController.setFocusMode(FocusMode.locked);
+      await _cameraController.setFocusMode(FocusMode.auto);
     } on CameraException catch (e) {
       debugPrint("camera error $e");
     }
@@ -181,37 +245,28 @@ class _CapturePageState extends State<CapturePage> {
         ),
       );
     }
-/*
-    var height = MediaQuery.of(context).size.height * 0.12;
-    var cartIcon = IconButton(
-      onPressed: () {},
-      iconSize: 30,
-      padding: EdgeInsets.zero,
-      constraints: const BoxConstraints(),
-      icon: const Icon(Icons.add_shopping_cart_outlined, color: Colors.white),
-    );
-    return Stack(
-      children: [
-        cameraPreview(),
-        captureButton(height, context),
-        createBurstButtons(),
-        Positioned(
-          bottom: 0,
-          left: 0,
-          child: Container(
-            width: MediaQuery.of(context).size.width,
-            height: height,
-            decoration: const BoxDecoration(color: Colors.black),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                switchCameraButton(context),
-                imageCart(cartIcon),
-                createSequenceButton(context),
-              ],
-*/
-    return OrientationBuilder(
+    return StreamBuilder(
+      stream: _orientationDetector.orientationStream,
       builder: (context, orientation) {
+        var beta = null;
+        var alpha = null;
+        if (orientation.hasData) {
+          beta = orientation.data!.beta;
+          alpha = orientation.data!.alpha.abs();
+          if (beta > 0.8) {
+            SystemChrome.setPreferredOrientations(
+                [DeviceOrientation.landscapeRight]);
+            isPortraitOrientation = false;
+          } else if (beta < -0.8) {
+            SystemChrome.setPreferredOrientations(
+                [DeviceOrientation.landscapeLeft]);
+            isPortraitOrientation = false;
+          } else if (alpha > 0.3) {
+            SystemChrome.setPreferredOrientations(
+                [DeviceOrientation.portraitUp]);
+            isPortraitOrientation = true;
+          }
+        }
         return Stack(children: [
           Positioned.fill(
             child: Container(
@@ -219,7 +274,7 @@ class _CapturePageState extends State<CapturePage> {
             ),
           ),
           cameraPreview(),
-          orientation == Orientation.landscape
+          (!isPortraitOrientation)
               ? landscapeLayout(context)
               : portraitLayout(context),
           if (_isProcessing) processingLoader(context)
@@ -233,25 +288,26 @@ class _CapturePageState extends State<CapturePage> {
         padding: EdgeInsets.all(24),
         height: MediaQuery.of(context).size.height,
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Expanded(
-                child:
-                    Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              TextButton(
-                  onPressed: () => switchMode(false),
-                  child: Text(AppLocalizations.of(context)!.photo.toUpperCase()),
-                  style: _isBurstMode ? notSelectedButton() : selectedButton()),
-              SizedBox(width: 10),
-              TextButton(
-                  onPressed: () => switchMode(true),
-                  child: Text(
-                      AppLocalizations.of(context)!.sequence.toUpperCase()),
-                  style: _isBurstMode ? selectedButton() : notSelectedButton()),
-            ])),
-          ],
+          children: listBurstButtons(),
         ));
+  }
+
+  List<Widget> listBurstButtons() {
+    return [
+      Expanded(
+          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+        TextButton(
+            onPressed: () => switchMode(false),
+            child: Text(AppLocalizations.of(context)!.photo.toUpperCase()),
+            style: _isBurstMode ? notSelectedButton() : selectedButton()),
+        SizedBox(width: 10),
+        TextButton(
+            onPressed: () => switchMode(true),
+            child: Text(AppLocalizations.of(context)!.sequence.toUpperCase()),
+            style: _isBurstMode ? selectedButton() : notSelectedButton()),
+      ])),
+    ];
   }
 
   void switchMode(bool isBurstMode) {
@@ -279,7 +335,6 @@ class _CapturePageState extends State<CapturePage> {
 
   ButtonStyle selectedButton() {
     return TextButton.styleFrom(
-        //minimumSize: Size(80, 0),
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(10)),
         ),
@@ -294,46 +349,98 @@ class _CapturePageState extends State<CapturePage> {
           borderRadius: BorderRadius.all(Radius.circular(10)),
         ),
         foregroundColor: Colors.white,
-        //backgroundColor: Colors.white,
         side: BorderSide(width: 3, color: Colors.white));
   }
 
   Widget portraitLayout(BuildContext context) {
-    return Container(
-        // set the height property to take the screen width
-        width: MediaQuery.of(context).size.width,
-        child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              BackdropFilter(
+    return Stack(
+      children: [
+        _isBurstMode
+            ? BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                 child: Container(color: Colors.transparent),
-              ),
-              Icon(Icons.screen_rotation, size: 120.0, color: Colors.white),
-              Padding(
-                  padding: EdgeInsets.all(50),
-                  child: Card(
-                      child: Padding(
-                          padding: EdgeInsets.all(16),
-                          child: Row(children: [
-                            Icon(
-                              Icons.info_outline,
-                              color: BLUE,
-                            ),
-                            Expanded(
-                                child: Padding(
-                                    padding: EdgeInsets.only(left: 8),
-                                    child: Text(
-                                        AppLocalizations.of(context)!
-                                            .switchCameraRequired,
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: BLUE,
-                                          fontSize: 16,
-                                        )))),
-                          ]))))
-            ]));
+              )
+            : Container(),
+        Center(
+          child: _isBurstMode ? askTurnDevice() : Container(),
+        ),
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            Padding(
+                padding: EdgeInsets.all(20),
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: listActionBar())),
+            Padding(
+              padding: EdgeInsets.all(16),
+              child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: listBurstButtons()),
+            )
+          ]),
+        ),
+      ],
+    );
+  }
+
+  List<Widget> listActionBar() {
+    return [
+      _imgListCaptured.isNotEmpty
+          ? badges.Badge(
+              position: badges.BadgePosition.bottomEnd(),
+              badgeContent: Text('${_imgListCaptured.length}'),
+              child: galleryButton(context))
+          : galleryButton(context),
+      (!_isBurstMode || !isPortraitOrientation) ? captureButton() : Spacer(),
+      _imgListCaptured.isNotEmpty ? createSequenceButton(context) : Container(),
+    ];
+  }
+
+  Widget actionBarPortrait() {
+    return Container(
+        padding: EdgeInsets.all(24),
+        height: MediaQuery.of(context).size.height,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Expanded(
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: listActionBar())),
+          ],
+        ));
+  }
+
+  Widget askTurnDevice() {
+    return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Icon(Icons.screen_rotation, size: 120.0, color: Colors.white),
+          Padding(
+              padding: EdgeInsets.all(50),
+              child: Card(
+                  child: Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Row(children: [
+                        Icon(
+                          Icons.info_outline,
+                          color: BLUE,
+                        ),
+                        Expanded(
+                            child: Padding(
+                                padding: EdgeInsets.only(left: 8),
+                                child: Text(
+                                    AppLocalizations.of(context)!
+                                        .switchCameraRequired,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: BLUE,
+                                      fontSize: 16,
+                                    )))),
+                      ]))))
+        ]);
   }
 
   Widget landscapeLayout(BuildContext context) {
@@ -342,62 +449,42 @@ class _CapturePageState extends State<CapturePage> {
         width: MediaQuery.of(context).size.width,
         child: Stack(children: [
           createBurstButtons(),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Expanded(
-                  child: Align(
-                      alignment: Alignment.centerRight,
-                      child: _imgListCaptured.isNotEmpty
-                          ? badges.Badge(
-                              position: badges.BadgePosition.bottomEnd(),
-                              badgeContent: Text('${_imgListCaptured.length}'),
-                              child: galleryButton(context))
-                          : galleryButton(context))),
-              Expanded(
-                  child: Align(
-                      alignment: Alignment.centerRight,
-                      child: captureButton())),
-              Expanded(
-                  child: Align(
-                      alignment: Alignment.centerRight,
-                      child: _imgListCaptured.isNotEmpty
-                          ? createSequenceButton(context)
-                          : Container()))
-            ],
-          )
+          Container(
+              padding: EdgeInsets.all(24),
+              width: MediaQuery.of(context).size.width,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: listActionBar(),
+              ))
         ]));
   }
 
-  Expanded createSequenceButton(BuildContext context) {
-    return Expanded(
-/*<<<<<<< HEAD
-        child: IconButton(
-            padding: EdgeInsets.zero,
-            iconSize: 30,
-            icon: const Icon(Icons.send_outlined, color: Colors.white),
-            onPressed: goToCollectionCreationPage,
-            tooltip: AppLocalizations.of(context)!
-                .createSequenceWithPicture_tooltip));
-=======*/
-        child: Container(
+  Widget createSequenceButton(BuildContext context) {
+    //return Expanded(
+    /* child: Container(
             height: 60,
             width: 60,
             decoration:
-                BoxDecoration(shape: BoxShape.circle, color: Colors.blue),
-            child: IconButton(
-                padding: EdgeInsets.zero,
-                iconSize: 30,
-                icon: const Icon(Icons.send_outlined, color: Colors.white),
-                onPressed: goToCollectionCreationPage,
-                tooltip: AppLocalizations.of(context)!
-                    .createSequenceWithPicture_tooltip)));
+                BoxDecoration(shape: BoxShape.circle, color: Colors.blue),*/
+    return IconButton(
+        padding: EdgeInsets.zero,
+        iconSize: 30,
+        icon: const Icon(Icons.send_outlined, color: Colors.white),
+        onPressed: goToCollectionCreationPage,
+        tooltip:
+            AppLocalizations.of(context)!.createSequenceWithPicture_tooltip);
   }
 
   Widget captureButton() {
     return GestureDetector(
       child: IconButton(
-          onPressed: _isBurstMode ? takeBurstPictures : takePicture,
+          //if the GPS is not active, the capture button does nothing, otherwise we see what mode we are in
+          onPressed: (_currentPosition == null)
+              ? startLocationUpdates
+              : _isBurstMode
+                  ? takeBurstPictures
+                  : takePicture,
           iconSize: 100,
           padding: EdgeInsets.zero,
           constraints: const BoxConstraints(),
@@ -406,7 +493,11 @@ class _CapturePageState extends State<CapturePage> {
             width: 60,
             decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: _isBurstPlay ? Colors.red : Colors.white),
+                color: (_currentPosition == null)
+                    ? Colors.grey
+                    : _isBurstPlay
+                        ? Colors.red
+                        : Colors.white),
           ),
           tooltip: AppLocalizations.of(context)!.capture),
     );
@@ -450,6 +541,68 @@ class _CapturePageState extends State<CapturePage> {
         ),
         shadowBackground: true,
       ),
+    );
+  }
+
+  Future<void> showGPSDialog() async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(AppLocalizations.of(context)!.gpsIsDisableTitle),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(AppLocalizations.of(context)!.gpsIsDisableContent),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text(AppLocalizations.of(context)!.common_close),
+              onPressed: () {
+                startLocationUpdates;
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> showPermissionDialog() async {
+    _isPermissionDialogOpen = true;
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(AppLocalizations.of(context)!.permissionDenied),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(AppLocalizations.of(context)!.permissionLocationRequired),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text(AppLocalizations.of(context)!.common_close),
+              onPressed: () {
+                Navigator.of(context).pop();
+                _isPermissionDialogOpen = false;
+              },
+            ),
+            TextButton(
+              child: Text(AppLocalizations.of(context)!.goToSettings),
+              onPressed: () {
+                goToSettings();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }
