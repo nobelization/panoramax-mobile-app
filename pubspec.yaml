@@ -55,6 +55,8 @@ dependencies:
   app_settings: ^5.1.1
   flutter_exif_plugin: ^1.1.0
   sensors: ^2.0.3
+  android_intent: ^2.0.2
+  receive_sharing_intent: ^1.8.0
 
 dev_dependencies:
   flutter_test:

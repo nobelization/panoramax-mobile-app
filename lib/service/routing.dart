@@ -13,7 +13,7 @@ class Routes extends Equatable {
         newSequenceCapture,
         newSequenceSend,
         instance,
-        newSequenceUpload
+        newSequenceUpload,
       ];
 }
 
@@ -24,10 +24,9 @@ class NavigationService {
   }
 
   dynamic pushReplacementTo(String route, {dynamic arguments}) {
-    return navigatorkey.currentState?.pushReplacementNamed(route, arguments: arguments);
+    return navigatorkey.currentState
+        ?.pushReplacementNamed(route, arguments: arguments);
   }
-
-
 
   dynamic goBack() {
     return navigatorkey.currentState?.pop();
