@@ -11,11 +11,63 @@ class _HomePageState extends State<HomePage> {
   late bool isLoading;
   GeoVisioCollections? geoVisionCollections;
 
+  late StreamSubscription _intentSub;
+  List<SharedMediaFile>? _sharedFiles;
+
   @override
   void initState() {
     super.initState();
     isLoading = true;
     getCollections();
+    listenSendingIntent();
+  }
+
+  @override
+  void dispose() {
+    _intentSub.cancel();
+    super.dispose();
+  }
+
+  void listenSendingIntent() {
+    // Listen to media sharing coming from outside the app while the app is in the memory.
+    _intentSub = ReceiveSharingIntent.instance.getMediaStream().listen((value) {
+      _sharedFiles = value;
+      if (_sharedFiles != null && _sharedFiles!.isNotEmpty) {
+        final fileList = sharedFilesToImages(_sharedFiles!);
+        GetIt.instance<NavigationService>()
+            .pushTo(Routes.newSequenceSend, arguments: fileList);
+      }
+    }, onError: (err) {
+      print("getIntentDataStream error: $err");
+    });
+
+    // Get the media sharing coming from outside the app while the app is closed.
+    ReceiveSharingIntent.instance.getInitialMedia().then((value) {
+      _sharedFiles = value;
+      // Tell the library that we are done processing the intent.
+      ReceiveSharingIntent.instance.reset();
+      if (_sharedFiles != null && _sharedFiles!.isNotEmpty) {
+        final fileList = sharedFilesToImages(_sharedFiles!);
+        GetIt.instance<NavigationService>()
+            .pushTo(Routes.newSequenceSend, arguments: fileList);
+      }
+    });
+  }
+
+  List<File> sharedFilesToImages(List<SharedMediaFile> list) {
+    return list
+        .where((element) => isImage(element))
+        .map((item) => File(item.path))
+        .toList();
+  }
+
+  bool isImage(SharedMediaFile file) {
+    final fileExtension = file.path.split('.').last.toLowerCase();
+    return (fileExtension == 'jpg' ||
+        fileExtension == 'jpeg' ||
+        fileExtension == 'png' ||
+        fileExtension == 'gif' ||
+        fileExtension == 'bmp');
   }
 
   Future<void> getCollections() async {
@@ -39,9 +91,9 @@ class _HomePageState extends State<HomePage> {
     if (!await PermissionHelper.isPermissionGranted()) {
       await PermissionHelper.askMissingPermission();
     }
-    await availableCameras().then(
-      (availableCameras) => GetIt.instance<NavigationService>().pushTo(Routes.newSequenceCapture, arguments: availableCameras)
-    );
+    await availableCameras().then((availableCameras) =>
+        GetIt.instance<NavigationService>()
+            .pushTo(Routes.newSequenceCapture, arguments: availableCameras));
   }
 
   Widget displayBody(isLoading) {
@@ -76,7 +128,8 @@ class _HomePageState extends State<HomePage> {
               child: Semantics(
                 header: true,
                 child: Text(AppLocalizations.of(context)!.yourSequence,
-                    style: GoogleFonts.nunito(fontSize: 25, fontWeight: FontWeight.w400)),
+                    style: GoogleFonts.nunito(
+                        fontSize: 25, fontWeight: FontWeight.w400)),
               ),
             ),
             Expanded(
@@ -106,7 +159,8 @@ class CollectionListView extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView.builder(
       itemCount: collections.length,
-      physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+      physics:
+          const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
       itemBuilder: (BuildContext context, int index) {
         return CollectionPreview(collections[index]);
       },
@@ -147,7 +201,8 @@ class NoElementView extends StatelessWidget {
         Center(
           child: Text(
             AppLocalizations.of(context)!.emptyError,
-            style: GoogleFonts.nunito(fontSize: 18, color: Colors.grey, fontWeight: FontWeight.w400),
+            style: GoogleFonts.nunito(
+                fontSize: 18, color: Colors.grey, fontWeight: FontWeight.w400),
           ),
         )
       ],
@@ -168,7 +223,8 @@ class UnknownErrorView extends StatelessWidget {
         Center(
           child: Text(
             AppLocalizations.of(context)!.unknownError,
-            style: GoogleFonts.nunito(fontSize: 20, color: Colors.red, fontWeight: FontWeight.w400),
+            style: GoogleFonts.nunito(
+                fontSize: 20, color: Colors.red, fontWeight: FontWeight.w400),
           ),
         )
       ],
