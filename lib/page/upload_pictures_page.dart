@@ -12,12 +12,15 @@ class UploadPicturesPage extends StatefulWidget {
 class _UploadPicturesState extends State<UploadPicturesPage> {
   late bool isLoading;
   GeoVisioCollection? sequences;
+  late int sequenceCount;
+  String? collectionId;
 
   @override
   void initState() {
     super.initState();
     isLoading = true;
-    //uploadImages();
+    sequenceCount = widget.imgList.length;
+    uploadImages();
     getMyCollections();
   }
 
@@ -34,35 +37,9 @@ class _UploadPicturesState extends State<UploadPicturesPage> {
       setState(() {
         sequences = refreshedSequences;
         isLoading = false;
-        //getStatusOfSequences();
       });
     }
   }
-
-  /*Future<void> getStatusOfSequences() async {
-    Map<GeoVisioLink, GeoVisioCollectionImportStatus> mapRefresh = Map();
-    setState(() {
-      isLoading = true;
-    });
-    try {
-      List<Future<Null>>? futures = sequences?.links
-          .where((sequence) => sequence.rel == "child")
-          .map((sequence) async {
-        var geovisioStatus = await CollectionsApi.INSTANCE
-            .getGeovisioStatus(collectionId: sequence.id!);
-
-        mapRefresh[sequence] = geovisioStatus;
-      }).toList();
-      await Future.wait(futures!.cast<Future<dynamic>>());
-    } catch (e) {
-      print(e);
-    } finally {
-      setState(() {
-        mapStatus = mapRefresh;
-        isLoading = false;
-      });
-    }
-  }*/
 
   Widget displayBodySequences(isLoading) {
     if (isLoading) {
@@ -70,32 +47,40 @@ class _UploadPicturesState extends State<UploadPicturesPage> {
     } else if (sequences == null || sequences?.links == null) {
       return const UnknownErrorView();
     } else if (sequences!.links.isNotEmpty) {
-      return SequencesListView(links: sequences!.links);
+      return SequencesListView(
+          links: sequences!.links,
+          collectionId: collectionId,
+          lastSequenceCount: sequenceCount);
     } else {
       return const NoElementView();
     }
   }
 
   Future<void> uploadImages() async {
-    final collectionId = await createCollection();
-    await sendPictures(collectionId);
+    await createCollection();
+    await sendPictures();
   }
 
-  Future<String> createCollection() async {
+  Future<void> createCollection() async {
     try {
       final collectionName = DateFormat('y_M_d_H_m_s').format(DateTime.now());
       final collection = await CollectionsApi.INSTANCE
           .apiCollectionsCreate(newCollectionName: collectionName);
-      return collection.id;
+      setState(() {
+        collectionId = collection.id;
+      });
     } catch (e) {
       rethrow;
     }
   }
 
-  Future<void> sendPictures(String collectionId) async {
+  Future<void> sendPictures() async {
+    if (collectionId == null) {
+      return;
+    }
     for (var i = 0; i < widget.imgList.length; i++) {
       await CollectionsApi.INSTANCE.apiCollectionsUploadPicture(
-        collectionId: collectionId,
+        collectionId: collectionId!,
         position: i + 1,
         pictureToUpload: widget.imgList[i],
       );
@@ -142,12 +127,15 @@ class _UploadPicturesState extends State<UploadPicturesPage> {
 }
 
 class SequencesListView extends StatelessWidget {
-  const SequencesListView({
-    super.key,
-    required this.links,
-  });
+  const SequencesListView(
+      {super.key,
+      required this.links,
+      required this.collectionId,
+      required this.lastSequenceCount});
 
   final List<GeoVisioLink> links;
+  final String? collectionId;
+  final int lastSequenceCount;
 
   @override
   Widget build(BuildContext context) {
@@ -158,7 +146,9 @@ class SequencesListView extends StatelessWidget {
       itemBuilder: (BuildContext context, int index) {
         if (links[index].rel == "child" &&
             links[index].geovisio_status != "hidden") {
-          return SequenceCard(links[index]);
+          return SequenceCard(links[index],
+              sequenceCount:
+                  links[index].id == collectionId ? lastSequenceCount : null);
         } else {
           return Container();
         }
