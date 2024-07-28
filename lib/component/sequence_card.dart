@@ -15,16 +15,45 @@ class _SequenceCardState extends State<SequenceCard> {
   late int itemCount;
   GeoVisioCollectionImportStatus? geovisioStatus;
   Timer? timer;
+  SequenceState sequenceState = SequenceState.SENDING;
 
   @override
   void initState() {
     super.initState();
     itemCount = widget.sequence.stats_items!.count;
-    if (widget.sequence.geovisio_status != "preparing" ||
-        widget.sequenceCount != null) {
-      timer = Timer.periodic(Duration(seconds: 1), (timer) {
+    checkSequenceState();
+    if (sequenceState != SequenceState.READY || widget.sequenceCount != null) {
+      timer = Timer.periodic(Duration(seconds: 5), (timer) {
         getStatus();
       });
+    }
+  }
+
+  void checkSequenceState() {
+    int count = geovisioStatus?.items
+            .where(
+              (element) => element.status == "ready",
+            )
+            .length ??
+        0;
+    print("checkSequenceStat");
+    setState(() {
+      sequenceState = geovisioStatus?.status == "deleted"
+          ? SequenceState.DELETED
+          : widget.sequence.geovisio_status == "hidden"
+              ? SequenceState.HIDDEN
+              : widget.sequenceCount == null
+                  ? widget.sequence.geovisio_status == "ready"
+                      ? SequenceState.READY
+                      : SequenceState.BLURRING
+                  : widget.sequenceCount != geovisioStatus?.items.length
+                      ? SequenceState.SENDING
+                      : count == widget.sequenceCount
+                          ? SequenceState.READY
+                          : SequenceState.BLURRING;
+    });
+    if (sequenceState == SequenceState.DELETED) {
+      timer?.cancel();
     }
   }
 
@@ -44,6 +73,7 @@ class _SequenceCardState extends State<SequenceCard> {
     } finally {
       setState(() {
         geovisioStatus = geovisioStatusRefresh;
+        checkSequenceState();
       });
     }
   }
@@ -59,33 +89,33 @@ class _SequenceCardState extends State<SequenceCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.all(10),
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: const BorderRadius.all(
-          Radius.circular(18),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.shade200,
-            spreadRadius: 4,
-            blurRadius: 6,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          widget.sequence.geovisio_status == "ready" &&
-                  widget.sequenceCount == null
-              ? Picture()
-              : Loader(),
-          PictureDetail(),
-        ],
-      ),
-    );
+    return sequenceState == SequenceState.DELETED ||
+            sequenceState == SequenceState.HIDDEN
+        ? Container()
+        : Container(
+            margin: const EdgeInsets.all(10),
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: const BorderRadius.all(
+                Radius.circular(18),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.shade200,
+                  spreadRadius: 4,
+                  blurRadius: 6,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            child: Column(
+              children: [
+                sequenceState == SequenceState.READY ? Picture() : Loader(),
+                PictureDetail(),
+              ],
+            ),
+          );
   }
 
   Widget PictureDetail() {
@@ -95,13 +125,8 @@ class _SequenceCardState extends State<SequenceCard> {
           children: [
             PictureCount(),
             Shooting(),
-            widget.sequence.geovisio_status == "ready"
-                ? Publishing()
-                : Container(),
-            widget.sequenceCount == null ||
-                    widget.sequence.stats_items?.count == widget.sequenceCount
-                ? Blurring()
-                : Container()
+            sequenceState == SequenceState.READY ? Publishing() : Container(),
+            sequenceState == SequenceState.BLURRING ? Blurring() : Container()
           ],
         ));
   }
@@ -119,8 +144,7 @@ class _SequenceCardState extends State<SequenceCard> {
             fontWeight: FontWeight.w800,
           ),
         ),
-        widget.sequence.geovisio_status == "ready" &&
-                widget.sequenceCount == null
+        sequenceState == SequenceState.READY
             ? FloatingActionButton(
                 onPressed: openUrl,
                 child: Icon(
@@ -180,8 +204,7 @@ class _SequenceCardState extends State<SequenceCard> {
                 child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-              widget.sequenceCount == null ||
-                      geovisioStatus?.items.length == widget.sequenceCount
+              sequenceState == SequenceState.BLURRING
                   ? Icon(
                       Icons.check_circle_outline,
                       color: Colors.blue,
@@ -191,8 +214,7 @@ class _SequenceCardState extends State<SequenceCard> {
                       strokeWidth: 4, // thickness of the circle
                       color: Colors.blue, // color of the progress bar
                     ),
-              Text(widget.sequenceCount == null ||
-                      geovisioStatus?.items.length == widget.sequenceCount
+              Text(sequenceState == SequenceState.BLURRING
                   ? AppLocalizations.of(context)!.sendingCompleted
                   : AppLocalizations.of(context)!.sendingInProgress)
             ]))));
@@ -241,3 +263,5 @@ class _SequenceCardState extends State<SequenceCard> {
     ));
   }
 }
+
+enum SequenceState { SENDING, BLURRING, READY, DELETED, HIDDEN }
