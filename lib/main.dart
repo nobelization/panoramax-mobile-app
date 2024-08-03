@@ -22,6 +22,7 @@ import 'package:webview_cookie_manager/webview_cookie_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:native_exif/native_exif.dart';
 import 'package:flutter_exif_plugin/flutter_exif_plugin.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:sensors/sensors.dart';
 import 'component/loader.dart';
 import 'service/api/api.dart';
