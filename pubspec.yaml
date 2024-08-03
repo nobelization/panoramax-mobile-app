@@ -55,6 +55,7 @@ dependencies:
   app_settings: ^5.1.1
   flutter_exif_plugin: ^1.1.0
   sensors: ^2.0.3
+  wakelock_plus: ^1.2.7
 
 dev_dependencies:
   flutter_test:
