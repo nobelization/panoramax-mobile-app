@@ -389,6 +389,7 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
       _imgListCaptured.isNotEmpty
           ? badges.Badge(
               position: badges.BadgePosition.bottomEnd(),
+              badgeStyle: badges.BadgeStyle(badgeColor: Colors.blue),
               badgeContent: Text('${_imgListCaptured.length}'),
               child: galleryButton(context))
           : galleryButton(context),
