@@ -40,6 +40,7 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
       DeviceOrientation.portraitDown,
     ]);
     WidgetsBinding.instance.removeObserver(this);
+    WakelockPlus.disable();
 
     super.dispose();
   }
@@ -237,6 +238,7 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    WakelockPlus.enable();
     if (widget.cameras?.isEmpty ?? true) {
       return Scaffold(
         appBar: AppBar(),
