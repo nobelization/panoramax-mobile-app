@@ -21,6 +21,7 @@
   "gpsIsDisableContent": "Merci d'activer votre GPS, l'application ne peut pas fonctionner sans",
   "gpsIsDisableTitle": "GPS non activé",
   "goToGpsEnable": "Activer le GPS",
+  "meters": "mètres",
 
   "newSequenceNameField": "Nom",
   "newSequenceNameField_placeholder": "Saisissez le nom de la nouvelle séquence",

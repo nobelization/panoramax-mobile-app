@@ -28,6 +28,7 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
     accuracy: LocationAccuracy.high,
     distanceFilter: 2, //The minimum distance (in meters) to trigger an update
   );
+  double? _accuracy;
 
   late final GravityOrientationDetector _orientationDetector;
   var isPortraitOrientation = true;
@@ -107,6 +108,7 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
             _positionStream!.listen((Position position) {
               setState(() {
                 _currentPosition = position;
+                _accuracy = position.accuracy;
               });
             });
           }
@@ -274,6 +276,7 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
             ),
           ),
           cameraPreview(),
+          accurancyComponent(),
           (!isPortraitOrientation)
               ? landscapeLayout(context)
               : portraitLayout(context),
@@ -281,6 +284,30 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
         ]);
       },
     );
+  }
+
+  Widget accurancyComponent() {
+    return _accuracy == null
+        ? Container()
+        : Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.all(Radius.circular(8)),
+            ),
+            padding: EdgeInsets.all(8.0),
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              Icon(
+                Icons.location_on,
+                size: 24,
+                color: Colors.blue,
+              ),
+              SizedBox(width: 8),
+              DefaultTextStyle(
+                style: TextStyle(color: Colors.blue),
+                child: Text(
+                    "${_accuracy?.toStringAsFixed(2)} ${AppLocalizations.of(context)!.meters}"),
+              )
+            ]));
   }
 
   Widget createBurstButtons() {
@@ -493,10 +520,12 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
             width: 60,
             decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: (_currentPosition == null)
+                color: (_currentPosition == null ||
+                        _accuracy == null ||
+                        _accuracy! > 10)
                     ? Colors.grey
                     : _isBurstPlay
-                        ? Colors.red
+                        ? const Color.fromARGB(255, 89, 42, 39)
                         : Colors.white),
           ),
           tooltip: AppLocalizations.of(context)!.capture),
