@@ -297,13 +297,14 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
             padding: EdgeInsets.all(8.0),
             child: Row(mainAxisSize: MainAxisSize.min, children: [
               Icon(
-                Icons.location_on,
+                _accuracy! > 10 ? Icons.error : Icons.gps_fixed,
                 size: 24,
-                color: Colors.blue,
+                color: _accuracy! > 10 ? Colors.red : Colors.blue,
               ),
               SizedBox(width: 8),
               DefaultTextStyle(
-                style: TextStyle(color: Colors.blue),
+                style: TextStyle(
+                    color: _accuracy! > 10 ? Colors.red : Colors.blue),
                 child: Text(
                     "${_accuracy?.toStringAsFixed(2)} ${AppLocalizations.of(context)!.meters}"),
               )
