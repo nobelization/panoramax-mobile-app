@@ -15,6 +15,14 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
             channel: 'stable'
+      - name: Clear cache
+        run: |
+          flutter clean
+          flutter pub get 
+      - run: flutter --version
+      - run: java -version
+      - name: Delete pubspec.lock
+        run: rm pubspec.lock
       - name: Build apk
         run: flutter build apk --debug
       - name: Upload APK
