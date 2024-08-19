@@ -52,6 +52,8 @@ dependencies:
   flutter_exif_plugin: ^1.1.0
   sensors: ^2.0.3
   wakelock_plus: ^1.2.7
+  android_intent: ^2.0.2
+  receive_sharing_intent: ^1.8.0
 
 dev_dependencies:
   flutter_test:

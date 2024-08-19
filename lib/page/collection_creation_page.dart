@@ -23,6 +23,8 @@ class CollectionCreationPageState extends State<CollectionCreationPage> {
     ]);
   }
 
+  final Map<File, bool> _selectedFiles = {};
+
   @override
   void initState() {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
@@ -31,12 +33,19 @@ class CollectionCreationPageState extends State<CollectionCreationPage> {
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
+    for (var file in widget.imgList) {
+      _selectedFiles[file] = true;
+    }
     super.initState();
   }
 
   void goToInstancePage() {
+    final list = _selectedFiles.entries
+        .where((entry) => entry.value)
+        .map((entry) => entry.key)
+        .toList();
     GetIt.instance<NavigationService>()
-        .pushTo(Routes.instance, arguments: widget.imgList);
+        .pushTo(Routes.instance, arguments: list);
   }
 
   @override
@@ -66,14 +75,8 @@ class CollectionCreationPageState extends State<CollectionCreationPage> {
                           spacing: 8,
                           runSpacing: 8,
                           children: [
-                            ...widget.imgList
-                                .map((item) => Container(
-                                    height: 100,
-                                    child: Image.file(
-                                      item,
-                                      fit: BoxFit.cover,
-                                    )))
-                                .toList()
+                            for (var file in _selectedFiles.keys)
+                              PictureItem(file),
                           ],
                         )))),
                 Padding(
@@ -90,5 +93,31 @@ class CollectionCreationPageState extends State<CollectionCreationPage> {
             ),
           ),
         ));
+  }
+
+  Widget PictureItem(File file) {
+    return Stack(
+      alignment: Alignment.bottomRight,
+      children: [
+        Container(
+            height: 80,
+            child: Image.file(
+              file,
+              fit: BoxFit.cover,
+            )),
+        SizedBox(
+          height: 24.0,
+          width: 24.0,
+          child: Checkbox(
+            value: _selectedFiles[file],
+            onChanged: (value) {
+              setState(() {
+                _selectedFiles[file] = value!;
+              });
+            },
+          ),
+        )
+      ],
+    );
   }
 }
