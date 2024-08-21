@@ -16,15 +16,36 @@ class _SequenceCardState extends State<SequenceCard> {
   GeoVisioCollectionImportStatus? geovisioStatus;
   Timer? timer;
   SequenceState sequenceState = SequenceState.SENDING;
+  MemoryImage? image;
 
   @override
   void initState() {
     super.initState();
     itemCount = widget.sequence.stats_items!.count;
     checkSequenceState();
-    if (sequenceState != SequenceState.READY || widget.sequenceCount != null) {
+    if (sequenceState == SequenceState.READY ||
+        sequenceState == SequenceState.HIDDEN) {
+      getImage();
+    }
+    if ((sequenceState != SequenceState.READY &&
+            sequenceState != SequenceState.HIDDEN) ||
+        widget.sequenceCount != null) {
       timer = Timer.periodic(Duration(seconds: 5), (timer) {
         getStatus();
+      });
+    }
+  }
+
+  void getImage() async {
+    MemoryImage? imageRefresh;
+    try {
+      imageRefresh = await CollectionsApi.INSTANCE
+          .getThumbernail(collectionId: widget.sequence.id!);
+    } catch (e) {
+      print(e);
+    } finally {
+      setState(() {
+        image = imageRefresh;
       });
     }
   }
@@ -89,14 +110,15 @@ class _SequenceCardState extends State<SequenceCard> {
 
   @override
   Widget build(BuildContext context) {
-    return sequenceState == SequenceState.DELETED ||
-            sequenceState == SequenceState.HIDDEN
+    return sequenceState == SequenceState.DELETED
         ? Container()
         : Container(
             margin: const EdgeInsets.all(10),
             width: double.infinity,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: sequenceState == SequenceState.HIDDEN
+                  ? Colors.grey.shade400
+                  : Colors.white,
               borderRadius: const BorderRadius.all(
                 Radius.circular(18),
               ),
@@ -109,12 +131,13 @@ class _SequenceCardState extends State<SequenceCard> {
                 ),
               ],
             ),
-            child: Column(
-              children: [
-                sequenceState == SequenceState.READY ? Picture() : Loader(),
-                PictureDetail(),
-              ],
-            ),
+            child: Column(children: [
+              sequenceState == SequenceState.READY ||
+                      sequenceState == SequenceState.HIDDEN
+                  ? Picture()
+                  : Loader(),
+              PictureDetail(),
+            ]),
           );
   }
 
@@ -125,7 +148,10 @@ class _SequenceCardState extends State<SequenceCard> {
           children: [
             PictureCount(),
             Shooting(),
-            sequenceState == SequenceState.READY ? Publishing() : Container(),
+            sequenceState == SequenceState.READY ||
+                    sequenceState == SequenceState.HIDDEN
+                ? Publishing()
+                : Container(),
             sequenceState == SequenceState.BLURRING ? Blurring() : Container()
           ],
         ));
@@ -137,14 +163,17 @@ class _SequenceCardState extends State<SequenceCard> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          '$count ${AppLocalizations.of(context)!.pictures}',
-          style: GoogleFonts.nunito(
-            fontSize: 18,
-            fontWeight: FontWeight.w800,
+        Row(children: [
+          Text(
+            '$count ${AppLocalizations.of(context)!.pictures}',
+            style: GoogleFonts.nunito(
+              fontSize: 18,
+              fontWeight: FontWeight.w800,
+            ),
           ),
-        ),
-        sequenceState == SequenceState.READY
+        ]),
+        sequenceState == SequenceState.READY ||
+                sequenceState == SequenceState.HIDDEN
             ? FloatingActionButton(
                 onPressed: openUrl,
                 child: Icon(
@@ -221,17 +250,46 @@ class _SequenceCardState extends State<SequenceCard> {
   }
 
   Widget Picture() {
-    return Container(
-        height: 140,
-        decoration: BoxDecoration(
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(18),
-              topRight: Radius.circular(18),
+    return ClipRect(
+      child: Stack(
+        children: [
+          if (image != null && image is MemoryImage)
+            Container(
+                height: 180,
+                decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(18),
+                      topRight: Radius.circular(18),
+                    ),
+                    image: DecorationImage(
+                      image: image!,
+                      fit: BoxFit.cover,
+                    ))),
+          if (sequenceState == SequenceState.HIDDEN)
+            ClipRect(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                child: Container(
+                  color: Colors.transparent,
+                  height: 180,
+                  width: double.infinity, // or a specific width
+                ),
+              ),
             ),
-            image: DecorationImage(
-              image: Image.network(widget.sequence.getThumbUrl()!).image,
-              fit: BoxFit.cover,
-            )));
+          if (sequenceState == SequenceState.HIDDEN)
+            Container(
+                height: 180,
+                child: Center(
+                    child: Text(
+                  AppLocalizations.of(context)!.hidden,
+                  style: GoogleFonts.nunito(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white),
+                )))
+        ],
+      ),
+    );
   }
 
   Widget Blurring() {

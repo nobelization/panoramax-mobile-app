@@ -144,8 +144,7 @@ class SequencesListView extends StatelessWidget {
       physics:
           const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
       itemBuilder: (BuildContext context, int index) {
-        if (links[index].rel == "child" &&
-            links[index].geovisio_status != "hidden") {
+        if (links[index].rel == "child") {
           return SequenceCard(links[index],
               sequenceCount:
                   links[index].id == collectionId ? lastSequenceCount : null);

@@ -16,6 +16,7 @@
   "publishing": "Publication",
   "blurringInProgress": "Floutage en cours",
   "share": "Partager",
+  "hidden": "Séquence masquée",
 
   "capture": "Prendre une photo",
   "createSequenceWithPicture_tooltip": "Créer une nouvelle séquence avec les photos prises",

@@ -171,4 +171,22 @@ class CollectionsApi {
       throw new Exception('${response.statusCode} - ${response.body}');
     }
   }
+
+  Future<MemoryImage> getThumbernail({required String collectionId}) async {
+    final instance = await getInstance();
+    var url = Uri.https(
+        "panoramax.$instance.fr", '/api/collections/${collectionId}/thumb.jpg');
+
+    final token = await getToken();
+
+    var response = await http.get(url, headers: <String, String>{
+      'Content-Type': 'image/jpeg',
+      'Authorization': 'Bearer $token'
+    });
+    if (response.statusCode >= 200 && response.statusCode < 400) {
+      return MemoryImage(response.bodyBytes);
+    } else {
+      throw new Exception('${response.statusCode} - ${response.body}');
+    }
+  }
 }
