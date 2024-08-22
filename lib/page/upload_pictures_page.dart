@@ -20,7 +20,9 @@ class _UploadPicturesState extends State<UploadPicturesPage> {
     super.initState();
     isLoading = true;
     sequenceCount = widget.imgList.length;
-    uploadImages();
+    if (sequenceCount > 0) {
+      uploadImages();
+    }
     getMyCollections();
   }
 
