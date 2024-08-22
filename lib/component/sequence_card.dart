@@ -23,10 +23,7 @@ class _SequenceCardState extends State<SequenceCard> {
     super.initState();
     itemCount = widget.sequence.stats_items!.count;
     checkSequenceState();
-    if (sequenceState == SequenceState.READY ||
-        sequenceState == SequenceState.HIDDEN) {
-      getImage();
-    }
+    getImage();
     if ((sequenceState != SequenceState.READY &&
             sequenceState != SequenceState.HIDDEN) ||
         widget.sequenceCount != null) {
