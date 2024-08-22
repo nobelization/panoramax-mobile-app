@@ -105,6 +105,12 @@ class _SequenceCardState extends State<SequenceCard> {
     }
   }
 
+  Future<void> shareUrl() async {
+    final instance = await getInstance();
+    final url = "panoramax.$instance.fr/sequence/${widget.sequence.id}";
+    await Share.share(url);
+  }
+
   @override
   Widget build(BuildContext context) {
     return sequenceState == SequenceState.DELETED
@@ -174,7 +180,7 @@ class _SequenceCardState extends State<SequenceCard> {
         sequenceState == SequenceState.READY ||
                 sequenceState == SequenceState.HIDDEN
             ? FloatingActionButton(
-                onPressed: openUrl,
+                onPressed: shareUrl,
                 child: Icon(
                   Icons.share,
                   //size: 14,

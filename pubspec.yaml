@@ -53,6 +53,7 @@ dependencies:
   sensors: ^2.0.3
   wakelock_plus: ^1.2.7
   url_launcher: ^6.3.0
+  share: ^2.0.4
 
 
 dev_dependencies:
