@@ -112,33 +112,35 @@ class _SequenceCardState extends State<SequenceCard> {
   Widget build(BuildContext context) {
     return sequenceState == SequenceState.DELETED
         ? Container()
-        : Container(
-            margin: const EdgeInsets.all(10),
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: sequenceState == SequenceState.HIDDEN
-                  ? Colors.grey.shade400
-                  : Colors.white,
-              borderRadius: const BorderRadius.all(
-                Radius.circular(18),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.shade200,
-                  spreadRadius: 4,
-                  blurRadius: 6,
-                  offset: const Offset(0, 3),
+        : GestureDetector(
+            onTap: openUrl,
+            child: Container(
+              margin: const EdgeInsets.all(10),
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: sequenceState == SequenceState.HIDDEN
+                    ? Colors.grey.shade400
+                    : Colors.white,
+                borderRadius: const BorderRadius.all(
+                  Radius.circular(18),
                 ),
-              ],
-            ),
-            child: Column(children: [
-              sequenceState == SequenceState.READY ||
-                      sequenceState == SequenceState.HIDDEN
-                  ? Picture()
-                  : Loader(),
-              PictureDetail(),
-            ]),
-          );
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.shade200,
+                    spreadRadius: 4,
+                    blurRadius: 6,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: Column(children: [
+                sequenceState == SequenceState.READY ||
+                        sequenceState == SequenceState.HIDDEN
+                    ? Picture()
+                    : Loader(),
+                PictureDetail(),
+              ]),
+            ));
   }
 
   Widget PictureDetail() {
