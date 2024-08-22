@@ -88,6 +88,9 @@ class _UploadPicturesState extends State<UploadPicturesPage> {
   }
 
   Future<void> goToCapture() async {
+    if (!await PermissionHelper.isPermissionGranted()) {
+      await PermissionHelper.askMissingPermission();
+    }
     await availableCameras().then((availableCameras) =>
         GetIt.instance<NavigationService>()
             .pushTo(Routes.newSequenceCapture, arguments: availableCameras));
@@ -95,34 +98,50 @@ class _UploadPicturesState extends State<UploadPicturesPage> {
 
   @override
   Widget build(BuildContext context) {
-    return RefreshIndicator(
-        displacement: 250,
-        strokeWidth: 3,
-        triggerMode: RefreshIndicatorTriggerMode.onEdge,
-        onRefresh: () async {
-          setState(() {
-            getMyCollections();
-          });
-        },
-        child: Scaffold(
-          appBar: PanoramaxAppBar(context: context),
-          body: Column(
-            children: <Widget>[
-              Container(
-                margin: const EdgeInsets.fromLTRB(10, 10, 10, 10),
-                child: Semantics(
-                  header: true,
-                  child: Text(AppLocalizations.of(context)!.mySequences,
-                      style: GoogleFonts.nunito(
-                          fontSize: 25, fontWeight: FontWeight.w400)),
-                ),
+    return PopScope(
+        canPop: false,
+        child: RefreshIndicator(
+            displacement: 250,
+            strokeWidth: 3,
+            triggerMode: RefreshIndicatorTriggerMode.onEdge,
+            onRefresh: () async {
+              setState(() {
+                getMyCollections();
+              });
+            },
+            child: Scaffold(
+              appBar: PanoramaxAppBar(context: context, backEnabled: false),
+              body: Column(
+                children: <Widget>[
+                  Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Semantics(
+                              header: true,
+                              child: Text(
+                                  AppLocalizations.of(context)!.mySequences,
+                                  style: GoogleFonts.nunito(
+                                      fontSize: 25,
+                                      fontWeight: FontWeight.w400)),
+                            ),
+                            FloatingActionButton(
+                                onPressed: goToCapture,
+                                child: Icon(Icons.add_a_photo),
+                                shape: CircleBorder(),
+                                mini: true,
+                                backgroundColor: Colors.blue,
+                                foregroundColor: Colors.white,
+                                tooltip: AppLocalizations.of(context)!
+                                    .createSequence_tooltip)
+                          ])),
+                  Expanded(
+                    child: displayBodySequences(isLoading),
+                  ),
+                ],
               ),
-              Expanded(
-                child: displayBodySequences(isLoading),
-              ),
-            ],
-          ),
-        ));
+            )));
   }
 }
 
