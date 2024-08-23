@@ -17,30 +17,38 @@ class _InstanceState extends State<InstancePage> {
   bool isInstanceChosen = false;
   final cookieManager = WebviewCookieManager();
 
-  int _selectedIndex = -1;
-
   void authentication(String instance) {
     setState(() {
-      API_HOSTNAME = instance;
+      setInstance(instance);
       url = "https://panoramax.${instance}.fr/api/auth/login";
       isInstanceChosen = true;
     });
   }
 
-  void getToken() async {
+  void getJWTToken() async {
+    final instance = await getInstance();
     final cookies =
-        await cookieManager.getCookies('https://panoramax.$API_HOSTNAME.fr');
+        await cookieManager.getCookies('https://panoramax.$instance.fr');
 
     var tokens = await AuthenticationApi.INSTANCE.apiTokensGet(cookies);
     var token =
         await AuthenticationApi.INSTANCE.apiTokenGet(tokens.id, cookies);
 
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    print(token.jwt_token);
-    prefs.setString('token', token.jwt_token);
+    setToken(token.jwt_token);
 
     GetIt.instance<NavigationService>()
         .pushTo(Routes.newSequenceUpload, arguments: widget.imgList);
+  }
+
+  void initState() {
+    super.initState();
+    getInstance().then((instance) async {
+      final token = await getToken();
+      if (instance != null && token != null) {
+        GetIt.instance<NavigationService>()
+            .pushTo(Routes.newSequenceUpload, arguments: widget.imgList);
+      }
+    });
   }
 
   @override
@@ -54,12 +62,17 @@ class _InstanceState extends State<InstancePage> {
                 controller: WebViewController()
                   ..setJavaScriptMode(JavaScriptMode.unrestricted)
                   ..setNavigationDelegate(NavigationDelegate(
-                    onNavigationRequest: (request) {
-                      if (request.url ==
-                          "https://panoramax.$API_HOSTNAME.fr/") {
-                        getToken();
-                      }
-                      return NavigationDecision.navigate;
+                    onNavigationRequest: (request) async {
+                      bool shouldNavigate = true;
+                      await getInstance().then((instance) {
+                        if (request.url == "https://panoramax.$instance.fr/") {
+                          getJWTToken();
+                          shouldNavigate = false;
+                        }
+                      });
+                      return shouldNavigate
+                          ? NavigationDecision.navigate
+                          : NavigationDecision.prevent;
                     },
                   ))
                   ..loadRequest(Uri.parse(url!)))

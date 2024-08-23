@@ -10,59 +10,79 @@ class UploadPicturesPage extends StatefulWidget {
 }
 
 class _UploadPicturesState extends State<UploadPicturesPage> {
-  int _uploadedImagesCount = 0;
-  bool _isUploading = false;
-  String? _errorMessage;
+  late bool isLoading;
+  GeoVisioCollection? sequences;
+  late int sequenceCount;
+  String? collectionId;
 
   @override
   void initState() {
     super.initState();
-    uploadImages();
+    isLoading = true;
+    sequenceCount = widget.imgList.length;
+    if (sequenceCount > 0) {
+      uploadImages();
+    }
+    getMyCollections();
   }
 
-  Future<void> uploadImages() async {
+  Future<void> getMyCollections() async {
+    GeoVisioCollection? refreshedSequences;
     setState(() {
-      _isUploading = true;
-      _errorMessage = null;
+      isLoading = true;
     });
-
     try {
-      final collectionId = await createCollection();
-      await sendPictures(collectionId);
-      setState(() {
-        _uploadedImagesCount = widget.imgList.length;
-        _isUploading = false;
-      });
+      refreshedSequences = await CollectionsApi.INSTANCE.getMeCollection();
     } catch (e) {
-      setState(() {
-        _errorMessage = e.toString();
-        _isUploading = false;
-      });
+      print(e);
     } finally {
       setState(() {
-        _isUploading = false;
+        sequences = refreshedSequences;
+        isLoading = false;
       });
     }
   }
 
-  Future<String> createCollection() async {
+  Widget displayBodySequences(isLoading) {
+    if (isLoading) {
+      return const LoaderIndicatorView();
+    } else if (sequences == null || sequences?.links == null) {
+      return const UnknownErrorView();
+    } else if (sequences!.links.isNotEmpty) {
+      return SequencesListView(
+          links: sequences!.links,
+          collectionId: collectionId,
+          lastSequenceCount: sequenceCount);
+    } else {
+      return const NoElementView();
+    }
+  }
+
+  Future<void> uploadImages() async {
+    await createCollection();
+    await sendPictures();
+  }
+
+  Future<void> createCollection() async {
     try {
       final collectionName = DateFormat('y_M_d_H_m_s').format(DateTime.now());
       final collection = await CollectionsApi.INSTANCE
           .apiCollectionsCreate(newCollectionName: collectionName);
-      if (collection == null) {
-        throw Exception(AppLocalizations.of(context)!.newCollectionFail);
-      }
-      return collection.id;
+      setState(() {
+        collectionId = collection.id;
+      });
     } catch (e) {
       rethrow;
     }
   }
 
-  Future<void> sendPictures(String collectionId) async {
+  Future<void> sendPictures() async {
+    if (collectionId == null) {
+      return;
+    }
     for (var i = 0; i < widget.imgList.length; i++) {
       await CollectionsApi.INSTANCE.apiCollectionsUploadPicture(
-        collectionId: collectionId,
+        collectionId: collectionId!,
         position: i + 1,
         pictureToUpload: widget.imgList[i],
       );
@@ -70,6 +90,9 @@ class _UploadPicturesState extends State<UploadPicturesPage> {
   }
 
   Future<void> goToCapture() async {
+    if (!await PermissionHelper.isPermissionGranted()) {
+      await PermissionHelper.askMissingPermission();
+    }
     await availableCameras().then((availableCameras) =>
         GetIt.instance<NavigationService>()
             .pushTo(Routes.newSequenceCapture, arguments: availableCameras));
@@ -77,39 +100,123 @@ class _UploadPicturesState extends State<UploadPicturesPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: BLUE,
-      body: Center(
-        child: _isUploading
-            ? Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircularProgressIndicator(),
-                  Text(
-                      style: TextStyle(color: Colors.white),
-                      AppLocalizations.of(context)!.newCollectionLoading(
-                          _uploadedImagesCount / widget.imgList.length)),
-                ],
-              )
-            : Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  if (_errorMessage != null)
-                    Text(AppLocalizations.of(context)!
-                        .newCollectionError(_errorMessage.toString())),
-                  Text(
-                      style: TextStyle(color: Colors.white),
-                      AppLocalizations.of(context)!.newCollectionUploadSuccess),
-                  ElevatedButton(
-                    onPressed: () {
-                      goToCapture();
-                    },
-                    child:
-                        Text(AppLocalizations.of(context)!.newCollectionBack),
+    return PopScope(
+        canPop: false,
+        child: RefreshIndicator(
+            displacement: 250,
+            strokeWidth: 3,
+            triggerMode: RefreshIndicatorTriggerMode.onEdge,
+            onRefresh: () async {
+              setState(() {
+                getMyCollections();
+              });
+            },
+            child: Scaffold(
+              appBar: PanoramaxAppBar(context: context, backEnabled: false),
+              body: Column(
+                children: <Widget>[
+                  Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Semantics(
+                              header: true,
+                              child: Text(
+                                  AppLocalizations.of(context)!.mySequences,
+                                  style: GoogleFonts.nunito(
+                                      fontSize: 25,
+                                      fontWeight: FontWeight.w400)),
+                            ),
+                            FloatingActionButton(
+                                onPressed: goToCapture,
+                                child: Icon(Icons.add_a_photo),
+                                shape: CircleBorder(),
+                                mini: true,
+                                backgroundColor: Colors.blue,
+                                foregroundColor: Colors.white,
+                                tooltip: AppLocalizations.of(context)!
+                                    .createSequence_tooltip)
+                          ])),
+                  Expanded(
+                    child: displayBodySequences(isLoading),
                   ),
                 ],
               ),
-      ),
+            )));
+  }
+}
+
+class SequencesListView extends StatelessWidget {
+  const SequencesListView(
+      {super.key,
+      required this.links,
+      required this.collectionId,
+      required this.lastSequenceCount});
+
+  final List<GeoVisioLink> links;
+  final String? collectionId;
+  final int lastSequenceCount;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      itemCount: links.length,
+      physics:
+          const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+      itemBuilder: (BuildContext context, int index) {
+        if (links[index].rel == "child") {
+          return SequenceCard(links[index],
+              sequenceCount:
+                  links[index].id == collectionId ? lastSequenceCount : null);
+        } else {
+          return Container();
+        }
+      },
+    );
+  }
+}
+
+class NoElementView extends StatelessWidget {
+  const NoElementView({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Center(
+          child: Text(
+            AppLocalizations.of(context)!.emptyError,
+            style: GoogleFonts.nunito(
+                fontSize: 18, color: Colors.grey, fontWeight: FontWeight.w400),
+          ),
+        )
+      ],
+    );
+  }
+}
+
+class UnknownErrorView extends StatelessWidget {
+  const UnknownErrorView({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Center(
+          child: Text(
+            AppLocalizations.of(context)!.unknownError,
+            style: GoogleFonts.nunito(
+                fontSize: 20, color: Colors.red, fontWeight: FontWeight.w400),
+          ),
+        )
+      ],
     );
   }
 }

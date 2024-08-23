@@ -8,13 +8,22 @@ part of 'geo_visio.dart';
 
 GeoVisioLink _$GeoVisioLinkFromJson(Map<String, dynamic> json) => GeoVisioLink()
   ..href = json['href'] as String
-  ..rel = json['rel'] as String
+  ..rel = json['rel'] as String?
   ..type = json['type'] as String?
   ..title = json['title'] as String?
   ..method = json['method'] as String?
   ..headers = json['headers']
   ..body = json['body']
-  ..merge = json['merge'] as bool?;
+  ..merge = json['merge'] as bool?
+  ..created = json['created'] as String?
+  ..geovisio_status = json['geovisio:status'] as String?
+  ..id = json['id'] as String?
+  ..stats_items = json['stats:items'] == null
+      ? null
+      : StatsItems.fromJson(json['stats:items'] as Map<String, dynamic>)
+  ..extent = json['extent'] == null
+      ? null
+      : GeoVisioExtent.fromJson(json['extent'] as Map<String, dynamic>);
 
 Map<String, dynamic> _$GeoVisioLinkToJson(GeoVisioLink instance) =>
     <String, dynamic>{
@@ -26,6 +35,33 @@ Map<String, dynamic> _$GeoVisioLinkToJson(GeoVisioLink instance) =>
       'headers': instance.headers,
       'body': instance.body,
       'merge': instance.merge,
+      'created': instance.created,
+      'geovisio:status': instance.geovisio_status,
+      'id': instance.id,
+      'stats:items': instance.stats_items,
+      'extent': instance.extent,
+    };
+
+GeoVisioExtent _$GeoVisioExtentFromJson(Map<String, dynamic> json) =>
+    GeoVisioExtent()
+      ..spatial = json['spatial']
+      ..temporal = json['temporal'] == null
+          ? null
+          : Temporal.fromJson(json['temporal'] as Map<String, dynamic>);
+
+Map<String, dynamic> _$GeoVisioExtentToJson(GeoVisioExtent instance) =>
+    <String, dynamic>{
+      'spatial': instance.spatial,
+      'temporal': instance.temporal,
+    };
+
+Temporal _$TemporalFromJson(Map<String, dynamic> json) => Temporal()
+  ..interval = (json['interval'] as List<dynamic>?)
+      ?.map((e) => (e as List<dynamic>?)?.map((e) => e as String?).toList())
+      .toList();
+
+Map<String, dynamic> _$TemporalToJson(Temporal instance) => <String, dynamic>{
+      'interval': instance.interval,
     };
 
 GeoVisioProvider _$GeoVisioProviderFromJson(Map<String, dynamic> json) =>
@@ -45,7 +81,7 @@ Map<String, dynamic> _$GeoVisioProviderToJson(GeoVisioProvider instance) =>
     };
 
 StatsItems _$StatsItemsFromJson(Map<String, dynamic> json) =>
-    StatsItems()..count = json['count'] as int;
+    StatsItems()..count = (json['count'] as num).toInt();
 
 Map<String, dynamic> _$StatsItemsToJson(StatsItems instance) =>
     <String, dynamic>{
@@ -111,4 +147,62 @@ Map<String, dynamic> _$GeoVisioCollectionsToJson(
     <String, dynamic>{
       'links': instance.links,
       'collections': instance.collections,
+    };
+
+GeoVisioCatalog _$GeoVisioCatalogFromJson(Map<String, dynamic> json) =>
+    GeoVisioCatalog()
+      ..stac_version = json['stac_version'] as String
+      ..stac_extension = (json['stac_extension'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList()
+      ..id = json['id'] as String
+      ..title = json['title'] as String?
+      ..description = json['description'] as String
+      ..links = (json['links'] as List<dynamic>)
+          .map((e) => GeoVisioLink.fromJson(e as Map<String, dynamic>))
+          .toList();
+
+Map<String, dynamic> _$GeoVisioCatalogToJson(GeoVisioCatalog instance) =>
+    <String, dynamic>{
+      'stac_version': instance.stac_version,
+      'stac_extension': instance.stac_extension,
+      'id': instance.id,
+      'title': instance.title,
+      'description': instance.description,
+      'links': instance.links,
+    };
+
+GeoVisioCollectionImportStatus _$GeoVisioCollectionImportStatusFromJson(
+        Map<String, dynamic> json) =>
+    GeoVisioCollectionImportStatus()
+      ..status = json['status'] as String
+      ..items = (json['items'] as List<dynamic>)
+          .map((e) => StatusItem.fromJson(e as Map<String, dynamic>))
+          .toList();
+
+Map<String, dynamic> _$GeoVisioCollectionImportStatusToJson(
+        GeoVisioCollectionImportStatus instance) =>
+    <String, dynamic>{
+      'status': instance.status,
+      'items': instance.items,
+    };
+
+StatusItem _$StatusItemFromJson(Map<String, dynamic> json) => StatusItem()
+  ..id = json['id'] as String?
+  ..status = json['status'] as String?
+  ..processing_in_progress = json['processing_in_progress'] as bool?
+  ..rank = (json['rank'] as num?)?.toInt()
+  ..nb_errors = (json['nb_errors'] as num?)?.toInt()
+  ..process_error = json['process_error'] as String?
+  ..processed_at = json['processed_at'] as String?;
+
+Map<String, dynamic> _$StatusItemToJson(StatusItem instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'status': instance.status,
+      'processing_in_progress': instance.processing_in_progress,
+      'rank': instance.rank,
+      'nb_errors': instance.nb_errors,
+      'process_error': instance.process_error,
+      'processed_at': instance.processed_at,
     };

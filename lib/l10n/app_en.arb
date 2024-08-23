@@ -8,6 +8,16 @@
   "emptyError": "No element found",
   "loading": "Loading...",
 
+  "mySequences": "My sequence",
+  "pictures": "picture(s)",
+  "shooting": "Shooting",
+  "sendingInProgress": "Sending in progress",
+  "sendingCompleted": "Sending completed",
+  "publishing": "Publishing",
+  "blurringInProgress": "Blurring in progress",
+  "share": "Share",
+  "hidden": "Hidden sequence",
+
   "capture": "Take a picture",
   "createSequenceWithPicture_tooltip": "Create a new sequence with captured pictures",
   "noCameraFoundError": "No camera found for this device",
