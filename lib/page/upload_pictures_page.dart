@@ -176,3 +176,47 @@ class SequencesListView extends StatelessWidget {
     );
   }
 }
+
+class NoElementView extends StatelessWidget {
+  const NoElementView({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Center(
+          child: Text(
+            AppLocalizations.of(context)!.emptyError,
+            style: GoogleFonts.nunito(
+                fontSize: 18, color: Colors.grey, fontWeight: FontWeight.w400),
+          ),
+        )
+      ],
+    );
+  }
+}
+
+class UnknownErrorView extends StatelessWidget {
+  const UnknownErrorView({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Center(
+          child: Text(
+            AppLocalizations.of(context)!.unknownError,
+            style: GoogleFonts.nunito(
+                fontSize: 20, color: Colors.red, fontWeight: FontWeight.w400),
+          ),
+        )
+      ],
+    );
+  }
+}
