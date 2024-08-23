@@ -54,6 +54,8 @@ dependencies:
   wakelock_plus: ^1.2.7
   url_launcher: ^6.3.0
   share: ^2.0.4
+  android_intent: ^2.0.2
+  receive_sharing_intent: ^1.8.0
 
 dev_dependencies:
   flutter_test:
