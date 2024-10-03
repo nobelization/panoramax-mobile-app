@@ -42,6 +42,7 @@ part 'page/instance_page.dart';
 part 'page/upload_pictures_page.dart';
 part 'service/routing.dart';
 part 'service/permission_helper.dart';
+part 'service/shared_picture_manager.dart';
 part 'utils/gravity_orientation_detector.dart';
 part 'user.dart';
 

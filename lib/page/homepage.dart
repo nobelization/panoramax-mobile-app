@@ -7,36 +7,51 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
+  final sharedPictureManager = SharedPictureManager();
+
   @override
   void initState() {
+    print("init homepage");
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     redirectUser();
   }
 
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
   Future<void> redirectUser() async {
+    print("redirectUser");
     final instance = await getInstance();
     //user is connected
     if (instance.isNotEmpty) {
       _goToSequence();
     } else {
       //user is disconnected
-      _createCollection();
+      await _createCollection();
     }
+    sharedPictureManager.listenSendingIntent();
   }
 
-  void _goToSequence() {
-    GetIt.instance<NavigationService>()
-        .pushTo(Routes.newSequenceUpload, arguments: List<File>.empty());
+  Future<void> _goToSequence() async {
+    GetIt.instance<NavigationService>().pushReplacementTo(
+        Routes.newSequenceUpload,
+        arguments: List<File>.empty());
   }
 
   Future<void> _createCollection() async {
+    print("createcollection");
     if (!await PermissionHelper.isPermissionGranted()) {
       await PermissionHelper.askMissingPermission();
     }
-    await availableCameras().then((availableCameras) =>
-        GetIt.instance<NavigationService>()
-            .pushTo(Routes.newSequenceCapture, arguments: availableCameras));
+    availableCameras().then((availableCameras) =>
+        GetIt.instance<NavigationService>().pushReplacementTo(
+            Routes.newSequenceCapture,
+            arguments: availableCameras));
   }
 
   @override
