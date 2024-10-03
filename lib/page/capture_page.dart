@@ -278,7 +278,7 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
             ),
           ),
           cameraPreview(),
-          accurancyComponent(),
+          if (_accuracy != null && _accuracy! > 10) accurancyComponent(),
           (!isPortraitOrientation)
               ? landscapeLayout(context)
               : portraitLayout(context),
