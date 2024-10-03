@@ -310,7 +310,7 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
                     style: TextStyle(
                         color: _accuracy! > 10 ? Colors.red : Colors.blue),
                     child: Text(
-                        "${_accuracy?.toStringAsFixed(2)} ${AppLocalizations.of(context)!.meters}"),
+                        "${_accuracy?.toInt()} ${AppLocalizations.of(context)!.meters}"),
                   )
                 ])));
   }
