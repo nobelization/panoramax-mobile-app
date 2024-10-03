@@ -533,6 +533,13 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
                     : _isBurstPlay
                         ? const Color.fromARGB(255, 89, 42, 39)
                         : Colors.white),
+            child: _accuracy == null || _accuracy! > 10
+                ? Icon(
+                    Icons.gps_fixed,
+                    color: Colors.red,
+                    size: 40,
+                  )
+                : Container(),
           ),
           tooltip: AppLocalizations.of(context)!.capture),
     );
