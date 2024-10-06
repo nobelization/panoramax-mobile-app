@@ -282,7 +282,8 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
           (!isPortraitOrientation)
               ? landscapeLayout(context)
               : portraitLayout(context),
-          if (_isProcessing) processingLoader(context)
+          if (_isProcessing) processingLoader(context),
+          if (_accuracy != null && _accuracy! > 10) alertDialogGpsAccurency()
         ]);
       },
     );
@@ -583,6 +584,16 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
         ),
         shadowBackground: true,
       ),
+    );
+  }
+
+  Widget alertDialogGpsAccurency() {
+    return AlertDialog(
+      title: Text(AppLocalizations.of(context)!.lowGpsAccuracyTitle),
+      content: Text(AppLocalizations.of(context)!.lowGpsAccuracyDesc),
+      backgroundColor: BLUE,
+      titleTextStyle: TextStyle(color: Colors.white),
+      contentTextStyle: TextStyle(color: Colors.white),
     );
   }
 
