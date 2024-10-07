@@ -514,11 +514,12 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
     return GestureDetector(
       child: IconButton(
           //if the GPS is not active, the capture button does nothing, otherwise we see what mode we are in
-          onPressed: (_currentPosition == null)
-              ? startLocationUpdates
-              : _isBurstMode
-                  ? takeBurstPictures
-                  : takePicture,
+          onPressed:
+              (_currentPosition == null || _accuracy == null || _accuracy! > 10)
+                  ? startLocationUpdates
+                  : _isBurstMode
+                      ? takeBurstPictures
+                      : takePicture,
           iconSize: 100,
           padding: EdgeInsets.zero,
           constraints: const BoxConstraints(),
