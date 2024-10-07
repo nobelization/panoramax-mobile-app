@@ -495,12 +495,6 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
   }
 
   Widget createSequenceButton(BuildContext context) {
-    //return Expanded(
-    /* child: Container(
-            height: 60,
-            width: 60,
-            decoration:
-                BoxDecoration(shape: BoxShape.circle, color: Colors.blue),*/
     return IconButton(
         padding: EdgeInsets.zero,
         iconSize: 30,
@@ -515,7 +509,7 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
       child: IconButton(
           //if the GPS is not active, the capture button does nothing, otherwise we see what mode we are in
           onPressed:
-              (_currentPosition == null || _accuracy == null || _accuracy! > 10)
+              (_currentPosition == null || _accuracy == null || _accuracy! > 50)
                   ? startLocationUpdates
                   : _isBurstMode
                       ? takeBurstPictures
@@ -548,17 +542,19 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
   }
 
   Widget galleryButton(BuildContext context) {
-    return Container(
-      height: 60,
-      width: 60,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.all(Radius.circular(10)),
-        image: _imgListCaptured.isNotEmpty
-            ? DecorationImage(
-                image: FileImage(_imgListCaptured.last), fit: BoxFit.cover)
-            : null,
-      ),
-    );
+    return IconButton(
+        onPressed: goToCollectionCreationPage,
+        icon: Container(
+          height: 60,
+          width: 60,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.all(Radius.circular(10)),
+            image: _imgListCaptured.isNotEmpty
+                ? DecorationImage(
+                    image: FileImage(_imgListCaptured.last), fit: BoxFit.cover)
+                : null,
+          ),
+        ));
   }
 
   StatelessWidget cameraPreview() {
