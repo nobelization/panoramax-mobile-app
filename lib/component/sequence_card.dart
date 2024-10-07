@@ -177,8 +177,7 @@ class _SequenceCardState extends State<SequenceCard> {
             ),
           ),
         ]),
-        sequenceState == SequenceState.READY ||
-                sequenceState == SequenceState.HIDDEN
+        sequenceState == SequenceState.READY
             ? FloatingActionButton(
                 onPressed: shareUrl,
                 child: Icon(
