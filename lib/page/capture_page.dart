@@ -278,11 +278,12 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
             ),
           ),
           cameraPreview(),
-          accurancyComponent(),
+          if (_accuracy != null && _accuracy! > 10) accurancyComponent(),
           (!isPortraitOrientation)
               ? landscapeLayout(context)
               : portraitLayout(context),
-          if (_isProcessing) processingLoader(context)
+          if (_isProcessing) processingLoader(context),
+          if (_accuracy != null && _accuracy! > 10) alertDialogGpsAccurency()
         ]);
       },
     );
@@ -310,7 +311,7 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
                     style: TextStyle(
                         color: _accuracy! > 10 ? Colors.red : Colors.blue),
                     child: Text(
-                        "${_accuracy?.toStringAsFixed(2)} ${AppLocalizations.of(context)!.meters}"),
+                        "${_accuracy?.toInt()} ${AppLocalizations.of(context)!.meters}"),
                   )
                 ])));
   }
@@ -494,12 +495,6 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
   }
 
   Widget createSequenceButton(BuildContext context) {
-    //return Expanded(
-    /* child: Container(
-            height: 60,
-            width: 60,
-            decoration:
-                BoxDecoration(shape: BoxShape.circle, color: Colors.blue),*/
     return IconButton(
         padding: EdgeInsets.zero,
         iconSize: 30,
@@ -513,11 +508,12 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
     return GestureDetector(
       child: IconButton(
           //if the GPS is not active, the capture button does nothing, otherwise we see what mode we are in
-          onPressed: (_currentPosition == null)
-              ? startLocationUpdates
-              : _isBurstMode
-                  ? takeBurstPictures
-                  : takePicture,
+          onPressed:
+              (_currentPosition == null || _accuracy == null || _accuracy! > 50)
+                  ? startLocationUpdates
+                  : _isBurstMode
+                      ? takeBurstPictures
+                      : takePicture,
           iconSize: 100,
           padding: EdgeInsets.zero,
           constraints: const BoxConstraints(),
@@ -533,23 +529,32 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
                     : _isBurstPlay
                         ? const Color.fromARGB(255, 89, 42, 39)
                         : Colors.white),
+            child: _accuracy == null || _accuracy! > 10
+                ? Icon(
+                    Icons.gps_fixed,
+                    color: Colors.red,
+                    size: 40,
+                  )
+                : Container(),
           ),
           tooltip: AppLocalizations.of(context)!.capture),
     );
   }
 
   Widget galleryButton(BuildContext context) {
-    return Container(
-      height: 60,
-      width: 60,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.all(Radius.circular(10)),
-        image: _imgListCaptured.isNotEmpty
-            ? DecorationImage(
-                image: FileImage(_imgListCaptured.last), fit: BoxFit.cover)
-            : null,
-      ),
-    );
+    return IconButton(
+        onPressed: goToCollectionCreationPage,
+        icon: Container(
+          height: 60,
+          width: 60,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.all(Radius.circular(10)),
+            image: _imgListCaptured.isNotEmpty
+                ? DecorationImage(
+                    image: FileImage(_imgListCaptured.last), fit: BoxFit.cover)
+                : null,
+          ),
+        ));
   }
 
   StatelessWidget cameraPreview() {
@@ -576,6 +581,16 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
         ),
         shadowBackground: true,
       ),
+    );
+  }
+
+  Widget alertDialogGpsAccurency() {
+    return AlertDialog(
+      title: Text(AppLocalizations.of(context)!.lowGpsAccuracyTitle),
+      content: Text(AppLocalizations.of(context)!.lowGpsAccuracyDesc),
+      backgroundColor: BLUE,
+      titleTextStyle: TextStyle(color: Colors.white),
+      contentTextStyle: TextStyle(color: Colors.white),
     );
   }
 

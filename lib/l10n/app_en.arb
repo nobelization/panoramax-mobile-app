@@ -31,7 +31,9 @@
   "gpsIsDisableContent": "Merci d'activer votre GPS, l'application ne peut pas fonctionner sans ca",
   "gpsIsDisableTitle": "GPS non activé",
   "goToGpsEnable": "activate GPS",
-  "meters": "meters",
+  "lowGpsAccuracyTitle": "Mauvaise précision de la localisation GPS",
+  "lowGpsAccuracyDesc": "Placez-vous en extérieur et patientez",
+  "meters": "m",
 
   "newSequenceNameField": "Name",
   "newSequenceNameField_placeholder": "Enter the new sequence name",
