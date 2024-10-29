@@ -24,14 +24,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     super.dispose();
   }
 
-  /*@override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    print("didChangeAppLifecycleState $state");
-    if (state == AppLifecycleState.resumed) {
-      listenSendingIntent();
-    }
-  }*/
-
   Future<void> redirectUser() async {
     print("redirectUser");
     final instance = await getInstance();

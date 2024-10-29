@@ -1,7 +1,10 @@
 part of panoramax;
 
 class SharedPictureManager extends WidgetsBindingObserver {
+  static const MethodChannel _channel =
+      MethodChannel("app.panoramax.beta/data"); //the same as in MainActivity.kt
   SharedPictureManager._internal();
+  List<File> listFiles = [];
 
   static final SharedPictureManager _instance =
       SharedPictureManager._internal();
@@ -11,7 +14,6 @@ class SharedPictureManager extends WidgetsBindingObserver {
   }
 
   late StreamSubscription _intentSub;
-  List<SharedMediaFile>? _sharedFiles;
 
   @override
   void dispose() {
@@ -19,44 +21,27 @@ class SharedPictureManager extends WidgetsBindingObserver {
   }
 
   void listenSendingIntent() {
-    print("function sending");
-    // Listen to media sharing coming from outside the app while the app is in the memory.
-    _intentSub = ReceiveSharingIntent.instance.getMediaStream().listen((value) {
-      print("listen ok");
-      _sharedFiles = value;
-      if (_sharedFiles != null && _sharedFiles!.isNotEmpty) {
-        final fileList = sharedFilesToImages(_sharedFiles!);
-        print("redirect file shared");
-        GetIt.instance<NavigationService>()
-            .pushTo(Routes.newSequenceSend, arguments: fileList);
-      }
-    }, onError: (err) {
-      print("getIntentDataStream error: $err");
-    });
+    _channel.setMethodCallHandler((MethodCall methodCall) async {
+      //'sendUri' must be the same as in MainActivity.kt
+      if (methodCall.method == 'sendUri') {
+        final List<Object?> uris = methodCall.arguments;
 
-    // Get the media sharing coming from outside the app while the app is closed.
-    ReceiveSharingIntent.instance.getInitialMedia().then((value) {
-      print("listen ok");
-      _sharedFiles = value;
-      // Tell the library that we are done processing the intent.
-      //ReceiveSharingIntent.instance.reset();
-      if (_sharedFiles != null && _sharedFiles!.isNotEmpty) {
-        final fileList = sharedFilesToImages(_sharedFiles!);
+        listFiles = uris
+            .where((element) => isImage(element))
+            .map((item) => File(item!.toString()))
+            .toList();
+
         GetIt.instance<NavigationService>()
-            .pushTo(Routes.newSequenceSend, arguments: fileList);
+            .pushTo(Routes.newSequenceSend, arguments: listFiles);
       }
     });
   }
 
-  List<File> sharedFilesToImages(List<SharedMediaFile> list) {
-    return list
-        .where((element) => isImage(element))
-        .map((item) => File(item.path))
-        .toList();
-  }
-
-  bool isImage(SharedMediaFile file) {
-    final fileExtension = file.path.split('.').last.toLowerCase();
+  bool isImage(Object? filePath) {
+    if (filePath == null || !(filePath is String)) {
+      return false;
+    }
+    final fileExtension = filePath.split('.').last.toLowerCase();
     return (fileExtension == 'jpg' ||
         fileExtension == 'jpeg' ||
         fileExtension == 'png' ||
