@@ -1,5 +1,7 @@
 part of panoramax;
 
+final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -57,7 +59,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: PanoramaxAppBar(context: context), body: LoaderIndicatorView());
+        appBar: PanoramaxAppBar(context: context),
+        body: LoaderIndicatorView(),
+        key: scaffoldKey);
   }
 }
 
