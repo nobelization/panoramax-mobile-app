@@ -113,6 +113,7 @@ class _UploadPicturesState extends State<UploadPicturesPage> {
             },
             child: Scaffold(
               appBar: PanoramaxAppBar(context: context, backEnabled: false),
+              key: scaffoldKey,
               body: Column(
                 children: <Widget>[
                   Padding(

@@ -1,5 +1,7 @@
 {
   "common_close": "Close",
+  "common_error": "Error",
+  "common_ok": "Ok",
 
   "yourSequence": "Your sequences",
   "element": "element(s)",
@@ -17,6 +19,8 @@
   "blurringInProgress": "Blurring in progress",
   "share": "Share",
   "hidden": "Hidden sequence",
+
+  "errorShare": "One or more of your pictures do not have a valid date or geolocation. Your sequence could not be imported.",
 
   "capture": "Take a picture",
   "createSequenceWithPicture_tooltip": "Create a new sequence with captured pictures",

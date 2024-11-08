@@ -25,14 +25,29 @@ class SharedPictureManager extends WidgetsBindingObserver {
       //'sendUri' must be the same as in MainActivity.kt
       if (methodCall.method == 'sendUri') {
         final List<Object?> uris = methodCall.arguments;
+        var invalidCount = 0;
 
         listFiles = uris
             .where((element) => isImage(element))
             .map((item) => File(item!.toString()))
             .toList();
 
-        GetIt.instance<NavigationService>()
-            .pushTo(Routes.newSequenceSend, arguments: listFiles);
+        for (var file in listFiles) {
+          final exif = await Exif.fromPath(file.path);
+          final gpsLatLong = await exif.getLatLong();
+          final date = await exif.getOriginalDate();
+          if (gpsLatLong == null || date == null) {
+            invalidCount++;
+          }
+        }
+        ;
+
+        if (invalidCount == 0) {
+          GetIt.instance<NavigationService>()
+              .pushTo(Routes.newSequenceSend, arguments: listFiles);
+        } else {
+          showAlertDialog();
+        }
       }
     });
   }
@@ -48,4 +63,22 @@ class SharedPictureManager extends WidgetsBindingObserver {
         fileExtension == 'gif' ||
         fileExtension == 'bmp');
   }
+}
+
+void showAlertDialog() async {
+  showDialog(
+      context: scaffoldKey.currentContext!,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(AppLocalizations.of(context)!.common_error),
+          content: Text(AppLocalizations.of(context)!.errorShare),
+          actions: [
+            TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text(AppLocalizations.of(context)!.common_ok))
+          ],
+        );
+      });
 }

@@ -1,5 +1,7 @@
 {
   "common_close": "Fermer",
+  "common_error": "Erreur",
+  "common_ok": "Ok",
   
   "yourSequence": "Les séquences",
   "element": "élément(s)",
@@ -17,6 +19,8 @@
   "blurringInProgress": "Floutage en cours",
   "share": "Partager",
   "hidden": "Séquence masquée",
+
+  "errorShare": "Une ou plusieurs de vos photos ne comportent pas de date valide ou de géolocalisation. Votre séquence n'a pas pu être importée.",
 
   "capture": "Prendre une photo",
   "createSequenceWithPicture_tooltip": "Créer une nouvelle séquence avec les photos prises",
