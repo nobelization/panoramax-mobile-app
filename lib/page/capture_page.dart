@@ -249,6 +249,7 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
     if (widget.cameras?.isEmpty ?? true) {
       return Scaffold(
         appBar: AppBar(),
+        key: scaffoldKey,
         body: Center(
           child: Text(AppLocalizations.of(context)!.noCameraFoundError),
         ),
