@@ -1,5 +1,8 @@
 # Paranomax Mobile App
 
+## Environment
+- Git or Github desktop
+
 ## Prerequisites
 - Dart
 - Docker Engine
