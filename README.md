@@ -1,7 +1,7 @@
 # Paranomax Mobile App
 
 ## Environment
-- Git or Github desktop
+- [Git](https://git-scm.com/) or [Github desktop](https://desktop.github.com/download/)
 
 ## Prerequisites
 - Dart
