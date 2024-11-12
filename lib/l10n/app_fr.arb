@@ -8,8 +8,8 @@
   "emptyError": "Aucun élément trouvé",
   "loading": "Chargement...",
 
-  "mySequences": "Mes séquences",
-  "pictures": "photo(s)",
+  "mySequences": "Mes photos",
+  "pictures": "{count, plural, =0{pas de photo} =1{1 photo} other{{count} photos}}",
   "shooting": "Prise de vue",
   "sendingInProgress": "Envoi en cours",
   "sendingCompleted": "Envoi terminé",
@@ -43,7 +43,7 @@
   "instanceOsmTitle": "OpenStreetMap France",
   "ignLicence": "Photos en France publiées sous Licence Ouverte 2.0",
   "instanceIgnTitle": "Institut Géographique National",
-  "instanceShare": "Partager",
+  "instanceShare": "Envoyer à",
 
   "newCollectionBack": "Retour à l'appareil photo",
   "newCollectionError": "Erreur {errorMessage}",

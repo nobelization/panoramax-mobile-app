@@ -8,8 +8,8 @@
   "emptyError": "No element found",
   "loading": "Loading...",
 
-  "mySequences": "My sequence",
-  "pictures": "picture(s)",
+  "mySequences": "My pictures",
+  "pictures": "{count, plural, =0{no picture} =1{1 picture} other{{count} pictures}}",
   "shooting": "Shooting",
   "sendingInProgress": "Sending in progress",
   "sendingCompleted": "Sending completed",
@@ -48,7 +48,7 @@
   "instanceOsmTitle": "OpenStreetMap France",
   "ignLicence": "Photos in France published under Licence ouvert 2.0 (CC-BY)",
   "instanceIgnTitle": "Institut Géographique National",
-  "instanceShare": "Share",
+  "instanceShare": "Send to",
 
   "newCollectionBack": "Back to the capture",
   "newCollectionError": "Error {errorMessage}",

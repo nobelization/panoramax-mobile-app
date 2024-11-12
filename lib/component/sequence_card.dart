@@ -163,14 +163,15 @@ class _SequenceCardState extends State<SequenceCard> {
   }
 
   Widget PictureCount() {
-    final count =
-        widget.sequenceCount == null ? itemCount : widget.sequenceCount;
+    final int count =
+        widget.sequenceCount == null ? itemCount : widget.sequenceCount!;
+    final text = AppLocalizations.of(context)!.pictures(count);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Row(children: [
           Text(
-            '$count ${AppLocalizations.of(context)!.pictures}',
+            text,
             style: GoogleFonts.nunito(
               fontSize: 18,
               fontWeight: FontWeight.w800,
