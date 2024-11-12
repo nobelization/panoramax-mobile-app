@@ -1,11 +1,11 @@
 # Paranomax Mobile App
 
 ## Environment
-- [Git](https://git-scm.com/) or [Github desktop](https://desktop.github.com/download/)
+- [GitHub CLI](https://cli.github.com/) or [GitHub desktop](https://desktop.github.com/download/)
 
 ## Prerequisites
-- Dart
-- Docker Engine For example [Docker install](https://docs.docker.com/engine/install/) or [Docker for Git](https://docker.courselabs.co/setup/)
+- [Dart](https://dart.dev/) 
+- [Docker Engine](https://www.docker.com/) For example [Docker install](https://docs.docker.com/engine/install/)
 
 ## Getting Started
 
