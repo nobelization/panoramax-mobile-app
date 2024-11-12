@@ -5,7 +5,7 @@
 
 ## Prerequisites
 - Dart
-- Docker Engine
+- Docker Engine For example [Docker install]((https://docs.docker.com/engine/install/) or [Docker for Git](https://docker.courselabs.co/setup/)
 
 ## Getting Started
 
