@@ -5,7 +5,7 @@ class AuthenticationApi {
 
   Future<GeoVisioToken> apiTokensGet(List<Cookie> cookies) async {
     final instance = await getInstance();
-    final url = Uri.https("panoramax.$instance.fr", '/api/users/me/tokens');
+    final url = Uri.https(instance, '/api/users/me/tokens');
 
     var session = null;
     for (var cookie in cookies) {
@@ -29,8 +29,7 @@ class AuthenticationApi {
       String tokenId, List<Cookie> cookies) async {
     // create path and map variables
     final instance = await getInstance();
-    var url =
-        Uri.https("panoramax.$instance.fr", '/api/users/me/tokens/${tokenId}');
+    var url = Uri.https(instance, '/api/users/me/tokens/${tokenId}');
 
     var session = null;
     for (var cookie in cookies) {
