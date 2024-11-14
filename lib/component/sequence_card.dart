@@ -107,8 +107,9 @@ class _SequenceCardState extends State<SequenceCard> {
 
   Future<void> shareUrl() async {
     final instance = await getInstance();
-    final url = "panoramax.$instance.fr/sequence/${widget.sequence.id}";
-    await Share.share(url);
+    final url = "https://panoramax.$instance.fr/sequence/${widget.sequence.id}";
+    await Share.share(url,
+        subject: AppLocalizations.of(context)!.titleShareUrl);
   }
 
   @override
