@@ -17,7 +17,7 @@ class _HomePageState extends State<HomePage> {
   Future<void> redirectUser() async {
     final instance = await getInstance();
     //user is connected
-    if (instance != null) {
+    if (instance.isNotEmpty) {
       _goToSequence();
     } else {
       //user is disconnected

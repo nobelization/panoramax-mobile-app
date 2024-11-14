@@ -20,15 +20,14 @@ class _InstanceState extends State<InstancePage> {
   void authentication(String instance) {
     setState(() {
       setInstance(instance);
-      url = "https://panoramax.${instance}.fr/api/auth/login";
+      url = "https://$instance/api/auth/login";
       isInstanceChosen = true;
     });
   }
 
   void getJWTToken() async {
     final instance = await getInstance();
-    final cookies =
-        await cookieManager.getCookies('https://panoramax.$instance.fr');
+    final cookies = await cookieManager.getCookies("https://$instance");
 
     var tokens = await AuthenticationApi.INSTANCE.apiTokensGet(cookies);
     var token =
@@ -44,7 +43,7 @@ class _InstanceState extends State<InstancePage> {
     super.initState();
     getInstance().then((instance) async {
       final token = await getToken();
-      if (instance != null && token != null) {
+      if (instance.isNotEmpty && token != null) {
         GetIt.instance<NavigationService>()
             .pushTo(Routes.newSequenceUpload, arguments: widget.imgList);
       }
@@ -65,7 +64,7 @@ class _InstanceState extends State<InstancePage> {
                     onNavigationRequest: (request) async {
                       bool shouldNavigate = true;
                       await getInstance().then((instance) {
-                        if (request.url == "https://panoramax.$instance.fr/") {
+                        if (request.url == "https://$instance/") {
                           getJWTToken();
                           shouldNavigate = false;
                         }
@@ -95,7 +94,7 @@ class _InstanceState extends State<InstancePage> {
                         AppLocalizations.of(context)!.osmLicenceTitle,
                         AppLocalizations.of(context)!.osmLicenceDescription,
                         "assets/OpenStreetMap.png",
-                        "openstreetmap"),
+                        "panoramax.openstreetmap.fr"),
                     CustomCard(
                         AppLocalizations.of(context)!.instanceIgnTitle,
                         AppLocalizations.of(context)!
@@ -105,7 +104,7 @@ class _InstanceState extends State<InstancePage> {
                         AppLocalizations.of(context)!.ignLicenceTitle,
                         AppLocalizations.of(context)!.ignLicenceDescription,
                         "assets/ign.png",
-                        "ign"),
+                        "panoramax.ign.fr"),
                   ],
                 )));
   }
