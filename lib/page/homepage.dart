@@ -36,7 +36,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     print("redirectUser");
     final instance = await getInstance();
     //user is connected
-    if (instance != null) {
+    if (instance.isNotEmpty) {
       await _goToSequence();
     } else {
       //user is disconnected

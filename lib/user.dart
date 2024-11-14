@@ -3,9 +3,9 @@ part of panoramax;
 const TAG_INSTANCE = "instance";
 const TAG_TOKEN = "token";
 
-Future<String?> getInstance() async {
+Future<String> getInstance() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  return prefs.getString(TAG_INSTANCE);
+  return prefs.getString(TAG_INSTANCE) ?? "";
 }
 
 void setInstance(String instance) async {

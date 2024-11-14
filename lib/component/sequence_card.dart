@@ -98,8 +98,7 @@ class _SequenceCardState extends State<SequenceCard> {
 
   Future<void> openUrl() async {
     final instance = await getInstance();
-    final Uri url =
-        Uri.https("panoramax.$instance.fr", '/sequence/${widget.sequence.id}');
+    final Uri url = Uri.https(instance, '/sequence/${widget.sequence.id}');
     if (!await launchUrl(url)) {
       throw Exception("Could not launch $url");
     }
@@ -107,7 +106,7 @@ class _SequenceCardState extends State<SequenceCard> {
 
   Future<void> shareUrl() async {
     final instance = await getInstance();
-    final url = "https://panoramax.$instance.fr/sequence/${widget.sequence.id}";
+    final url = "$instance/sequence/${widget.sequence.id}";
     await Share.share(url,
         subject: AppLocalizations.of(context)!.titleShareUrl);
   }
