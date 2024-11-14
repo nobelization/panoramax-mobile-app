@@ -88,12 +88,22 @@ class _InstanceState extends State<InstancePage> {
                                 fontSize: 25, fontWeight: FontWeight.w400))),
                     CustomCard(
                         AppLocalizations.of(context)!.instanceOsmTitle,
-                        AppLocalizations.of(context)!.osmLicence,
+                        AppLocalizations.of(context)!
+                            .osmGeographicCoverageTitle,
+                        AppLocalizations.of(context)!
+                            .osmGeographicCoverageDescription,
+                        AppLocalizations.of(context)!.osmLicenceTitle,
+                        AppLocalizations.of(context)!.osmLicenceDescription,
                         "assets/OpenStreetMap.png",
                         "openstreetmap"),
                     CustomCard(
                         AppLocalizations.of(context)!.instanceIgnTitle,
-                        AppLocalizations.of(context)!.ignLicence,
+                        AppLocalizations.of(context)!
+                            .ignGeographicCoverageTitle,
+                        AppLocalizations.of(context)!
+                            .ignGeographicCoverageDescription,
+                        AppLocalizations.of(context)!.ignLicenceTitle,
+                        AppLocalizations.of(context)!.ignLicenceDescription,
                         "assets/ign.png",
                         "ign"),
                   ],
@@ -101,7 +111,13 @@ class _InstanceState extends State<InstancePage> {
   }
 
   Widget CustomCard(
-      String title, String subtitle, String img, String instance) {
+      String name,
+      String geoTitle,
+      String geoDescription,
+      String licenceTitle,
+      String licenceDescription,
+      String img,
+      String instance) {
     return Container(
         child: Card(
       // Set the shape of the card using a rounded rectangle border with a 8 pixel radius
@@ -123,30 +139,32 @@ class _InstanceState extends State<InstancePage> {
               fit: BoxFit.fitWidth,
             ),
           ),
-          Container(
-            padding: const EdgeInsets.all(15),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  title,
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Divider(
+                  //color: Colors.black,
+                  ),
+              Container(
+                padding: EdgeInsets.all(16),
+                child: Text(
+                  name,
                   style: TextStyle(
                     fontSize: 18,
                     color: Colors.grey[800],
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                // Add a space between the title and the text
-                Container(height: 10),
-                Text(
-                  subtitle,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[700],
+              ),
+              Divider(
+                  //color: Colors.black,
                   ),
-                ),
-              ],
-            ),
+              CustomRowInCard(Icons.public, geoTitle, geoDescription),
+              Divider(
+                  //color: Colors.black,
+                  ),
+              CustomRowInCard(Icons.copyright, licenceTitle, licenceDescription)
+            ],
           ),
           Container(
               alignment: Alignment.centerRight,
@@ -161,5 +179,33 @@ class _InstanceState extends State<InstancePage> {
         ],
       ),
     ));
+  }
+
+  Widget CustomRowInCard(IconData icon, String title, String description) {
+    return Container(
+        padding: EdgeInsets.all(16),
+        alignment: Alignment.topLeft,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(icon),
+            SizedBox(
+              width: 8,
+            ),
+            Expanded(
+                child: Column(
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                SizedBox(
+                  height: 8,
+                ),
+                Text(description)
+              ],
+            ))
+          ],
+        ));
   }
 }
