@@ -39,10 +39,16 @@
   "newSequenceNameField_placeholder": "Saisissez le nom de la nouvelle séquence",
   "newSequenceSendButton": "Envoyer",
 
-  "osmLicence": "Photos dans le Monde entier publiées  sous licence CC-BY-SA 4.0",
+  "osmLicenceTitle": "Les photos sont librement utilisables en open data",
+  "osmLicenceDescription": "N'oubliez pas de citer l'auteur de la photo et respectez les termes de la license Creative Commons CC-BY-SA 4.0.",
   "instanceOsmTitle": "OpenStreetMap France",
-  "ignLicence": "Photos en France publiées sous Licence Ouverte 2.0",
-  "instanceIgnTitle": "Institut Géographique National",
+  "osmGeographicCoverageTitle": "Les photos peuvent être localisées dans le Monde entier",
+  "osmGeographicCoverageDescription": "Abstenez-vous néanmoins d'envoyer des photos dans les zones sensibles comme les terrains militaires.",
+  "ignLicenceTitle": "Les photos sont librement utilisables en open data",
+  "ignLicenceDescription": "N'oubliez pas de citer l'auteur de la photo et respectez les termes de la license etalab-2.0.",
+  "instanceIgnTitle": "Institut national de l'information géographique et forestière",
+  "ignGeographicCoverageTitle": "Les photos doivent être localisées en France",
+  "ignGeographicCoverageDescription": "Les photos que vous envoyez à l'IGN doivent forcément être prises sur le territoire français (ce qui inclut les territoires ultra-marins) et en dehors de certaines zones sensibles comme les terrains militaires.",
   "instanceShare": "Envoyer à",
 
   "newCollectionBack": "Retour à l'appareil photo",
@@ -56,5 +62,7 @@
   "newSequenceFormHintText": "Saisissez le nom de la séquence",
   "newSequenceFormValidationEmpty": "Le nom de la séquence ne peut pas être vide",
   "nameSerie": "Séquence du {date}",
-  "newSequenceCancel": "annuler et revenir à la prise de vue"
+  "newSequenceCancel": "annuler et revenir à la prise de vue",
+
+  "titleShareUrl": "Découvrez mes photos 📷 Panoramax"
 }
