@@ -1,8 +1,11 @@
 # Paranomax Mobile App
 
+## Environment
+- [GitHub CLI](https://cli.github.com/) or [GitHub desktop](https://desktop.github.com/download/)
+
 ## Prerequisites
-- Dart
-- Docker Engine
+- [Dart](https://dart.dev/) 
+- [Docker Engine](https://www.docker.com/) For example [Docker install](https://docs.docker.com/engine/install/)
 
 ## Getting Started
 
