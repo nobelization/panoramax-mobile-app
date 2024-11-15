@@ -217,6 +217,11 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
       await exif.setLatLong(
           currentLocation.latitude, currentLocation.longitude);
       await exif.setAltitude(currentLocation.altitude);
+
+      DateTime now = DateTime.now().toUtc();
+      String formattedDate = DateFormat('yyyy:MM:dd HH:mm:ss').format(now);
+
+      exif.setAttribute('GPSDateTime', formattedDate);
       await exif.saveAttributes();
     }
   }
@@ -244,6 +249,7 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
     if (widget.cameras?.isEmpty ?? true) {
       return Scaffold(
         appBar: AppBar(),
+        key: scaffoldKey,
         body: Center(
           child: Text(AppLocalizations.of(context)!.noCameraFoundError),
         ),
