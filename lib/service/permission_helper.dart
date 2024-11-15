@@ -9,12 +9,10 @@ class PermissionHelper {
       bool cameraPermission = await Permission.camera.isGranted;
       bool locationPermission = await Permission.location.isGranted;
       bool storagePermission = await Permission.storage.isGranted;
-      bool mediaLocationPermission =
-          await Permission.accessMediaLocation.isGranted;
-      return locationPermission &&
-          cameraPermission &&
-          storagePermission &&
-          mediaLocationPermission;
+      /*bool mediaLocationPermission =
+          await Permission.accessMediaLocation.isGranted;*/
+      return locationPermission && cameraPermission && storagePermission; //&&
+      //mediaLocationPermission;
     }
   }
 
@@ -26,8 +24,8 @@ class PermissionHelper {
     bool locationPermission = await Permission.location.isGranted;
     bool cameraPermission = await Permission.camera.isGranted;
     bool storagePermission = await Permission.storage.isGranted;
-    bool mediaLocationPermission =
-        await Permission.accessMediaLocation.isGranted;
+    /*bool mediaLocationPermission =
+        await Permission.accessMediaLocation.isGranted;*/
 
     if (!locationPermission) {
       locationPermission = (await Permission.location.request()).isGranted;
@@ -41,9 +39,9 @@ class PermissionHelper {
       storagePermission = (await Permission.storage.request()).isGranted;
     }
 
-    if (!mediaLocationPermission) {
+    /*if (!mediaLocationPermission) {
       mediaLocationPermission =
           (await Permission.accessMediaLocation.request()).isGranted;
-    }
+    }*/
   }
 }
