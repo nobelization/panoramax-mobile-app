@@ -33,8 +33,7 @@ class CollectionsApi {
 
     // create path and map variables
     final instance = await getInstance();
-    var url =
-        Uri.https("panoramax.$instance.fr", '/api/collections', queryParams);
+    var url = Uri.https(instance, '/api/collections', queryParams);
 
     var response = await http.get(url);
     if (response.statusCode >= 200) {
@@ -51,7 +50,7 @@ class CollectionsApi {
   Future<GeoVisioCollection> apiCollectionsCreate(
       {required String newCollectionName}) async {
     final instance = await getInstance();
-    var url = Uri.https("panoramax.$instance.fr", '/api/collections');
+    var url = Uri.https(instance, '/api/collections');
 
     final token = await getToken();
 
@@ -77,8 +76,7 @@ class CollectionsApi {
       required int position,
       required File pictureToUpload}) async {
     final instance = await getInstance();
-    var url = Uri.https(
-        "panoramax.$instance.fr", '/api/collections/${collectionId}/items');
+    var url = Uri.https(instance, '/api/collections/${collectionId}/items');
 
     final token = await getToken();
 
@@ -116,8 +114,7 @@ class CollectionsApi {
     final token = await getToken();
 
     final instance = await getInstance();
-    var url = Uri.https(
-        "panoramax.$instance.fr", '/api/users/me/collection', queryParams);
+    var url = Uri.https(instance, '/api/users/me/collection', queryParams);
 
     var response = await http.get(url, headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
@@ -135,7 +132,7 @@ class CollectionsApi {
 
   Future<GeoVisioCatalog> getMeCatalog() async {
     final instance = await getInstance();
-    var url = Uri.https("panoramax.$instance.fr", '/api/users/me/catalog');
+    var url = Uri.https(instance, '/api/users/me/catalog');
 
     final token = await getToken();
 
@@ -155,8 +152,8 @@ class CollectionsApi {
   Future<GeoVisioCollectionImportStatus> getGeovisioStatus(
       {required String collectionId}) async {
     final instance = await getInstance();
-    var url = Uri.https("panoramax.$instance.fr",
-        '/api/collections/${collectionId}/geovisio_status');
+    var url =
+        Uri.https(instance, '/api/collections/${collectionId}/geovisio_status');
 
     final token = await getToken();
     var response = await http.get(url, headers: <String, String>{
@@ -174,8 +171,7 @@ class CollectionsApi {
 
   Future<MemoryImage> getThumbernail({required String collectionId}) async {
     final instance = await getInstance();
-    var url = Uri.https(
-        "panoramax.$instance.fr", '/api/collections/${collectionId}/thumb.jpg');
+    var url = Uri.https(instance, '/api/collections/${collectionId}/thumb.jpg');
 
     final token = await getToken();
 

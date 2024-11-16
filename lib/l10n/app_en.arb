@@ -1,5 +1,7 @@
 {
   "common_close": "Close",
+  "common_error": "Error",
+  "common_ok": "Ok",
 
   "yourSequence": "Your sequences",
   "element": "element(s)",
@@ -8,8 +10,8 @@
   "emptyError": "No element found",
   "loading": "Loading...",
 
-  "mySequences": "My sequence",
-  "pictures": "picture(s)",
+  "mySequences": "My pictures",
+  "pictures": "{count, plural, =0{no picture} =1{1 picture} other{{count} pictures}}",
   "shooting": "Shooting",
   "sendingInProgress": "Sending in progress",
   "sendingCompleted": "Sending completed",
@@ -17,6 +19,8 @@
   "blurringInProgress": "Blurring in progress",
   "share": "Share",
   "hidden": "Hidden sequence",
+
+  "errorShare": "One or more of your pictures do not have a valid date or geolocation. Your sequence could not be imported.",
 
   "capture": "Take a picture",
   "createSequenceWithPicture_tooltip": "Create a new sequence with captured pictures",
@@ -44,11 +48,17 @@
   "gpsIsDisableContent": "Please activate your GPS, the application cannot work without it",
   "gpsIsDisableTitle": "GPS disabled",
 
-  "osmLicence": "Photos around the world published under CC-BY-SA 4.0 license",
+  "osmLicenceTitle": "The photos are freely usable as open data.",
+  "osmLicenceDescription": "Don't forget to credit the author of the photo and comply with the terms of the Creative Commons CC-BY-SA 4.0 license.",
   "instanceOsmTitle": "OpenStreetMap France",
-  "ignLicence": "Photos in France published under Licence ouvert 2.0 (CC-BY)",
-  "instanceIgnTitle": "Institut Géographique National",
-  "instanceShare": "Share",
+  "osmGeographicCoverageTitle": "Photos can be located worldwide",
+  "osmGeographicCoverageDescription": "Nevertheless, refrain from sending photos in sensitive areas such as military grounds.",
+  "ignLicenceTitle": "The photos are freely usable as open data.",
+  "ignLicenceDescription": "Don't forget to credit the author of the photo and comply with the terms of the Etalab-2.0 license.",
+  "instanceIgnTitle": "Institut national de l'information géographique et forestière",
+  "ignGeographicCoverageTitle": "Photos must be located in France",
+  "ignGeographicCoverageDescription": "The photos you submit to the IGN must be taken within French territory (including overseas territories) and outside certain sensitive areas, such as military grounds.",
+  "instanceShare": "Send to",
 
   "newCollectionBack": "Back to the capture",
   "newCollectionError": "Error {errorMessage}",
@@ -61,6 +71,7 @@
   "newSequenceFormHintText": "Enter collection name",
   "newSequenceFormValidationEmpty": "Collection name cannot be empty",
   "nameSerie": "Sequence from {date}",
-  "newSequenceCancel": "cancel and return to capturing"
+  "newSequenceCancel": "cancel and return to capturing",
 
+  "titleShareUrl": "Discover my photos 📷 Panoramax"
 }

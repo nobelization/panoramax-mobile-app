@@ -98,8 +98,7 @@ class _SequenceCardState extends State<SequenceCard> {
 
   Future<void> openUrl() async {
     final instance = await getInstance();
-    final Uri url =
-        Uri.https("panoramax.$instance.fr", '/sequence/${widget.sequence.id}');
+    final Uri url = Uri.https(instance, '/sequence/${widget.sequence.id}');
     if (!await launchUrl(url)) {
       throw Exception("Could not launch $url");
     }
@@ -107,8 +106,9 @@ class _SequenceCardState extends State<SequenceCard> {
 
   Future<void> shareUrl() async {
     final instance = await getInstance();
-    final url = "panoramax.$instance.fr/sequence/${widget.sequence.id}";
-    await Share.share(url);
+    final url = "$instance/sequence/${widget.sequence.id}";
+    await Share.share(url,
+        subject: AppLocalizations.of(context)!.titleShareUrl);
   }
 
   @override
@@ -163,14 +163,15 @@ class _SequenceCardState extends State<SequenceCard> {
   }
 
   Widget PictureCount() {
-    final count =
-        widget.sequenceCount == null ? itemCount : widget.sequenceCount;
+    final int count =
+        widget.sequenceCount == null ? itemCount : widget.sequenceCount!;
+    final text = AppLocalizations.of(context)!.pictures(count);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Row(children: [
           Text(
-            '$count ${AppLocalizations.of(context)!.pictures}',
+            text,
             style: GoogleFonts.nunito(
               fontSize: 18,
               fontWeight: FontWeight.w800,
