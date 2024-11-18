@@ -5,7 +5,12 @@ const TAG_TOKEN = "token";
 
 Future<String> getInstance() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  return prefs.getString(TAG_INSTANCE) ?? "";
+  var instance = prefs.getString(TAG_INSTANCE);
+  if (instance != null && !instance.contains("panoramax")) {
+    prefs.remove(TAG_INSTANCE);
+    instance = null;
+  }
+  return instance ?? "";
 }
 
 void setInstance(String instance) async {
