@@ -15,3 +15,10 @@ Install following program
 
 Open Andriod Studio, in the left menu you will see plugins, click on this.
 Then install Flutter and Restart IDE.
+
+
+## Installation steps for Linux (Debian)
+
+### Development environment
+Choose one of the environments below to write/maintain the code:
+
