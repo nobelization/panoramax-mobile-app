@@ -8,7 +8,10 @@ Choose one of the environments below to write/maintain the code:
 - [GitHub CLI](https://cli.github.com/)
 - [GitHub desktop](https://desktop.github.com/download/)
 - [GitHub online](https://github.com/)
-  
+
+### Link GitHub desktop with GitLab  
+- [Steps to link GitHub with Gitlab repo](https://itnext.io/how-to-use-github-desktop-with-gitlab-cd4d2de3d104)
+    
 ### Prerequisites
 Install following program
 - [Android Studio](https://developer.android.com/studio/install)
