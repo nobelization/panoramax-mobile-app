@@ -17,7 +17,9 @@ Install following program
 - [Android Studio](https://developer.android.com/studio/install)
   Open Andriod Studio, in the left menu you will see plugins, click on this.
   Then install Flutter and Restart IDE.
+  
 or
+
 - [Visual Studio Code (VS Code)](https://code.visualstudio.com/download)
 
 
