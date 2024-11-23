@@ -221,7 +221,7 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
   Future initCamera(CameraDescription cameraDescription) async {
     _cameraController = CameraController(
       cameraDescription,
-      ResolutionPreset.high,
+      ResolutionPreset.max,
       enableAudio: false,
     );
     try {
