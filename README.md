@@ -11,15 +11,15 @@ Panoramax mobile is an application to capture photo sequences with your mobile a
 > You can follow progression in this [project](https://github.com/orgs/nobelization/projects/1).
 
 <div align="center">
-  <!--- <a href="https://f-droid.org/packages/app_id"> --->
+  <!--- <a href="https://f-droid.org/packages/app_id"> 
     <img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" alt="Get it on F-Droid" height="80" align="center"/>
-  <!---</a>--->
-  <!--- <a href="https://play.google.com/store/apps/app_id"> --->
+  </a>
+  <!--- <a href="https://play.google.com/store/apps/app_id">
     <img src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png' alt='Get it on Google Play' height="80" align="center"/>
-  <!---</a>--->
-  <!--- <a href="https://apps.apple.com/us/app/app_id"> --->
+  </a>
+  <a href="https://apps.apple.com/us/app/app_id">
     <img src="assets/apple-appstore.svg" alt="Get it on App Store" height="60" align="center"/>
-  <!---</a>--->
+  </a>--->
   <a href="https://github.com/nobelization/panoramax-mobile-app/releases/latest/">
     <img src="https://user-images.githubusercontent.com/663460/26973090-f8fdc986-4d14-11e7-995a-e7c5e79ed925.png" alt="Download app from GitHub" height="80" align="center"/>
   </a>
