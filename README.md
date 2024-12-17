@@ -6,7 +6,8 @@
 Panoramax mobile is an application to capture photo sequences with your mobile and send these sequences to a Panoramax instance.
 
 > [!NOTE]
-> The app is under development, a first version is available [here](https://github.com/nobelization/panoramax-mobile-app/releases).
+> The app is under development, a first version is available [here](https://github.com/nobelization/panoramax-mobile-app/releases/download/v1.2.1-beta/app-release-v1_2_1-beta.apk).
+
 > You can follow progression in this [project](https://github.com/orgs/nobelization/projects/1).
 
 <div align="center">
