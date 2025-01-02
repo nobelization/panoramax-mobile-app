@@ -39,6 +39,9 @@ android {
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }
+    buildFeatures {
+        buildConfig = true
+    }
 
     defaultConfig {
         applicationId "com.panoramax.app"
