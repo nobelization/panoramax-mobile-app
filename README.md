@@ -1,3 +1,7 @@
+> [!CAUTION]
+> this repository is now archived and has been migrated to a new repository: https://gitlab.com/panoramax/clients/mobile-app<br>
+> All pending issues have been **migrated** to this repository.
+> 
 <p align="center">
 <img src="/assets/logo-mobile-app-beta.png" height="100"/>
 </p>
