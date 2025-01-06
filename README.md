@@ -74,8 +74,12 @@ dart run build_runner watch --delete-conflicting-outputs
 flutter test integration_test
 ```
 
+### Build apk for Android
+```shell  
+flutter build apk --release
+```
+           
 ### Documentation
-
 - [Panoramax website](https://panoramax.fr/)
 - [Meta catalog](https://api.panoramax.xyz/)
 - [Panoramax repository](https://gitlab.com/panoramax/)
