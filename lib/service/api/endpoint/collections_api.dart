@@ -7,7 +7,7 @@ class CollectionsApi {
   ///
   /// List available collections
   ///
-  Future<GeoVisioCollections?> apiCollectionsGet(
+  Future<GeoVisioCollections?> apiCollectionsGetAll(
       {int? limit,
       String? format,
       List<int>? bbox,
@@ -32,8 +32,8 @@ class CollectionsApi {
     }
 
     // create path and map variables
-    var url = Uri.https(
-        "panoramax.$API_HOSTNAME.fr", '/api/collections', queryParams);
+    final instance = await getInstance();
+    var url = Uri.https(instance, '/api/collections', queryParams);
 
     var response = await http.get(url);
     if (response.statusCode >= 200) {
@@ -49,10 +49,10 @@ class CollectionsApi {
 
   Future<GeoVisioCollection> apiCollectionsCreate(
       {required String newCollectionName}) async {
-    var url = Uri.https("panoramax.$API_HOSTNAME.fr", '/api/collections');
+    final instance = await getInstance();
+    var url = Uri.https(instance, '/api/collections');
 
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
+    final token = await getToken();
 
     var response = await http.post(
       url,
@@ -75,11 +75,10 @@ class CollectionsApi {
       {required String collectionId,
       required int position,
       required File pictureToUpload}) async {
-    var url = Uri.https(
-        "panoramax.$API_HOSTNAME.fr", '/api/collections/${collectionId}/items');
+    final instance = await getInstance();
+    var url = Uri.https(instance, '/api/collections/${collectionId}/items');
 
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
+    final token = await getToken();
 
     var request = http.MultipartRequest('POST', url)
       ..headers['Content-Type'] = 'application/json; charset=UTF-8'
@@ -92,6 +91,98 @@ class CollectionsApi {
       return;
     } else {
       throw new Exception('${response.statusCode} - ${response.reasonPhrase}');
+    }
+  }
+
+  Future<GeoVisioCollection> getMeCollection(
+      {int? limit, List<int>? bbox, String? filter, String? sortby}) async {
+    // query params
+    Map<String, String> queryParams = {};
+    if (limit != null) {
+      queryParams.putIfAbsent("limit", limit as String Function());
+    }
+    if (sortby != null) {
+      queryParams.putIfAbsent("sortby", sortby as String Function());
+    }
+    if (bbox != null) {
+      queryParams.putIfAbsent("bbox", bbox as String Function());
+    }
+    if (filter != null) {
+      queryParams.putIfAbsent("filter", filter as String Function());
+    }
+
+    final token = await getToken();
+
+    final instance = await getInstance();
+    var url = Uri.https(instance, '/api/users/me/collection', queryParams);
+
+    var response = await http.get(url, headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+      'Authorization': 'Bearer $token'
+    });
+
+    if (response.statusCode >= 200) {
+      var geovisioCollection =
+          GeoVisioCollection.fromJson(json.decode(response.body));
+      return geovisioCollection;
+    } else {
+      throw new Exception('${response.statusCode} - ${response.body}');
+    }
+  }
+
+  Future<GeoVisioCatalog> getMeCatalog() async {
+    final instance = await getInstance();
+    var url = Uri.https(instance, '/api/users/me/catalog');
+
+    final token = await getToken();
+
+    var response = await http.get(url, headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+      'Authorization': 'Bearer $token'
+    });
+    if (response.statusCode >= 200 && response.statusCode < 400) {
+      var geovisioCatalog =
+          GeoVisioCatalog.fromJson(json.decode(response.body));
+      return geovisioCatalog;
+    } else {
+      throw new Exception('${response.statusCode} - ${response.body}');
+    }
+  }
+
+  Future<GeoVisioCollectionImportStatus> getGeovisioStatus(
+      {required String collectionId}) async {
+    final instance = await getInstance();
+    var url =
+        Uri.https(instance, '/api/collections/${collectionId}/geovisio_status');
+
+    final token = await getToken();
+    var response = await http.get(url, headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+      'Authorization': 'Bearer $token'
+    });
+    if (response.statusCode >= 200 && response.statusCode < 400) {
+      var geovisioStatus =
+          GeoVisioCollectionImportStatus.fromJson(json.decode(response.body));
+      return geovisioStatus;
+    } else {
+      throw new Exception('${response.statusCode} - ${response.body}');
+    }
+  }
+
+  Future<MemoryImage> getThumbernail({required String collectionId}) async {
+    final instance = await getInstance();
+    var url = Uri.https(instance, '/api/collections/${collectionId}/thumb.jpg');
+
+    final token = await getToken();
+
+    var response = await http.get(url, headers: <String, String>{
+      'Content-Type': 'image/jpeg',
+      'Authorization': 'Bearer $token'
+    });
+    if (response.statusCode >= 200 && response.statusCode < 400) {
+      return MemoryImage(response.bodyBytes);
+    } else {
+      throw new Exception('${response.statusCode} - ${response.body}');
     }
   }
 }

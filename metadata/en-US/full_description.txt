@@ -1,0 +1,1 @@
+Panoramax mobile is an application to capture photo sequences and upload them to a Panoramax instance.

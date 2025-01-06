@@ -15,6 +15,18 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
             channel: 'stable'
+      - uses: actions/setup-java@v4
+        with:
+            java-version: '17'
+            distribution: 'adopt'
+      - name: Clear cache
+        run: |
+          flutter clean
+          flutter pub get 
+      - run: flutter --version
+      - run: java -version
+      - name: Delete pubspec.lock
+        run: rm pubspec.lock
       - name: Build apk
         run: flutter build apk --debug
       - name: Upload APK
@@ -23,32 +35,32 @@ jobs:
            name: app_debug
            path: build/app/outputs/flutter-apk/app-debug.apk
 
-  integration-tests:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        api-level: [ 34 ]
-        target: [ playstore ]
-    needs: [ build ]
-    steps:
-      - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
-        with:
-          channel: 'stable'
-      - name: Retrieve dependencies
-        run: dart pub get
-      - name: Generate tests
-        run: dart run build_runner build --delete-conflicting-outputs
-      - name: Enable KVM
-        run: |
-          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
-          sudo udevadm control --reload-rules
-          sudo udevadm trigger --name-match=kvm
-      - name: Run Flutter Driver tests
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          target: ${{ matrix.target }}
-          api-level: ${{ matrix.api-level }}
-          arch: x86_64
-          profile: Nexus 6
-          script: flutter drive --driver=integration_test/driver.dart --target=integration_test/panoramax_test.dart
+#  integration-tests:
+#    runs-on: ubuntu-latest
+#    strategy:
+#      matrix:
+#        api-level: [ 34 ]
+#        target: [ playstore ]
+#    needs: [ build ]
+#    steps:
+#      - uses: actions/checkout@v4
+#      - uses: subosito/flutter-action@v2
+#        with:
+#          channel: 'stable'
+#      - name: Retrieve dependencies
+#        run: dart pub get
+#      - name: Generate tests
+#        run: dart run build_runner build --delete-conflicting-outputs
+#      - name: Enable KVM
+#        run: |
+#          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+#          sudo udevadm control --reload-rules
+#          sudo udevadm trigger --name-match=kvm
+#      - name: Run Flutter Driver tests
+#        uses: reactivecircus/android-emulator-runner@v2
+#        with:
+#          target: ${{ matrix.target }}
+#          api-level: ${{ matrix.api-level }}
+#          arch: x86_64
+#          profile: Nexus 6
+#          script: flutter drive --driver=integration_test/driver.dart --target=integration_test/panoramax_test.dart

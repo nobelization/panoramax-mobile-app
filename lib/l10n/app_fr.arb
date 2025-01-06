@@ -1,5 +1,7 @@
 {
   "common_close": "Fermer",
+  "common_error": "Erreur",
+  "common_ok": "Ok",
   
   "yourSequence": "Les séquences",
   "element": "élément(s)",
@@ -7,6 +9,18 @@
   "unknownError": "Oops ! Une erreur s'est produite...",
   "emptyError": "Aucun élément trouvé",
   "loading": "Chargement...",
+
+  "mySequences": "Mes photos",
+  "pictures": "{count, plural, =0{pas de photo} =1{1 photo} other{{count} photos}}",
+  "shooting": "Prise de vue",
+  "sendingInProgress": "Envoi en cours",
+  "sendingCompleted": "Envoi terminé",
+  "publishing": "Publication",
+  "blurringInProgress": "Floutage en cours",
+  "share": "Partager",
+  "hidden": "Séquence masquée",
+
+  "errorShare": "Une ou plusieurs de vos photos ne comportent pas de date valide ou de géolocalisation. Votre séquence n'a pas pu être importée.",
 
   "capture": "Prendre une photo",
   "createSequenceWithPicture_tooltip": "Créer une nouvelle séquence avec les photos prises",
@@ -21,16 +35,25 @@
   "gpsIsDisableContent": "Merci d'activer votre GPS, l'application ne peut pas fonctionner sans",
   "gpsIsDisableTitle": "GPS non activé",
   "goToGpsEnable": "Activer le GPS",
+  "lowGpsAccuracyTitle": "Mauvaise précision de la localisation GPS",
+  "lowGpsAccuracyDesc": "Placez-vous en extérieur et patientez",
+  "meters": "m",
 
   "newSequenceNameField": "Nom",
   "newSequenceNameField_placeholder": "Saisissez le nom de la nouvelle séquence",
   "newSequenceSendButton": "Envoyer",
 
-  "osmLicence": "Photos dans le Monde entier publiées  sous licence CC-BY-SA 4.0",
+  "osmLicenceTitle": "Les photos sont librement utilisables en open data",
+  "osmLicenceDescription": "N'oubliez pas de citer l'auteur de la photo et respectez les termes de la license Creative Commons CC-BY-SA 4.0.",
   "instanceOsmTitle": "OpenStreetMap France",
-  "ignLicence": "Photos en France publiées sous Licence Ouverte 2.0",
-  "instanceIgnTitle": "Institut Géographique National",
-  "instanceShare": "Partager",
+  "osmGeographicCoverageTitle": "Les photos peuvent être localisées dans le Monde entier",
+  "osmGeographicCoverageDescription": "Abstenez-vous néanmoins d'envoyer des photos dans les zones sensibles comme les terrains militaires.",
+  "ignLicenceTitle": "Les photos sont librement utilisables en open data",
+  "ignLicenceDescription": "N'oubliez pas de citer l'auteur de la photo et respectez les termes de la license etalab-2.0.",
+  "instanceIgnTitle": "Institut national de l'information géographique et forestière",
+  "ignGeographicCoverageTitle": "Les photos doivent être localisées en France",
+  "ignGeographicCoverageDescription": "Les photos que vous envoyez à l'IGN doivent forcément être prises sur le territoire français (ce qui inclut les territoires ultra-marins) et en dehors de certaines zones sensibles comme les terrains militaires.",
+  "instanceShare": "Envoyer à",
 
   "newCollectionBack": "Retour à l'appareil photo",
   "newCollectionError": "Erreur {errorMessage}",
@@ -43,5 +66,7 @@
   "newSequenceFormHintText": "Saisissez le nom de la séquence",
   "newSequenceFormValidationEmpty": "Le nom de la séquence ne peut pas être vide",
   "nameSerie": "Séquence du {date}",
-  "newSequenceCancel": "annuler et revenir à la prise de vue"
+  "newSequenceCancel": "annuler et revenir à la prise de vue",
+
+  "titleShareUrl": "Découvrez mes photos 📷 Panoramax"
 }

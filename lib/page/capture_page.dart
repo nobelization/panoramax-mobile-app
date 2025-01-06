@@ -28,6 +28,7 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
     accuracy: LocationAccuracy.high,
     distanceFilter: 2, //The minimum distance (in meters) to trigger an update
   );
+  double? _accuracy;
 
   late final GravityOrientationDetector _orientationDetector;
   var isPortraitOrientation = true;
@@ -40,6 +41,7 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
       DeviceOrientation.portraitDown,
     ]);
     WidgetsBinding.instance.removeObserver(this);
+    WakelockPlus.disable();
 
     super.dispose();
   }
@@ -107,6 +109,7 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
             _positionStream!.listen((Position position) {
               setState(() {
                 _currentPosition = position;
+                _accuracy = position.accuracy;
               });
             });
           }
@@ -214,6 +217,11 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
       await exif.setLatLong(
           currentLocation.latitude, currentLocation.longitude);
       await exif.setAltitude(currentLocation.altitude);
+
+      DateTime now = DateTime.now().toUtc();
+      String formattedDate = DateFormat('yyyy:MM:dd HH:mm:ss').format(now);
+
+      exif.setAttribute('GPSDateTime', formattedDate);
       await exif.saveAttributes();
     }
   }
@@ -221,7 +229,7 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
   Future initCamera(CameraDescription cameraDescription) async {
     _cameraController = CameraController(
       cameraDescription,
-      ResolutionPreset.high,
+      ResolutionPreset.max,
       enableAudio: false,
     );
     try {
@@ -237,9 +245,11 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    WakelockPlus.enable();
     if (widget.cameras?.isEmpty ?? true) {
       return Scaffold(
         appBar: AppBar(),
+        key: scaffoldKey,
         body: Center(
           child: Text(AppLocalizations.of(context)!.noCameraFoundError),
         ),
@@ -274,13 +284,42 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
             ),
           ),
           cameraPreview(),
+          if (_accuracy != null && _accuracy! > 10) accurancyComponent(),
           (!isPortraitOrientation)
               ? landscapeLayout(context)
               : portraitLayout(context),
-          if (_isProcessing) processingLoader(context)
+          if (_isProcessing) processingLoader(context),
+          if (_accuracy != null && _accuracy! > 10) alertDialogGpsAccurency()
         ]);
       },
     );
+  }
+
+  Widget accurancyComponent() {
+    return _accuracy == null
+        ? Container()
+        : Padding(
+            padding: EdgeInsets.all(32),
+            child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.all(Radius.circular(8)),
+                ),
+                padding: EdgeInsets.all(8.0),
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  Icon(
+                    _accuracy! > 10 ? Icons.error : Icons.gps_fixed,
+                    size: 24,
+                    color: _accuracy! > 10 ? Colors.red : Colors.blue,
+                  ),
+                  SizedBox(width: 8),
+                  DefaultTextStyle(
+                    style: TextStyle(
+                        color: _accuracy! > 10 ? Colors.red : Colors.blue),
+                    child: Text(
+                        "${_accuracy?.toInt()} ${AppLocalizations.of(context)!.meters}"),
+                  )
+                ])));
   }
 
   Widget createBurstButtons() {
@@ -389,6 +428,7 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
       _imgListCaptured.isNotEmpty
           ? badges.Badge(
               position: badges.BadgePosition.bottomEnd(),
+              badgeStyle: badges.BadgeStyle(badgeColor: Colors.blue),
               badgeContent: Text('${_imgListCaptured.length}'),
               child: galleryButton(context))
           : galleryButton(context),
@@ -461,12 +501,6 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
   }
 
   Widget createSequenceButton(BuildContext context) {
-    //return Expanded(
-    /* child: Container(
-            height: 60,
-            width: 60,
-            decoration:
-                BoxDecoration(shape: BoxShape.circle, color: Colors.blue),*/
     return IconButton(
         padding: EdgeInsets.zero,
         iconSize: 30,
@@ -480,11 +514,12 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
     return GestureDetector(
       child: IconButton(
           //if the GPS is not active, the capture button does nothing, otherwise we see what mode we are in
-          onPressed: (_currentPosition == null)
-              ? startLocationUpdates
-              : _isBurstMode
-                  ? takeBurstPictures
-                  : takePicture,
+          onPressed:
+              (_currentPosition == null || _accuracy == null || _accuracy! > 10)
+                  ? startLocationUpdates
+                  : _isBurstMode
+                      ? takeBurstPictures
+                      : takePicture,
           iconSize: 100,
           padding: EdgeInsets.zero,
           constraints: const BoxConstraints(),
@@ -493,28 +528,39 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
             width: 60,
             decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: (_currentPosition == null)
+                color: (_currentPosition == null ||
+                        _accuracy == null ||
+                        _accuracy! > 10)
                     ? Colors.grey
                     : _isBurstPlay
-                        ? Colors.red
+                        ? const Color.fromARGB(255, 89, 42, 39)
                         : Colors.white),
+            child: _accuracy == null || _accuracy! > 10
+                ? Icon(
+                    Icons.gps_fixed,
+                    color: Colors.red,
+                    size: 40,
+                  )
+                : Container(),
           ),
           tooltip: AppLocalizations.of(context)!.capture),
     );
   }
 
   Widget galleryButton(BuildContext context) {
-    return Container(
-      height: 60,
-      width: 60,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.all(Radius.circular(10)),
-        image: _imgListCaptured.isNotEmpty
-            ? DecorationImage(
-                image: FileImage(_imgListCaptured.last), fit: BoxFit.cover)
-            : null,
-      ),
-    );
+    return IconButton(
+        onPressed: goToCollectionCreationPage,
+        icon: Container(
+          height: 60,
+          width: 60,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.all(Radius.circular(10)),
+            image: _imgListCaptured.isNotEmpty
+                ? DecorationImage(
+                    image: FileImage(_imgListCaptured.last), fit: BoxFit.cover)
+                : null,
+          ),
+        ));
   }
 
   StatelessWidget cameraPreview() {
@@ -541,6 +587,16 @@ class _CapturePageState extends State<CapturePage> with WidgetsBindingObserver {
         ),
         shadowBackground: true,
       ),
+    );
+  }
+
+  Widget alertDialogGpsAccurency() {
+    return AlertDialog(
+      title: Text(AppLocalizations.of(context)!.lowGpsAccuracyTitle),
+      content: Text(AppLocalizations.of(context)!.lowGpsAccuracyDesc),
+      backgroundColor: BLUE,
+      titleTextStyle: TextStyle(color: Colors.white),
+      contentTextStyle: TextStyle(color: Colors.white),
     );
   }
 

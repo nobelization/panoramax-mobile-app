@@ -17,30 +17,37 @@ class _InstanceState extends State<InstancePage> {
   bool isInstanceChosen = false;
   final cookieManager = WebviewCookieManager();
 
-  int _selectedIndex = -1;
-
   void authentication(String instance) {
     setState(() {
-      API_HOSTNAME = instance;
-      url = "https://panoramax.${instance}.fr/api/auth/login";
+      setInstance(instance);
+      url = "https://$instance/api/auth/login";
       isInstanceChosen = true;
     });
   }
 
-  void getToken() async {
-    final cookies =
-        await cookieManager.getCookies('https://panoramax.$API_HOSTNAME.fr');
+  void getJWTToken() async {
+    final instance = await getInstance();
+    final cookies = await cookieManager.getCookies("https://$instance");
 
     var tokens = await AuthenticationApi.INSTANCE.apiTokensGet(cookies);
     var token =
         await AuthenticationApi.INSTANCE.apiTokenGet(tokens.id, cookies);
 
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    print(token.jwt_token);
-    prefs.setString('token', token.jwt_token);
+    setToken(token.jwt_token);
 
     GetIt.instance<NavigationService>()
         .pushTo(Routes.newSequenceUpload, arguments: widget.imgList);
+  }
+
+  void initState() {
+    super.initState();
+    getInstance().then((instance) async {
+      final token = await getToken();
+      if (instance.isNotEmpty && token != null) {
+        GetIt.instance<NavigationService>()
+            .pushTo(Routes.newSequenceUpload, arguments: widget.imgList);
+      }
+    });
   }
 
   @override
@@ -54,99 +61,150 @@ class _InstanceState extends State<InstancePage> {
                 controller: WebViewController()
                   ..setJavaScriptMode(JavaScriptMode.unrestricted)
                   ..setNavigationDelegate(NavigationDelegate(
-                    onNavigationRequest: (request) {
-                      if (request.url ==
-                          "https://panoramax.$API_HOSTNAME.fr/") {
-                        getToken();
-                      }
-                      return NavigationDecision.navigate;
+                    onNavigationRequest: (request) async {
+                      bool shouldNavigate = true;
+                      await getInstance().then((instance) {
+                        if (request.url == "https://$instance/") {
+                          getJWTToken();
+                          shouldNavigate = false;
+                        }
+                      });
+                      return shouldNavigate
+                          ? NavigationDecision.navigate
+                          : NavigationDecision.prevent;
                     },
                   ))
                   ..loadRequest(Uri.parse(url!)))
             : SingleChildScrollView(
-                child: Align(
-                    alignment: Alignment.center,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(AppLocalizations.of(context)!.instanceShare),
-                        CustomCard(
-                            AppLocalizations.of(context)!.instanceOsmTitle,
-                            AppLocalizations.of(context)!.osmLicence,
-                            "assets/OpenStreetMap.png",
-                            "openstreetmap"),
-                        CustomCard(
-                            AppLocalizations.of(context)!.instanceIgnTitle,
-                            AppLocalizations.of(context)!.ignLicence,
-                            "assets/ign.png",
-                            "ign"),
-                      ],
-                    ))));
+                padding: EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                        padding: EdgeInsets.only(bottom: 16),
+                        child: Text(AppLocalizations.of(context)!.instanceShare,
+                            style: GoogleFonts.nunito(
+                                fontSize: 25, fontWeight: FontWeight.w400))),
+                    CustomCard(
+                        AppLocalizations.of(context)!.instanceOsmTitle,
+                        AppLocalizations.of(context)!
+                            .osmGeographicCoverageTitle,
+                        AppLocalizations.of(context)!
+                            .osmGeographicCoverageDescription,
+                        AppLocalizations.of(context)!.osmLicenceTitle,
+                        AppLocalizations.of(context)!.osmLicenceDescription,
+                        "assets/OpenStreetMap.png",
+                        "panoramax.openstreetmap.fr"),
+                    CustomCard(
+                        AppLocalizations.of(context)!.instanceIgnTitle,
+                        AppLocalizations.of(context)!
+                            .ignGeographicCoverageTitle,
+                        AppLocalizations.of(context)!
+                            .ignGeographicCoverageDescription,
+                        AppLocalizations.of(context)!.ignLicenceTitle,
+                        AppLocalizations.of(context)!.ignLicenceDescription,
+                        "assets/ign.png",
+                        "panoramax.ign.fr"),
+                  ],
+                )));
   }
 
   Widget CustomCard(
-      String title, String subtitle, String img, String instance) {
+      String name,
+      String geoTitle,
+      String geoDescription,
+      String licenceTitle,
+      String licenceDescription,
+      String img,
+      String instance) {
     return Container(
-        padding: EdgeInsets.all(16),
         child: Card(
-          // Set the shape of the card using a rounded rectangle border with a 8 pixel radius
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+      // Set the shape of the card using a rounded rectangle border with a 8 pixel radius
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      // Set the clip behavior of the card
+      clipBehavior: Clip.antiAliasWithSaveLayer,
+      // Define the child widgets of the card
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          Container(
+            padding: EdgeInsets.fromLTRB(0, 16, 0, 0),
+            child: Image.asset(
+              img,
+              height: 150,
+              width: 150,
+              fit: BoxFit.fitWidth,
+            ),
           ),
-          // Set the clip behavior of the card
-          clipBehavior: Clip.antiAliasWithSaveLayer,
-          // Define the child widgets of the card
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
+              Divider(
+                  //color: Colors.black,
+                  ),
               Container(
-                padding: EdgeInsets.fromLTRB(0, 16, 0, 0),
-                child: Image.asset(
-                  img,
-                  height: 150,
-                  width: 150,
-                  fit: BoxFit.fitWidth,
+                padding: EdgeInsets.all(16),
+                child: Text(
+                  name,
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.grey[800],
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.all(15),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      title,
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.grey[800],
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    // Add a space between the title and the text
-                    Container(height: 10),
-                    Text(
-                      subtitle,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[700],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                  alignment: Alignment.centerRight,
-                  padding: EdgeInsets.fromLTRB(0, 0, 16, 16),
-                  child: ElevatedButton(
-                    onPressed: () => authentication(instance),
-                    child: Text("Envoyer"),
-                    style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(BLUE),
-                        foregroundColor:
-                            MaterialStateProperty.all(Colors.white)),
-                  ))
+              Divider(
+                  //color: Colors.black,
+                  ),
+              CustomRowInCard(Icons.public, geoTitle, geoDescription),
+              Divider(
+                  //color: Colors.black,
+                  ),
+              CustomRowInCard(Icons.copyright, licenceTitle, licenceDescription)
             ],
           ),
+          Container(
+              alignment: Alignment.centerRight,
+              padding: EdgeInsets.fromLTRB(0, 0, 16, 16),
+              child: ElevatedButton(
+                onPressed: () => authentication(instance),
+                child: Text("Envoyer"),
+                style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(BLUE),
+                    foregroundColor: MaterialStateProperty.all(Colors.white)),
+              ))
+        ],
+      ),
+    ));
+  }
+
+  Widget CustomRowInCard(IconData icon, String title, String description) {
+    return Container(
+        padding: EdgeInsets.all(16),
+        alignment: Alignment.topLeft,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(icon),
+            SizedBox(
+              width: 8,
+            ),
+            Expanded(
+                child: Column(
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                SizedBox(
+                  height: 8,
+                ),
+                Text(description)
+              ],
+            ))
+          ],
         ));
   }
 }

@@ -1,3 +1,11 @@
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader('UTF-8') { reader ->
+        localProperties.load(reader)
+    }
+}
+
 buildscript {
     ext.kotlin_version = '1.9.0'
     repositories {
@@ -20,6 +28,24 @@ allprojects {
 rootProject.buildDir = '../build'
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
+}
+subprojects {
+    afterEvaluate { project ->
+        if (project.hasProperty('android')) {
+            project.android.compileSdkVersion localProperties.getProperty('flutter.compileSdkVersion').toInteger()
+            project.android.defaultConfig.targetSdkVersion = localProperties.getProperty('flutter.targetSdkVersion').toInteger()
+            project.android.compileOptions.sourceCompatibility = JavaVersion.VERSION_17
+            project.android.compileOptions.targetCompatibility = JavaVersion.VERSION_17
+            tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+                kotlinOptions.jvmTarget = JavaVersion.VERSION_17
+            }
+            project.android {
+                if (namespace == null) {
+                    namespace project.group
+                }
+            }
+        }
+    }
 }
 subprojects {
     project.evaluationDependsOn(':app')
